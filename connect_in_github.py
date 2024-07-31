@@ -42,7 +42,11 @@ def info_target_file_info(auth_obj, user_name: str, repository_name: str, file_p
     with Github(auth=auth_obj) as connect_github:
         received_repo = connect_github.get_user(user_name).get_repo(repository_name).get_contents(file_path)
         print(received_repo.__dict__)
+        print(received_repo.html_url, 'для получения ссылки на файл')
+        # Получение всего контента из файла
         print(received_repo.decoded_content.decode('utf-8').split('\n'))
+        for i in received_repo.decoded_content.decode('utf-8').split('\n'):
+            print(i)
         connect_github.close()
 
 
@@ -58,8 +62,10 @@ def info_target_repo_info(auth_obj, user_name: str, repository_name: str):
     """
     with Github(auth=auth_obj) as connect_github:
         received_repo = connect_github.get_user(user_name).get_repo(repository_name)  #.get_repos(repository_name)
+        print(received_repo.__dict__)
         print(received_repo)
-        print(received_repo)
+        print(received_repo.name)
+        print(received_repo.html_url)
         connect_github.close()
 
 
@@ -82,8 +88,8 @@ def info_repo_name(auth_obj, user_name: str):
 if __name__ == '__main__':
     # info_repo_name(auth_obj=auth, user_name=username)
     repo_name = 'currency-exchange-api'
-    # info_target_repo_info(auth_obj=auth, user_name=username,
-    #                       repository_name=repo_name)
-    file = 'src/main/java/pet/project/servlet/exchange/ExchangeRateServlet.java'
-    info_target_file_info(auth_obj=auth, user_name=username,
-                          repository_name=repo_name, file_path=file)
+    info_target_repo_info(auth_obj=auth, user_name=username,
+                          repository_name=repo_name)
+    # file = 'src/main/java/pet/project/servlet/exchange/ExchangeRateServlet.java'
+    # info_target_file_info(auth_obj=auth, user_name=username,
+    #                       repository_name=repo_name, file_path=file)
