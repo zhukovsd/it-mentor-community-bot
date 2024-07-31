@@ -1,3 +1,6 @@
+.env
+.idea
+directory_for_experiments
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
