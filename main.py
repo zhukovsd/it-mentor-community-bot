@@ -21,7 +21,7 @@ async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def hello_inline_query(
-        update: Update, context: ContextTypes.DEFAULT_TYPE
+    update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     results = [
         InlineQueryResultArticle(
@@ -35,11 +35,11 @@ async def hello_inline_query(
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    _ = load_dotenv()
 
     bot_token: str | None = os.getenv("TELEGRAM_BOT_TOKEN")
 
-    if None:
+    if bot_token is None:
         raise EnvironmentError("'TELEGRAM_BOT_TOKEN' is not present")
 
     application = ApplicationBuilder().token(bot_token).concurrent_updates(True).build()
