@@ -3,3 +3,5 @@ version: "3.9"
 services:
   bot:
     image: zhukovsd/it-mentor-community-bot:docker
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
