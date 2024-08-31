@@ -9,6 +9,7 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
       PROJECTS_REVIEWS_COLLECTION_CHAT_ID: ${PROJECTS_REVIEWS_COLLECTION_CHAT_ID}
+      ALLOWED_USER_IDS: ${ALLOWED_USER_IDS}
     restart: always
     depends_on:
       - database
