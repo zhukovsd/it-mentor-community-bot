@@ -20,8 +20,6 @@ log = logging.getLogger(__name__)
 
 
 async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    log.info(f"{ADD_PROJECT_COMMAND_NAME} was called")
-
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
     user = await update.get_bot().get_chat_member(chat_id, user_id)
@@ -110,9 +108,9 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await context.bot.forward_message(
-        from_chat_id=update.effective_chat.id,
+        from_chat_id=chat_id,
         chat_id=projects_reviews_collection_chat_id,
-        message_id=update.effective_message.id,
+        message_id=update.message.reply_to_message.id,
     )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -127,6 +125,7 @@ def is_admin(user: ChatMember) -> bool:
         user.status == ChatMemberStatus.ADMINISTRATOR
         or user.status == ChatMemberStatus.OWNER
     )
+
 
 def is_allowed_user(user: ChatMember) -> bool:
     allowed_user_ids = os.getenv("ALLOWED_USER_IDS")
