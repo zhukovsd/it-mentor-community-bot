@@ -38,7 +38,10 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
+ALLOWED_USER_IDS=
 ```
+
+`ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
 
 5. Поднять БД в контейнере командой
 
@@ -74,10 +77,12 @@ POSTGRES_HOST=database
 POSTGRES_PORT=5432
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
+ALLOWED_USER_IDS=
 ```
 
 `POSTGRES_HOST` = название сервиса с БД в docker-compose-prod.yaml файле. Дефолт `database`
 `POSTGRES_PORT` = порт сервиса с БД в docker-compose-prod.yaml файле. Дефолт `5432` для postgres
+`ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
 
 2. Собрать образ бота
 
