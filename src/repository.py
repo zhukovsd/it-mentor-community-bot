@@ -7,6 +7,8 @@ _ = load_dotenv()
 postgres_user: str | None = os.getenv("POSTGRES_USER")
 postgres_password: str | None = os.getenv("POSTGRES_PASSWORD")
 postgres_db: str | None = os.getenv("POSTGRES_DB")
+postgres_host: str | None = os.getenv("POSTGRES_HOST")
+postgres_port: str | None = os.getenv("POSTGRES_PORT")
 
 if postgres_user is None:
     raise EnvironmentError("'POSTGRES_USER' is not present")
@@ -14,11 +16,15 @@ if postgres_password is None:
     raise EnvironmentError("'POSTGRES_PASSWORD' is not present")
 if postgres_db is None:
     raise EnvironmentError("'POSTGRES_DB' is not present")
+if postgres_host is None:
+    raise EnvironmentError("'POSTGRES_HOST' is not present")
+if postgres_port is None:
+    raise EnvironmentError("'POSTGRES_PORT' is not present")
 
 db = DB(
     dbname=postgres_db,
-    host="localhost",
-    port=5433,
+    host=postgres_host,
+    port=int(postgres_port),
     user=postgres_user,
     passwd=postgres_password,
 )
