@@ -26,8 +26,10 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     user = await update.get_bot().get_chat_member(chat_id, user_id)
 
-    if not is_admin(user):
-        log.error(f"{ADD_PROJECT_COMMAND_NAME} was called by not admin user")
+    if not is_admin(user) and not is_allowed_user(user):
+        log.error(
+            f"{ADD_PROJECT_COMMAND_NAME} was called by not admin user: {user.user.id}-{user.status}"
+        )
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="У вас нет прав на использование данной команды",
@@ -125,3 +127,22 @@ def is_admin(user: ChatMember) -> bool:
         user.status == ChatMemberStatus.ADMINISTRATOR
         or user.status == ChatMemberStatus.OWNER
     )
+
+def is_allowed_user(user: ChatMember) -> bool:
+    allowed_user_ids = os.getenv("ALLOWED_USER_IDS")
+
+    if allowed_user_ids is None:
+        log.error(
+            f"{ADD_PROJECT_COMMAND_NAME} cannot find ALLOWED_USER_IDS to check permissions"
+        )
+        return False
+
+    allowed_user_ids = allowed_user_ids.split(",")
+    allowed_user_ids = list(map(int, allowed_user_ids))
+
+    user_id = user.user.id
+
+    if user_id in allowed_user_ids:
+        return True
+
+    return False
