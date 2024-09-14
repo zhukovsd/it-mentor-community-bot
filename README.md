@@ -26,3 +26,11 @@ TELEGRAM_BOT_TOKEN=
  - C помощью UI pycharm
  - Через `python main.py`
 
+
+---
+
+#### С помощью докера
+
+1. Собрать образ с помощью Dockerfile - zhukovsd/it-mentor-community-bot
+2. Запустить с помощью `docker run zhukovsd/it-mentor-community-bot`
+3. Запустить с помощью `docker compose up -d` (у образа должен быть тег main)

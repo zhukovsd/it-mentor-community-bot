@@ -1,0 +1,5 @@
+services:
+  bot:
+    image: zhukovsd/it-mentor-community-bot:main
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
