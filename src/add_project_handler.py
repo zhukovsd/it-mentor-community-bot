@@ -1,5 +1,6 @@
 import logging
 import os
+from time import sleep
 from telegram import ChatMember, Update
 from repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
@@ -28,19 +29,29 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called by not admin user: {user.user.id}-{user.status}"
         )
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="У вас нет прав на использование данной команды",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
     if update.message.reply_to_message is None:
         log.error(f"{ADD_PROJECT_COMMAND_NAME} was called outside of reply")
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Сделайте реплай на сообщение со ссылкой на проект",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
@@ -51,10 +62,15 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, excpected 2"
         )
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
@@ -64,10 +80,15 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with {len(args)} arguments, excpected 2"
         )
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
@@ -77,10 +98,15 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with invalid project name '{project_name}' argument"
         )
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Неправильное название проекта (второй аргумент)",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
@@ -92,10 +118,15 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} for project '{project_name}' and '{language}' didn't find suitable reply"
         )
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Сообщение по заданным критериям не найдено",
             reply_to_message_id=update.effective_message.id,
+        )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
         )
         return
 
@@ -107,13 +138,22 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if projects_reviews_collection_chat_id is None:
         log.error(f"{ADD_PROJECT_COMMAND_NAME} cannot find chat_id to forward message")
-        await context.bot.send_message(
+        error_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Чат для пересылки не найден",
             reply_to_message_id=update.effective_message.id,
         )
+        sleep(10)
+        await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[update.effective_message.id, error_message.id],
+        )
         return
 
+    await context.bot.delete_message(
+        chat_id=update.effective_chat.id,
+        message_id=update.effective_message.id,
+    )
     await context.bot.forward_message(
         from_chat_id=chat_id,
         chat_id=projects_reviews_collection_chat_id,
