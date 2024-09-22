@@ -31,6 +31,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="У вас нет прав на использование данной команды",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -39,6 +40,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Сделайте реплай на сообщение со ссылкой на проект",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -52,6 +54,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -64,6 +67,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -76,6 +80,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Неправильное название проекта (второй аргумент)",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -90,6 +95,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Сообщение по заданным критериям не найдено",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
@@ -104,6 +110,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text="Чат для пересылки не найден",
+            reply_to_message_id=update.effective_message.id,
         )
         return
 
