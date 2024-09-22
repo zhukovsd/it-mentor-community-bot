@@ -1,5 +1,6 @@
 import logging
 import os
+import asyncio
 from time import sleep
 from telegram import ChatMember, Message, Update
 from repository import find_reply_by_language_and_project
@@ -34,7 +35,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="У вас нет прав на использование данной команды",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -48,7 +49,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Сделайте реплай на сообщение со ссылкой на проект",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -67,7 +68,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -85,7 +86,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -103,7 +104,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Неправильное название проекта (второй аргумент)",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -123,7 +124,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Сообщение по заданным критериям не найдено",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
@@ -143,7 +144,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Чат для пересылки не найден",
             reply_to_message_id=update.effective_message.id,
         )
-        sleep(10)
+        await asyncio.sleep(10)
         await context.bot.delete_messages(
             chat_id=chat_id,
             message_ids=[update.effective_message.id, error_message.id],
