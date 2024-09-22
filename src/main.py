@@ -3,7 +3,11 @@ import os
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
+from telegram import (
+    Update,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
 from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
@@ -11,13 +15,13 @@ from telegram.ext import (
     InlineQueryHandler,
 )
 
+from add_project_handler import add_project
+from add_project_handler import ADD_PROJECT_COMMAND_NAME
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
-
-
-async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="World")
+log = logging.getLogger(__name__)
 
 
 async def hello_inline_query(
@@ -44,10 +48,10 @@ if __name__ == "__main__":
 
     application = ApplicationBuilder().token(bot_token).concurrent_updates(True).build()
 
-    hello_handler = CommandHandler("hello", hello)
+    add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     inline_hello_handler = InlineQueryHandler(hello_inline_query)
 
-    application.add_handler(hello_handler)
     application.add_handler(inline_hello_handler)
+    application.add_handler(add_project_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
