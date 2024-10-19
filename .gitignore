@@ -1,6 +1,10 @@
-.env
-.idea
+<<<<<<< HEAD
+
 directory_for_experiments
+=======
+.idea
+
+>>>>>>> 56426d125fe60493162b97988da1a31ee5c0d74e
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -124,6 +128,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .venv
 env/
 venv/
