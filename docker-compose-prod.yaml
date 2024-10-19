@@ -1,0 +1,23 @@
+services:
+  bot:
+    image: zhukovsd/it-mentor-community-bot:main
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PROJECTS_REVIEWS_COLLECTION_CHAT_ID: ${PROJECTS_REVIEWS_COLLECTION_CHAT_ID}
+      ALLOWED_USER_IDS: ${ALLOWED_USER_IDS}
+    restart: always
+    depends_on:
+      - database
+    
+  database:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
