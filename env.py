@@ -5,6 +5,7 @@ load_dotenv()
 
 # Секретные данные
 API_FGP_GITHUB = os.environ.get("API_FGP_GITHUB")
+GOOGLE_API = os.environ.get('GOOGLE_API')
 # Данные ниже - для тестирования
 # (их можно передавать не из ENV файла, а напрямую из кода
 # Например когда данные приходят из клиента,
