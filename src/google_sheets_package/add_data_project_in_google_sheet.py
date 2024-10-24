@@ -1,5 +1,5 @@
 import gspread
-from env import GOOGLE_API
+from env import JSON_KEY_GOOGLE_API
 import json
 from env import URL_REPO
 from src.get_data_completed_project.project_data_serializer import ProjectDataSerializer
@@ -12,7 +12,7 @@ class AddDataProjectInGSheet:
         """
         Нужен для добавления проекта в таблицу итогов
         """
-        self.__dict_api_key_gsheet = json.loads(GOOGLE_API)
+        self.__dict_api_key_gsheet = json.loads(JSON_KEY_GOOGLE_API)
         self.__google_sheet_object = gspread.service_account_from_dict(self.__dict_api_key_gsheet)
         # Для получения индекса по имени листа, который используется для открытия нужного нам листа
         self.__index_sheet_list = {
