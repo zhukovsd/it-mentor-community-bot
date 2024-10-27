@@ -1,7 +1,7 @@
 import gspread
-from env import JSON_KEY_GOOGLE_API
+from src.env import JSON_KEY_GOOGLE_API
 import json
-from env import URL_REPO
+from src.env import URL_REPO
 from src.get_data_completed_project.project_data_serializer import ProjectDataSerializer
 from src.get_data_completed_project.get_all_data_from_repo_url import get_info_from_url
 from src.google_sheets_package.table_fields_serializer import TableFieldsSerializer

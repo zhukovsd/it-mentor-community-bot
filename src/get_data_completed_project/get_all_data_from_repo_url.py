@@ -1,4 +1,4 @@
-from env import URL_REPO
+from src.env import URL_REPO
 from urllib.parse import urlparse
 from src.get_data_completed_project.project_data_serializer import ProjectDataSerializer
 

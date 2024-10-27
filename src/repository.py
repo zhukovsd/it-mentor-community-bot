@@ -35,7 +35,7 @@ def find_reply_by_language_and_project(language: str, project: str) -> str | Non
         f"""
         SELECT message, language FROM "Add_project_replies" 
         WHERE project_name='{project}'
-    """
+        """
     )
     rows = query.dictresult()
 

@@ -1,7 +1,6 @@
 import logging
 import os
 import asyncio
-from time import sleep
 from telegram import ChatMember, Message, Update
 from repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
@@ -24,6 +23,7 @@ log = logging.getLogger(__name__)
 async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
+    print('chat_id', chat_id, 'user_id', user_id)
     user = await update.get_bot().get_chat_member(chat_id, user_id)
 
     if not is_admin(user) and not is_allowed_user(user):
@@ -115,7 +115,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     bot_reply_text = find_reply_by_language_and_project(language, project_name)
 
-    if bot_reply_text == None:
+    if bot_reply_text is None:
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} for project '{project_name}' and '{language}' didn't find suitable reply"
         )
@@ -158,7 +158,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.forward_message(
         from_chat_id=chat_id,
         chat_id=projects_reviews_collection_chat_id,
-        message_id=update.message.reply_to_message.id,
+        message_id=student_message.id,
     )
     await context.bot.send_message(
         chat_id=chat_id,
@@ -166,6 +166,17 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_to_message_id=student_message.id,
         parse_mode=ParseMode.MARKDOWN_V2,
     )
+    f"""
+    Используемые аргументы
+    {language}, {student_message}, {project_name}
+    Добавить
+    - Функцию извлекающую github сссылку из сообщения
+    - get_all_data_from_repo_url
+    - add_data_project_in_google_sheet 
+    """
+    print('Язык', language)
+    print('Тип проекта', project_name)
+    print('Сообщение', student_message)
 
 
 def is_admin(user: ChatMember) -> bool:
