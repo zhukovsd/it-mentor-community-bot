@@ -4,13 +4,10 @@ import os
 load_dotenv()
 
 # Секретные данные
-API_FGP_GITHUB: str | None = os.environ.get("API_FGP_GITHUB")
 JSON_KEY_GOOGLE_API: str | None = os.environ.get('JSON_KEY_GOOGLE_API')
 # Имя таблицы в которую добавляем
 ADD_TO_SHEET: str | None = os.environ.get('ADD_TO_SHEET')
 
-if API_FGP_GITHUB is None:
-    raise EnvironmentError("'API_FGP_GITHUB' is None")
 if JSON_KEY_GOOGLE_API is None:
     raise EnvironmentError("'JSON_KEY_GOOGLE_API' is None")
 if ADD_TO_SHEET is None:

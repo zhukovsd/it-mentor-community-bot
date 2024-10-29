@@ -39,6 +39,7 @@ POSTGRES_PORT=
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
 ALLOWED_USER_IDS=
+
 JSON_KEY_GOOGLE_API='{JSON-string}'
 ADD_TO_SHEET='name_sheet'
 ```
@@ -119,6 +120,9 @@ POSTGRES_PORT=5432
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
 ALLOWED_USER_IDS=
+
+JSON_KEY_GOOGLE_API='{JSON-string}'
+ADD_TO_SHEET='name_sheet'
 ```
 
 `POSTGRES_HOST` = название сервиса с БД в docker-compose-prod.yaml файле. Дефолт `database`

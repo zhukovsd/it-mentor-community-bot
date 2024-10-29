@@ -1,10 +1,9 @@
 import gspread
-from src.env import JSON_KEY_GOOGLE_API
+from env import JSON_KEY_GOOGLE_API, URL_REPO
 import json
-from src.env import URL_REPO
-from src.get_data_completed_project_package.project_data_serializer import ProjectDataSerializer
-from src.get_data_completed_project_package.get_all_data_from_repo_url import get_info_from_url
-from src.google_sheets_package.table_fields_serializer import TableFieldsSerializer
+from get_data_completed_project_package.project_data_serializer import ProjectDataSerializer
+from get_data_completed_project_package.get_all_data_from_repo_url import get_info_from_url
+from .table_fields_serializer import TableFieldsSerializer
 
 
 class AddDataProjectInGSheet:
