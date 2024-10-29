@@ -4,8 +4,17 @@ import os
 load_dotenv()
 
 # Секретные данные
-API_FGP_GITHUB = os.environ.get("API_FGP_GITHUB")
-JSON_KEY_GOOGLE_API = os.environ.get('JSON_KEY_GOOGLE_API')
+API_FGP_GITHUB: str | None = os.environ.get("API_FGP_GITHUB")
+JSON_KEY_GOOGLE_API: str | None = os.environ.get('JSON_KEY_GOOGLE_API')
+# Имя таблицы в которую добавляем
+ADD_TO_SHEET: str | None = os.environ.get('ADD_TO_SHEET')
+
+if API_FGP_GITHUB is None:
+    raise EnvironmentError("'API_FGP_GITHUB' is None")
+if JSON_KEY_GOOGLE_API is None:
+    raise EnvironmentError("'JSON_KEY_GOOGLE_API' is None")
+if ADD_TO_SHEET is None:
+    raise EnvironmentError("'ADD_TO_SHEET' is None")
 # Данные ниже - для тестирования
 # (их можно передавать не из ENV файла, а напрямую из кода
 # Например когда данные приходят из клиента,

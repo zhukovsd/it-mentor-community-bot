@@ -1,6 +1,6 @@
 from src.env import URL_REPO
 from urllib.parse import urlparse
-from src.get_data_completed_project.project_data_serializer import ProjectDataSerializer
+from src.get_data_completed_project_package.project_data_serializer import ProjectDataSerializer
 
 
 def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataSerializer:
@@ -9,7 +9,7 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
         и формируем объект для дальнейшей работы с таблицей.
     :param url: Передаем url репозитория из сообщения.
     :param lang_project: Передаем язык программирования проекта из команды.
-    :param type_project: Тип проекта (Виселица, Симуляция и т.п.) из команды
+    :param type_project: Тип проекта (Виселица, Симуляция и т.п.) из команды.
     :return project_data_serializer_obj: Хранит в себе информацию для добавления в таблицу
     """
     parsed_url = urlparse(url)

@@ -39,9 +39,50 @@ POSTGRES_PORT=
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
 ALLOWED_USER_IDS=
+JSON_KEY_GOOGLE_API='{JSON-string}'
+ADD_TO_SHEET='name_sheet'
 ```
 
+`ADD_TO_SHEET` - Строка без пробелов содержащая в себе имя файла google sheet из google drive который подключается с помощью google api.  
 `ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
+`PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по аналогии с `ALLOWED_USER_IDS`
+- **Не добавлять сюда** ID другого **чат бота** или того же самого который используется
+
+`JSON_KEY_GOOGLE_API` - JSON строка формата:
+```json
+{
+  "type": "service_account",
+  "project_id": "it-menthor-community-bot",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "",
+  "token_uri": "",
+  "auth_provider_x509_cert_url": "",
+  "client_x509_cert_url": "",
+  "universe_domain": ""
+}
+```
+4.1. Как Получить JSON токен google API для подключения?
+Для этого Нужно перейти на:
+- https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project
+- Далее в: API & Services > Переходим: Credentials > Создаем: Create credentials > Service account key
+- Заполняем все необходимые поля
+- Нажимаем Done 
+- Нажимаем “Manage service accounts” над Service Accounts.
+- В открывшейся таблице кликаем 3 точки > Manage Keys
+- ADD KEY > Create new key > JSON
+Мы получим JSON файл с API Key
+##### Обязательно
+Нужно будет добавить к пользователям Email из API Key в ключе `client_email`
+Делать это стоит конкретно к таблице с которой мы будем работать, либо к папке с таблицами в которой мы будем работать
+
+Так же надо перейти в 
+- API & Servises > Library
+- Ввести `Google Drive API` и `Google Sheets API` в поиск
+- И включить эти две либы (Нажать Enable) 
+- Для работы с google docks надо будет 
 
 5. Поднять БД в контейнере командой
 
