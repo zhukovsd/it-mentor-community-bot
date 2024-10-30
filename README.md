@@ -5,6 +5,26 @@
 - Бот должен быть админом в чатах в которых вызываются его команды и в чате в который он будет пересылать сообщения
 - [yoyo-migrations документация](https://ollycope.com/software/yoyo/latest/)
 
+### Как Получить JSON токен google API для подключения?
+Для этого Нужно перейти на:
+- https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project
+- Далее в: API & Services > Переходим: Credentials > Создаем: Create credentials > Service account key
+- Заполняем все необходимые поля
+- Нажимаем Done 
+- Нажимаем “Manage service accounts” над Service Accounts.
+- В открывшейся таблице кликаем 3 точки > Manage Keys
+- ADD KEY > Create new key > JSON
+Мы получим JSON файл с API Key
+##### Обязательно
+Нужно будет добавить к пользователям Email из API Key в ключе `client_email`
+Делать это стоит конкретно к таблице с которой мы будем работать, либо к папке с таблицами в которой мы будем работать
+
+Так же надо перейти в 
+- API & Servises > Library
+- Ввести `Google Drive API` и `Google Sheets API` в поиск
+- И включить эти две либы (Нажать Enable) 
+- Для работы с google docks надо будет 
+
 ## Локальный запуск 
 
 1. Создать venv
@@ -65,25 +85,6 @@ ADD_TO_SHEET='name_sheet'
   "universe_domain": ""
 }
 ```
-4.1. Как Получить JSON токен google API для подключения?
-Для этого Нужно перейти на:
-- https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project
-- Далее в: API & Services > Переходим: Credentials > Создаем: Create credentials > Service account key
-- Заполняем все необходимые поля
-- Нажимаем Done 
-- Нажимаем “Manage service accounts” над Service Accounts.
-- В открывшейся таблице кликаем 3 точки > Manage Keys
-- ADD KEY > Create new key > JSON
-Мы получим JSON файл с API Key
-##### Обязательно
-Нужно будет добавить к пользователям Email из API Key в ключе `client_email`
-Делать это стоит конкретно к таблице с которой мы будем работать, либо к папке с таблицами в которой мы будем работать
-
-Так же надо перейти в 
-- API & Servises > Library
-- Ввести `Google Drive API` и `Google Sheets API` в поиск
-- И включить эти две либы (Нажать Enable) 
-- Для работы с google docks надо будет 
 
 5. Поднять БД в контейнере командой
 
