@@ -23,6 +23,7 @@ class AddDataProjectInGSheet:
             "weather-viewer": 4,
             "cloud-file-storage": 5,
             "task-tracker": 6,
+            "другое": 7
         }
 
     def add_project_in_gsheet(self, project_data_object: ProjectDataSerializer, gsheets_name: str):
