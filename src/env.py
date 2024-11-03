@@ -12,7 +12,7 @@ if JSON_KEY_GOOGLE_API is None:
     raise EnvironmentError("'JSON_KEY_GOOGLE_API' is None")
 if ADD_TO_SHEET is None:
     raise EnvironmentError("'ADD_TO_SHEET' is None")
-# Данные ниже - для тестирования
+# Данные ниже - для ручного тестирования, они необязательны
 # (их можно передавать не из ENV файла, а напрямую из кода
 # Например когда данные приходят из клиента,
 # то в методы будут передаваться данные которые пришли из клиента, а не указанные ниже)

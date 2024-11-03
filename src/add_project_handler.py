@@ -6,11 +6,8 @@ from repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-# from .get_data_completed_project_package.get_all_data_from_repo_url import get_info_from_url
-# from .get_data_completed_project_package.parsing_url_from_message import parsing_url_from_message
 import get_data_completed_project_package
 import google_sheets_package
-# from .google_sheets_package.add_data_project_in_google_sheet import AddDataProjectInGSheet
 from env import ADD_TO_SHEET
 
 ADD_PROJECT_COMMAND_NAME = "addproject"

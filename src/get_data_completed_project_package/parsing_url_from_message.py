@@ -15,7 +15,6 @@ def parsing_url_from_message(message: str):
         if len(word) >= len(sample_url):
             slice_word = word[:len(sample_url)]
             if slice_word == sample_url:
-                # result_url = word.replace(',', '')
                 result_url = __clear_url_of_char(word)
                 return result_url
         else:
