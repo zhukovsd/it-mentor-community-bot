@@ -26,7 +26,7 @@ class AddDataProjectInGSheet:
             "другое": 7
         }
 
-    def add_project_in_gsheet(self, project_data_object: ProjectDataSerializer, gsheets_name: str):
+    def add_project_to_gsheet(self, project_data_object: ProjectDataSerializer, gsheets_name: str):
         """
         Позволяет нам добавить информацию в google sheets по переданному объекту
         :param project_data_object: Информация извлеченная из url с помощью get_info_from_url
