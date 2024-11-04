@@ -171,7 +171,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     message = student_message.text
-    __connect_modules_to_add_data_to_gsheets(
+    google_sheets_package.connect_modules_to_add_data_to_gsheets(
         message=message,
         lang_project=language,
         type_project=project_name
@@ -213,29 +213,3 @@ def is_reply(message: Message | None) -> bool:
     if message.reply_to_message.id == message.reply_to_message.message_thread_id:
         return False
     return True
-
-
-# todo: Возможно стоит вынести в отдельный файл
-def __connect_modules_to_add_data_to_gsheets(message: str, lang_project: str, type_project: str):
-    """
-    Подключение модулей для добавления данных в гугл таблицы итогов месяца.
-    :param message: Пересланное боту сообщение для добавления.
-    :param lang_project: Язык программирования добавляемого проекта. Достается из параметров команды.
-    :param type_project: Тип проекта. Должен быть аналогичен итему из списка PROJECT_NAMES.
-        Достается из параметров команды.
-    """
-    url = google_sheets_package.parse_url_from_message(message)
-
-    if url is None:
-        return
-
-    project_data_obj = google_sheets_package.get_info_from_url(
-        url=url,
-        lang_project=lang_project,
-        type_project=type_project
-    )
-    add_in_sheets_obj = google_sheets_package.GSheetService()
-    add_in_sheets_obj.add_project_to_gsheet(
-        project_data_object=project_data_obj,
-        gsheets_name=ADD_TO_SHEET
-    )
