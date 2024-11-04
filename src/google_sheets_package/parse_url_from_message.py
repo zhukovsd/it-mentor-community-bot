@@ -1,4 +1,4 @@
-def parsing_url_from_message(message: str):
+def parse_url_from_message(message: str):
     """
     Извлекает url из сообщения пользователя.
     Может удалять query параметры ссылки, так как для очистки
@@ -12,13 +12,12 @@ def parsing_url_from_message(message: str):
     list_message_words = message.split()
 
     for word in list_message_words:
-        if len(word) >= len(sample_url):
-            slice_word = word[:len(sample_url)]
-            if slice_word == sample_url:
-                result_url = __clear_url_of_char(word)
-                return result_url
-        else:
+        if len(word) <= len(sample_url):
             continue
+        slice_word = word[:len(sample_url)]
+        if slice_word == sample_url:
+            result_url = __clear_url_of_char(word)
+            return result_url
 
 
 def __clear_url_of_char(word: str):
@@ -43,4 +42,4 @@ if __name__ == '__main__':
 Буду рад обоснованной, sdfsdfdsafdfsfasfasfasdfas критике и предложениям по улучшению. В некоторых местах есть спорные моменты. Я умышленно их оставил на суд ревьювера. Также хотелось бы услышать общее впечатление по реализации и по стилю написания кода.
 https://github.com/violaceusflame/simulation!?,!.?,!?!,,.?.
     """
-    print(parsing_url_from_message(message_text))
+    print(parse_url_from_message(message_text))

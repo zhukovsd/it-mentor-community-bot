@@ -1,4 +1,4 @@
-class ProjectDataSerializer:
+class ProjectDataDTO:
     def __init__(self, name_owner_repo, url_owner_repo,
                  repository_name, repository_url,
                  program_lang_project, type_project):

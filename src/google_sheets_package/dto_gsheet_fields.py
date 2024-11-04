@@ -1,4 +1,4 @@
-class TableFieldsSerializer:
+class GSheetFieldsDTO:
     def __init__(self, object_opened_sheet, number_row_cell_excel: int | str):
         """
         Для удобного взаимодействия с таблицей, содержит в себе Поля

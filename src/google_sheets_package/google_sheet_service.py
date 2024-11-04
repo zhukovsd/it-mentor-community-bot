@@ -1,12 +1,12 @@
 import gspread
 from env import JSON_KEY_GOOGLE_API, URL_REPO
 import json
-from get_data_completed_project_package.project_data_serializer import ProjectDataSerializer
-from get_data_completed_project_package.get_all_data_from_repo_url import get_info_from_url
-from .table_fields_serializer import TableFieldsSerializer
+from .dto_project_data import ProjectDataDTO
+from .get_all_data_from_repo_url import get_info_from_url
+from .dto_gsheet_fields import GSheetFieldsDTO
 
 
-class AddDataProjectInGSheet:
+class GSheetService:
     def __init__(self):
         """
         Нужен для добавления проекта в таблицу итогов
@@ -26,7 +26,7 @@ class AddDataProjectInGSheet:
             "другое": 7
         }
 
-    def add_project_in_gsheet(self, project_data_object: ProjectDataSerializer, gsheets_name: str):
+    def add_project_to_gsheet(self, project_data_object: ProjectDataDTO, gsheets_name: str):
         """
         Позволяет нам добавить информацию в google sheets по переданному объекту
         :param project_data_object: Информация извлеченная из url с помощью get_info_from_url
@@ -42,7 +42,7 @@ class AddDataProjectInGSheet:
         if find_url_repo_in_sheet is None:
             last_filled_row = len(open_sheet.get_all_values())
             empty_row = last_filled_row + 1
-            fields_sheet_obj = TableFieldsSerializer(open_sheet, empty_row)
+            fields_sheet_obj = GSheetFieldsDTO(open_sheet, empty_row)
 
             # Если ячейка с url пустая - то вся строка гарантированно пустая
             check_cell_sheet = open_sheet.get(fields_sheet_obj.repository_url).first()
@@ -64,5 +64,5 @@ class AddDataProjectInGSheet:
 
 if __name__ == '__main__':
     project_object = get_info_from_url(URL_REPO, "Java", "currency-exchange")
-    add_project_in_sheet_object = AddDataProjectInGSheet()
-    add_project_in_sheet_object.add_project_in_gsheet(project_object, 'monthly_results_for_it_mentor')
+    add_project_in_sheet_object = GSheetService()
+    add_project_in_sheet_object.add_project_to_gsheet(project_object, 'monthly_results_for_it_mentor')

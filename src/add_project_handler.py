@@ -6,7 +6,6 @@ from repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-import get_data_completed_project_package
 import google_sheets_package
 from env import ADD_TO_SHEET
 
@@ -172,7 +171,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     message = student_message.text
-    __connecting_modules_to_add_data_to_gsheets(
+    __connect_modules_to_add_data_to_gsheets(
         message=message,
         lang_project=language,
         type_project=project_name
@@ -217,7 +216,7 @@ def is_reply(message: Message | None) -> bool:
 
 
 # todo: Возможно стоит вынести в отдельный файл
-def __connecting_modules_to_add_data_to_gsheets(message: str, lang_project: str, type_project: str):
+def __connect_modules_to_add_data_to_gsheets(message: str, lang_project: str, type_project: str):
     """
     Подключение модулей для добавления данных в гугл таблицы итогов месяца.
     :param message: Пересланное боту сообщение для добавления.
@@ -225,14 +224,18 @@ def __connecting_modules_to_add_data_to_gsheets(message: str, lang_project: str,
     :param type_project: Тип проекта. Должен быть аналогичен итему из списка PROJECT_NAMES.
         Достается из параметров команды.
     """
-    url = get_data_completed_project_package.parsing_url_from_message(message)
-    project_data_obj = get_data_completed_project_package.get_info_from_url(
+    url = google_sheets_package.parse_url_from_message(message)
+
+    if url is None:
+        return
+
+    project_data_obj = google_sheets_package.get_info_from_url(
         url=url,
         lang_project=lang_project,
         type_project=type_project
     )
-    add_in_sheets_obj = google_sheets_package.AddDataProjectInGSheet()
-    add_in_sheets_obj.add_project_in_gsheet(
+    add_in_sheets_obj = google_sheets_package.GSheetService()
+    add_in_sheets_obj.add_project_to_gsheet(
         project_data_object=project_data_obj,
         gsheets_name=ADD_TO_SHEET
     )

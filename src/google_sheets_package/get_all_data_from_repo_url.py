@@ -1,9 +1,9 @@
 from env import URL_REPO
 from urllib.parse import urlparse
-from .project_data_serializer import ProjectDataSerializer
+from .dto_project_data import ProjectDataDTO
 
 
-def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataSerializer:
+def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataDTO:
     """
     Получаем информацию о репозитории и пользователе из url
         и формируем объект для дальнейшей работы с таблицей.
@@ -23,7 +23,7 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
     # (например, что бы избавиться от части пути к конкретному файлу)
     repo_url = f'{parsed_url.scheme}://{parsed_url.hostname}/{repo_owner}/{repo_name}'
 
-    project_data_serializer_obj = ProjectDataSerializer(
+    project_data_serializer_obj = ProjectDataDTO(
         repository_name=repo_name,
         name_owner_repo=repo_owner,
         repository_url=repo_url,
