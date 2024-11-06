@@ -1,9 +1,17 @@
 import gspread
-from env import JSON_KEY_GOOGLE_API, URL_REPO
 import json
+import logging
+
+from log_config import log_config
+from env import JSON_KEY_GOOGLE_API, URL_REPO
+
 from .dto_project_data import ProjectDataDTO
-from .get_all_data_from_repo_url import get_info_from_url
+from .get_info_from_repo_url import get_info_from_url
 from .dto_gsheet_fields import GSheetFieldsDTO
+
+
+log_config()
+log = logging.getLogger(__name__)
 
 
 class GSheetService:
@@ -55,11 +63,15 @@ class GSheetService:
                 open_sheet.update_acell(fields_sheet_obj.name_owner_repo, data_object.name_owner_repo)
                 open_sheet.update_acell(fields_sheet_obj.url_owner_repo, data_object.url_owner_repo)
                 open_sheet.update_acell(fields_sheet_obj.program_lang_project, data_object.program_lang_project)
+
+                log.info('Ссылка - repo_url_from_data_obj: %s добавлена в Таблицу gsheet', data_object.repository_url)
             else:
-                print(f'В ячейке {fields_sheet_obj.repository_url} содержится {check_cell_sheet}')
+                log.warning('В ячейке fields_sheet: %r содержится check_cell_sheet: %r',
+                            fields_sheet_obj.repository_url, check_cell_sheet)
         else:
             # todo: Тут возможно надо будет добавить отправку сообщения в телегу
-            print(f'{find_url_repo_in_sheet.value} Существует в таблице и находится в {find_url_repo_in_sheet.address}')
+            log.warning('cell_value_in_sheet: %r Существует в таблице и находится в cell_address_in_sheet: %r',
+                        find_url_repo_in_sheet.value, find_url_repo_in_sheet.address)
 
 
 if __name__ == '__main__':

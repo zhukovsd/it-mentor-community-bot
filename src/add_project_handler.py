@@ -7,7 +7,6 @@ from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
 import google_sheets_package
-from env import ADD_TO_SHEET
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
 PROJECT_NAMES = [
@@ -171,11 +170,23 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     message = student_message.text
-    google_sheets_package.connect_modules_to_add_data_to_gsheets(
+    check_add_data: bool = google_sheets_package.connect_modules_to_add_data_to_gsheets(
         message=message,
         lang_project=language,
         type_project=project_name
     )
+
+    if check_add_data is False:
+        error_message = await context.bot.send_message(
+            chat_id=chat_id,
+            text='Отсутствует ссылка в передаваемом сообщении, в gsheet ничего не добавлено',
+            reply_to_message_id=student_message.id,
+        )
+        await asyncio.sleep(15)
+        await context.bot.delete_messages(
+            chat_id=chat_id,
+            message_ids=[error_message.id]
+        )
 
 
 def is_admin(user: ChatMember) -> bool:

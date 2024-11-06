@@ -1,7 +1,13 @@
-from dotenv import load_dotenv
+import logging
 import os
+from dotenv import load_dotenv
+
+from log_config import log_config
 
 load_dotenv()
+log_config()
+log = logging.getLogger(__name__)
+
 
 # Секретные данные
 JSON_KEY_GOOGLE_API: str | None = os.environ.get('JSON_KEY_GOOGLE_API')

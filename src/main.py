@@ -17,10 +17,9 @@ from telegram.ext import (
 
 from add_project_handler import add_project
 from add_project_handler import ADD_PROJECT_COMMAND_NAME
+from log_config import log_config
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+log_config()
 log = logging.getLogger(__name__)
 
 
