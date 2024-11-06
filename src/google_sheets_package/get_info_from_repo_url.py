@@ -1,6 +1,5 @@
-from env import URL_REPO
 from urllib.parse import urlparse
-from .dto_project_data import ProjectDataDTO
+from .gsheet_dtos import ProjectDataDTO
 
 
 def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataDTO:
@@ -36,7 +35,7 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
 
 if __name__ == '__main__':
     # Test func
-    object_project_data = get_info_from_url(URL_REPO, 'Java', 'Конвертер валют')
+    object_project_data = get_info_from_url('Для url репозитория', 'Java', 'Конвертер валют')
     print(
         object_project_data.url_owner_repo,
         object_project_data.repository_url,

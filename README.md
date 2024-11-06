@@ -61,10 +61,10 @@ PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
 ALLOWED_USER_IDS=
 
 JSON_KEY_GOOGLE_API='{JSON-string}'
-ADD_TO_SHEET='name_sheet'
+ADD_TO_SHEET_NAME='name_sheet'
 ```
 
-`ADD_TO_SHEET` - Строка без пробелов содержащая в себе имя файла google sheet из google drive который подключается с помощью google api.  
+`ADD_TO_SHEET_NAME` - Строка без пробелов содержащая в себе имя файла google sheet из google drive который подключается с помощью google api.  
 `ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
 `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по аналогии с `ALLOWED_USER_IDS`
 - **Не добавлять сюда** ID другого **чат бота** или того же самого который используется

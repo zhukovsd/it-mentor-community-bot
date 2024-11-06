@@ -3,11 +3,8 @@ import json
 import logging
 
 from log_config import log_config
-from env import JSON_KEY_GOOGLE_API, URL_REPO
-
-from .dto_project_data import ProjectDataDTO
+from .gsheet_dtos import ProjectDataDTO, GSheetFieldsDTO
 from .get_info_from_repo_url import get_info_from_url
-from .dto_gsheet_fields import GSheetFieldsDTO
 
 
 log_config()
@@ -15,12 +12,12 @@ log = logging.getLogger(__name__)
 
 
 class GSheetService:
-    def __init__(self):
+    def __init__(self, json_key_google_api):
         """
         Нужен для добавления проекта в таблицу итогов
         """
         # Подключение происходит с помощью ключа превращенного в dict
-        self.__dict_api_key_gsheet = json.loads(JSON_KEY_GOOGLE_API)
+        self.__dict_api_key_gsheet = json.loads(json_key_google_api)
         self.__google_sheet_object = gspread.service_account_from_dict(self.__dict_api_key_gsheet)
         # Для получения индекса по имени листа, который используется для открытия нужного нам листа
         self.__index_sheet_list = {
@@ -64,17 +61,17 @@ class GSheetService:
                 open_sheet.update_acell(fields_sheet_obj.url_owner_repo, data_object.url_owner_repo)
                 open_sheet.update_acell(fields_sheet_obj.program_lang_project, data_object.program_lang_project)
 
-                log.info('Ссылка - repo_url_from_data_obj: %s добавлена в Таблицу gsheet', data_object.repository_url)
+                log.info('Ссылка - : %s добавлена в Таблицу gsheet', data_object.repository_url)
             else:
-                log.warning('В ячейке fields_sheet: %r содержится check_cell_sheet: %r',
+                log.warning('В указанной ячейке: %r содержится информация: %r, пожалуйста проверьте целостность таблицы',
                             fields_sheet_obj.repository_url, check_cell_sheet)
         else:
             # todo: Тут возможно надо будет добавить отправку сообщения в телегу
-            log.warning('cell_value_in_sheet: %r Существует в таблице и находится в cell_address_in_sheet: %r',
+            log.warning('Проект: %r Существует в таблице и находится в ячейке по адресу: %r',
                         find_url_repo_in_sheet.value, find_url_repo_in_sheet.address)
 
 
 if __name__ == '__main__':
-    project_object = get_info_from_url(URL_REPO, "Java", "currency-exchange")
-    add_project_in_sheet_object = GSheetService()
+    project_object = get_info_from_url("Для url repo", "Java", "currency-exchange")
+    add_project_in_sheet_object = GSheetService('api_json_key')
     add_project_in_sheet_object.add_project_to_gsheet(project_object, 'monthly_results_for_it_mentor')

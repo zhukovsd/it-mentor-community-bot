@@ -170,16 +170,16 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     message = student_message.text
-    check_add_data: bool = google_sheets_package.connect_modules_to_add_data_to_gsheets(
+    check_add_data = google_sheets_package.connect_modules_to_add_data_to_gsheets(
         message=message,
         lang_project=language,
         type_project=project_name
     )
 
-    if check_add_data is False:
+    if check_add_data.boolean_val is False:
         error_message = await context.bot.send_message(
             chat_id=chat_id,
-            text='Отсутствует ссылка в передаваемом сообщении, в gsheet ничего не добавлено',
+            text=check_add_data.error_message,
             reply_to_message_id=student_message.id,
         )
         await asyncio.sleep(15)

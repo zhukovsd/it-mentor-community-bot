@@ -1,14 +1,18 @@
-import os
-from dotenv import load_dotenv
 from pg import DB
+from env import (
+    POSTGRES_USER,
+    POSTGRES_PASSWORD,
+    POSTGRES_DB,
+    POSTGRES_HOST,
+    POSTGRES_PORT
+    )
 
-_ = load_dotenv()
 
-postgres_user: str | None = os.getenv("POSTGRES_USER")
-postgres_password: str | None = os.getenv("POSTGRES_PASSWORD")
-postgres_db: str | None = os.getenv("POSTGRES_DB")
-postgres_host: str | None = os.getenv("POSTGRES_HOST")
-postgres_port: str | None = os.getenv("POSTGRES_PORT")
+postgres_user: str | None = POSTGRES_USER
+postgres_password: str | None = POSTGRES_PASSWORD
+postgres_db: str | None = POSTGRES_DB
+postgres_host: str | None = POSTGRES_HOST
+postgres_port: str | None = POSTGRES_PORT
 
 if postgres_user is None:
     raise EnvironmentError("'POSTGRES_USER' is not present")
