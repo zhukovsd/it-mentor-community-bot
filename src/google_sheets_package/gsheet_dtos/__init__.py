@@ -1,3 +1,6 @@
 from .dto_project_data import ProjectDataDTO
 from .dto_gsheet_fields import GSheetFieldsDTO
 from .dto_check_validation_added_data import CheckValidationAddedDataDTO
+from .interview_info_dto import InterviewInfo
+from .interview_question_timestamp_dto import InterviewQuestionTimestamp
+from .interview_question_dto import InterviewQuestion
