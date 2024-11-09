@@ -171,9 +171,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = student_message.text
     check_add_data = google_sheets_package.connect_modules_to_add_data_to_gsheets(
-        message=message,
-        lang_project=language,
-        type_project=project_name
+        message=message, lang_project=language, type_project=project_name
     )
 
     if check_add_data.boolean_val is False:
@@ -184,8 +182,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await asyncio.sleep(15)
         await context.bot.delete_messages(
-            chat_id=chat_id,
-            message_ids=[error_message.id]
+            chat_id=chat_id, message_ids=[error_message.id]
         )
 
 
