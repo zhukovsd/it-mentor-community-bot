@@ -6,7 +6,11 @@
 - [yoyo-migrations документация](https://ollycope.com/software/yoyo/latest/)
 
 ### Как Получить JSON токен google API для подключения?
+
+[gspread auth docs](https://docs.gspread.org/en/latest/oauth2.html#for-bots-using-service-account)
+
 Для этого Нужно перейти на:
+
 - https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project
 - Далее в: API & Services > Переходим: Credentials > Создаем: Create credentials > Service account key
 - Заполняем все необходимые поля
@@ -14,16 +18,20 @@
 - Нажимаем “Manage service accounts” над Service Accounts.
 - В открывшейся таблице кликаем 3 точки > Manage Keys
 - ADD KEY > Create new key > JSON
+
 Мы получим JSON файл с API Key
+
 ##### Обязательно
+
 Нужно будет добавить к пользователям Email из API Key в ключе `client_email`
 Делать это стоит конкретно к таблице с которой мы будем работать, либо к папке с таблицами в которой мы будем работать
 
-Так же надо перейти в 
-- API & Servises > Library
+Также надо перейти в 
+
+- API & Services > Library
 - Ввести `Google Drive API` и `Google Sheets API` в поиск
 - И включить эти две либы (Нажать Enable) 
-- Для работы с google docks надо будет 
+- Для работы с Google Docs надо будет 
 
 ## Локальный запуск 
 
@@ -46,6 +54,7 @@ https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html#widge
 ```bash
 pip install -r requirements.txt
 ```
+
 4. Создать `.env` файл в корне проекта. Он будет использоваться только для локального запуска
 
 ```env
