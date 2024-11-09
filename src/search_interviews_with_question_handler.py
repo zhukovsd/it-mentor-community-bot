@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 from telegram import Message, Update
@@ -16,6 +17,10 @@ json_google_api_key = env.JSON_KEY_GOOGLE_API
 assert (
     json_google_api_key is not None
 ), "JSON_KEY_GOOGLE_API environment variable is not set"
+
+assert (
+    env.SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS is not None
+), "SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS environment variable is not set"
 
 google_sheet_service = GSheetService(json_google_api_key)
 
@@ -54,6 +59,20 @@ async def search_interviews_with_question(
         update.effective_message.text is not None
     ), "Message text in command cannot be None"
 
+    if not is_allowed_chat(update.effective_chat.id):
+        error = await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Команда запрещена в этом чате",
+            reply_to_message_id=update.effective_message.id,
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+        await asyncio.sleep(10)
+        _ = await context.bot.delete_messages(
+            chat_id=update.effective_chat.id,
+            message_ids=[error.id, update.effective_message.id],
+        )
+        return
+
     question_id = get_question_id(update.effective_message)
 
     if question_id <= 0:
@@ -78,8 +97,9 @@ async def search_interviews_with_question(
         )
         return
 
-    response_header = f"Ответы на вопрос \\#{question_id}: `{escape_special_chars(question.question)}` ({question.popularity}%) из коллекции собеседований:\n\n"
-
+    question_popularity = escape_special_chars(str(question.popularity))
+    question_text = escape_special_chars(question.question)
+    response_header = f"Ответы на вопрос \\#{question_id}: `{question_text}` \\({question_popularity}%\\) из коллекции собеседований:\n\n"
     response = response_header + answers
 
     log.info(response)
@@ -90,6 +110,17 @@ async def search_interviews_with_question(
         reply_to_message_id=update.effective_message.id,
         parse_mode=ParseMode.MARKDOWN_V2,
     )
+
+
+def is_allowed_chat(chat_id: int) -> bool:
+    allowed_chat_ids = env.SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS
+    allowed_chat_ids = allowed_chat_ids.split(",")
+    allowed_chat_ids = list(map(int, allowed_chat_ids))
+
+    if chat_id in allowed_chat_ids:
+        return True
+
+    return False
 
 
 def get_answers(question: InterviewQuestion, amount: int) -> list[str]:
