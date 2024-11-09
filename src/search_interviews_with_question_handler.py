@@ -86,6 +86,15 @@ async def search_interviews_with_question(
 
     question = google_sheet_service.get_interview_question_by_id(question_id)
 
+    if question is None:
+        _ = await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="В коллекции собеседований нет такого вопроса",
+            reply_to_message_id=update.effective_message.id,
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+        return
+
     answers = "\n".join(get_answers(question, 5))
 
     if len(answers) == 0:

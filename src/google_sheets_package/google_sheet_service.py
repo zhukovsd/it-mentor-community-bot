@@ -115,11 +115,13 @@ class GSheetService:
                 find_url_repo_in_sheet.address,
             )
 
-    def get_interview_question_by_id(self, question_id: int) -> InterviewQuestion:
+    def get_interview_question_by_id(
+        self, question_id: int
+    ) -> InterviewQuestion | None:
         if len(self.__interview_questions) == 0:
             self._update_interview_questions()
 
-        return self.__interview_questions[question_id]
+        return self.__interview_questions.get(question_id)
 
     def _update_interview_questions(self) -> None:
         gsheets_client = gspread.auth.service_account_from_dict(
