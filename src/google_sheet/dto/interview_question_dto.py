@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-from .interview_question_timestamp_dto import InterviewQuestionTimestamp
+from src.google_sheet.dto.interview_question_timestamp_dto import (
+    InterviewQuestionTimestamp,
+)
 
 
 @dataclass

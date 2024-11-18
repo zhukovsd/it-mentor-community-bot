@@ -1,5 +1,5 @@
 class CheckValidationAddedDataDTO:
-    def __init__(self, boolean_val=True, error_message=''):
+    def __init__(self, boolean_val=True, error_message=""):
         """
 
         :param boolean_val:

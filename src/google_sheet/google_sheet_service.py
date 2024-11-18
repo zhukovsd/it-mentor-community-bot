@@ -3,18 +3,20 @@ import gspread
 import json
 import logging
 
-from log_config import log_config
-import env
-from .gsheet_dtos import (
-    ProjectDataDTO,
-    GSheetFieldsDTO,
-    InterviewQuestion,
-    InterviewQuestionTimestamp,
-    InterviewInfo,
-)
-from .get_info_from_repo_url import get_info_from_url
+from src.config import logs
+from src.config import env
 
-from .interview_collection_sheet_constants import (
+from src.google_sheet.dto.dto_project_data import ProjectDataDTO
+from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
+from src.google_sheet.dto.interview_question_dto import InterviewQuestion
+from src.google_sheet.dto.interview_question_timestamp_dto import (
+    InterviewQuestionTimestamp,
+)
+from src.google_sheet.dto.interview_info_dto import InterviewInfo
+
+from src.google_sheet.get_info_from_repo_url import get_info_from_url
+
+from src.google_sheet.interview_collection_sheet_constants import (
     QUESTION_COL_INDEX,
     SUMMARY_SHEET_INDEX,
     QUESTION_ID_COL_INDEX,
@@ -25,7 +27,7 @@ from .interview_collection_sheet_constants import (
     QUESTION_POPULRATIY_COL_INDEX,
 )
 
-log_config()
+logs.configure()
 log = logging.getLogger(__name__)
 
 
@@ -329,7 +331,7 @@ class GSheetService:
         if isinstance(x, int):
             return True
         try:
-            _ = int(x)
+            _ = int(x)  # pyright: ignore [reportArgumentType]
             return True
         except Exception as e:
             return False

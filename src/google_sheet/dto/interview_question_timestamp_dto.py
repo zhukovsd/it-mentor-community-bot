@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .interview_info_dto import InterviewInfo
+from src.google_sheet.dto.interview_info_dto import InterviewInfo
 
 
 @dataclass
