@@ -3,21 +3,23 @@ from dotenv import load_dotenv
 
 _ = load_dotenv()
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# pyright: reportAssignmentType=false
+
+TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Константы для работы с gsheet
-JSON_KEY_GOOGLE_API = os.getenv("JSON_KEY_GOOGLE_API")
-ADD_TO_SHEET_NAME = os.getenv("ADD_TO_SHEET_NAME")
+JSON_KEY_GOOGLE_API: str = os.getenv("JSON_KEY_GOOGLE_API")
+ADD_TO_SHEET_NAME: str = os.getenv("ADD_TO_SHEET_NAME")
 
 # Константы для подключения к БД
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-POSTGRES_DB = os.getenv("POSTGRES_DB")
-POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_USER: str = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB: str = os.getenv("POSTGRES_DB")
+POSTGRES_HOST: str = os.getenv("POSTGRES_HOST")
+POSTGRES_PORT: str = os.getenv("POSTGRES_PORT")
 
-INTERVIEW_COLLECTION_SPREADSHEET_ID = os.getenv("INTERVIEW_COLLECTION_SPREADSHEET_ID")
-SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS = os.getenv("SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS")  # fmt: skip
+INTERVIEW_COLLECTION_SPREADSHEET_ID: str = os.getenv("INTERVIEW_COLLECTION_SPREADSHEET_ID")  # fmt: skip
+SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS: str = os.getenv("SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS")  # fmt: skip
 
 # fmt: off
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"

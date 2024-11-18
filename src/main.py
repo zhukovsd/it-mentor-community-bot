@@ -1,8 +1,8 @@
 import logging
-import os
 from uuid import uuid4
 
-from dotenv import load_dotenv
+from src.config import logs
+
 from telegram import (
     Update,
     InlineQueryResultArticle,
@@ -16,17 +16,19 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from src.config.env import TELEGRAM_BOT_TOKEN
 
-from log_config import log_config
+from src.handler.add_project_handler import add_project
+from src.handler.add_project_handler import ADD_PROJECT_COMMAND_NAME
 
-from add_project_handler import add_project
-from add_project_handler import ADD_PROJECT_COMMAND_NAME
-from search_interviews_with_question_handler import search_interviews_with_question
-from search_interviews_with_question_handler import (
+from src.handler.search_interviews_with_question_handler import (
+    search_interviews_with_question,
+)
+from src.handler.search_interviews_with_question_handler import (
     SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
 )
 
-log_config()
+logs.configure()
 log = logging.getLogger(__name__)
 
 
@@ -41,18 +43,15 @@ async def hello_inline_query(
         )
     ]
 
-    await update.inline_query.answer(results)
+    assert update.inline_query is not None
+
+    _ = await update.inline_query.answer(results)
 
 
 if __name__ == "__main__":
-    _ = load_dotenv()
-
-    bot_token: str | None = os.getenv("TELEGRAM_BOT_TOKEN")
-
-    if bot_token is None:
-        raise EnvironmentError("'TELEGRAM_BOT_TOKEN' is not present")
-
-    application = ApplicationBuilder().token(bot_token).concurrent_updates(True).build()
+    application = (
+        ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
+    )
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     search_interviews_with_question_handler = MessageHandler(
