@@ -1,26 +1,20 @@
 import asyncio
 import logging
 import re
+
 from telegram import Message, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from google_sheets_package.gsheet_dtos import InterviewQuestion
-from google_sheets_package import GSheetService
-import env
+from src.google_sheet.dto.interview_question_dto import InterviewQuestion
+from src.google_sheet.google_sheet_service import GSheetService
+from src.config import env
 
 SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
 
 log = logging.getLogger(__name__)
 
 json_google_api_key = env.JSON_KEY_GOOGLE_API
-assert (
-    json_google_api_key is not None
-), "JSON_KEY_GOOGLE_API environment variable is not set"
-
-assert (
-    env.SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS is not None
-), "SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS environment variable is not set"
 
 google_sheet_service = GSheetService(json_google_api_key)
 
@@ -49,37 +43,33 @@ special_chars = [
 async def search_interviews_with_question(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    assert (
-        update.effective_chat is not None
-    ), "Chat in which command is called cannot be None"
-    assert (
-        update.effective_message is not None
-    ), "Message that triggered bot cannot be None"
-    assert (
-        update.effective_message.text is not None
-    ), "Message text in command cannot be None"
+    chat = update.effective_chat
+    command_message = update.effective_message
 
-    if not is_allowed_chat(update.effective_chat.id):
+    assert chat is not None, "Chat in which command is called cannot be None"
+    assert command_message is not None, "Message that triggered bot cannot be None"
+
+    if not is_allowed_chat(chat.id):
         error = await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=chat.id,
             text="Команда запрещена в этом чате",
-            reply_to_message_id=update.effective_message.id,
+            reply_to_message_id=command_message.id,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         await asyncio.sleep(10)
         _ = await context.bot.delete_messages(
-            chat_id=update.effective_chat.id,
-            message_ids=[error.id, update.effective_message.id],
+            chat_id=chat.id,
+            message_ids=[error.id, command_message.id],
         )
         return
 
-    question_id = get_question_id(update.effective_message)
+    question_id = get_question_id(command_message)
 
     if question_id <= 0:
         _ = await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=chat.id,
             text="Id вопросов начинаются с единицы",
-            reply_to_message_id=update.effective_message.id,
+            reply_to_message_id=command_message.id,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         return
@@ -88,9 +78,9 @@ async def search_interviews_with_question(
 
     if question is None:
         _ = await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=chat.id,
             text="В коллекции собеседований нет такого вопроса",
-            reply_to_message_id=update.effective_message.id,
+            reply_to_message_id=command_message.id,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         return
@@ -99,9 +89,9 @@ async def search_interviews_with_question(
 
     if len(answers) == 0:
         _ = await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=chat.id,
             text="В коллекции собеседований нет ответов на этот вопрос",
-            reply_to_message_id=update.effective_message.id,
+            reply_to_message_id=command_message.id,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         return
@@ -114,9 +104,9 @@ async def search_interviews_with_question(
     log.info(response)
 
     _ = await context.bot.send_message(
-        chat_id=update.effective_chat.id,
+        chat_id=chat.id,
         text=response,
-        reply_to_message_id=update.effective_message.id,
+        reply_to_message_id=command_message.id,
         parse_mode=ParseMode.MARKDOWN_V2,
     )
 
