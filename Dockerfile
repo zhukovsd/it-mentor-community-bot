@@ -1,11 +1,11 @@
 FROM python:3.12
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/it-mentor-bot
 
-COPY requirements.txt ./
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src .
+COPY src ./src
 COPY migrations ./migrations
 
 COPY entrypoint.sh .
