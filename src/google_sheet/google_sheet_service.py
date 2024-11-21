@@ -8,6 +8,7 @@ from src.config import env
 
 from src.google_sheet.dto.dto_project_data import ProjectDataDTO
 from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
+from src.google_sheet.dto.interview_question_category import InterviewQuestionCategory
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.google_sheet.dto.interview_question_timestamp_dto import (
     InterviewQuestionTimestamp,
@@ -125,15 +126,20 @@ class GSheetService:
 
         return self.__interview_questions.get(question_id)
 
+    def get_interview_questions(self) -> list[InterviewQuestion]:
+        if len(self.__interview_questions) == 0:
+            self._update_interview_questions()
+
+        return list(self.__interview_questions.values())
+
     def _update_interview_questions(self) -> None:
+        log.info("Parsing interview collection Google spreadsheet")
+
         gsheets_client = gspread.auth.service_account_from_dict(
             self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
         )
 
         interview_collection_spreadsheet_id = env.INTERVIEW_COLLECTION_SPREADSHEET_ID
-        assert (
-            interview_collection_spreadsheet_id is not None
-        ), "INTERVIEW_COLLECTION_SPREADSHEET_ID environment variable is not set"
 
         interview_collection_spreadsheet = gsheets_client.open_by_key(
             interview_collection_spreadsheet_id
@@ -146,20 +152,23 @@ class GSheetService:
         # Col[Row[Any]]
         summary_sheet_values: list[list[Any]] = summary_sheet.get_all_values()
 
-        question_id_to_row = self._map_question_id_to_row(summary_sheet_values)
+        question_id_to_row_category = self._map_question_id_to_row_category(
+            summary_sheet_values
+        )
+
         col_to_interview_info = self._map_col_index_to_interview_info(
             summary_sheet_values
         )
 
         questions = self._map_question_id_to_question(
-            question_id_to_row, col_to_interview_info
+            question_id_to_row_category, col_to_interview_info
         )
 
         self.__interview_questions = questions
 
-    def _map_question_id_to_row(
+    def _map_question_id_to_row_category(
         self, cols_rows: list[list[Any]]
-    ) -> dict[int, list[Any]]:
+    ) -> dict[int, tuple[list[Any], InterviewQuestionCategory]]:
         """
         Maps question id to question row.
 
@@ -170,34 +179,51 @@ class GSheetService:
         For the following table
         ┌───┬────┬────┬────────┬───────┐
         │ A │  B │  C │    D   │    E  │
-        ├───┼────┼────┼────────┼───────┤
+        ├───┼────┴────┴────────┴───────┤
+        │ l │ Java Core                │
+        ├───┼────┬────┬────────┬───────┤
         │ 1 │ q1 │ 1% │ 10:00  │       │
         ├───┼────┼────┼────────┼───────┤
         │ 2 │ q2 │ 2% │        │ 20:00 │
-        ├───┼────┼────┼────────┼───────┤
+        ├───┼────┴────┴────────┴───────┤
+        │ l │ OOP                      │
+        ├───┼────┬────┬────────┬───────┤
         │ 3 │ q2 │ 3% │ 30:00  │       │
         └───┴────┴────┴────────┴───────┘
 
         Function will return this dict
         {
-            1 : [1, q1, 1%, 10:00, ''],
-            2 : [2, q2, 2%, '', 20:00],
-            3 : [3, q3, 3%, 30:00, ''],
+            1 : ([1, q1, 1%, 10:00, ''], Java Core),
+            2 : ([2, q2, 2%, '', 20:00], Java Core),
+            3 : ([3, q3, 3%, 30:00, ''], OOP),
         }
         """
 
-        q_id_to_q_row: dict[int, list[Any]] = dict()
+        q_id_to_q_row: dict[int, tuple[list[Any], InterviewQuestionCategory]] = dict()
+        current_category_name = ""
+        current_category_link = ""
 
         for i, row in enumerate(cols_rows):
-            if i < FIRST_QUESTION_ROW_INDEX:
+            if i < FIRST_QUESTION_ROW_INDEX - 1:
                 continue
 
             question_id = row[QUESTION_ID_COL_INDEX]
 
+            if self._is_link(question_id):
+                link = str(question_id)
+                name = str(row[QUESTION_COL_INDEX])
+
+                current_category_name = name
+                current_category_link = link
+
+                continue
+
             if not self._is_int(question_id):
                 continue
 
-            q_id_to_q_row[int(question_id)] = row
+            q_id_to_q_row[int(question_id)] = row, InterviewQuestionCategory(
+                name=current_category_name, link=current_category_link
+            )
 
         return q_id_to_q_row
 
@@ -290,17 +316,24 @@ class GSheetService:
 
     def _map_question_id_to_question(
         self,
-        question_id_to_row: dict[int, list[Any]],
+        question_id_to_row_category: dict[
+            int, tuple[list[Any], InterviewQuestionCategory]
+        ],
         col_to_interview_info: dict[int, InterviewInfo],
     ) -> dict[int, InterviewQuestion]:
         """Maps question id to the IntervewQuestion."""
 
         id_to_question: dict[int, InterviewQuestion] = dict()
 
-        for question_id in question_id_to_row:
-            row = question_id_to_row[question_id]
+        for question_id in question_id_to_row_category:
+            row_category = question_id_to_row_category[question_id]
 
-            interview_question = InterviewQuestion(question_id, "", 0.0, [])
+            row = row_category[0]
+            category = row_category[1]
+
+            interview_question = InterviewQuestion(
+                question_id, "", 0.0, [], InterviewQuestionCategory("", "")
+            )
 
             for i, col in enumerate(row):
                 if i == QUESTION_COL_INDEX:
@@ -323,6 +356,7 @@ class GSheetService:
 
                     interview_question.timestamps.append(interview_timestamp)
 
+            interview_question.category = category
             id_to_question[question_id] = interview_question
 
         return id_to_question
@@ -333,6 +367,17 @@ class GSheetService:
         try:
             _ = int(x)  # pyright: ignore [reportArgumentType]
             return True
+        except Exception:
+            return False
+
+    def _is_link(self, x: int | float | str | None | Any) -> bool:
+        if x is None:
+            return False
+        if isinstance(x, str):
+            return x.startswith("http")
+        try:
+            x_str = str(x)
+            return x_str.startswith("http")
         except Exception:
             return False
 
