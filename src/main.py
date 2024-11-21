@@ -18,6 +18,13 @@ from telegram.ext import (
 )
 from src.config.env import TELEGRAM_BOT_TOKEN
 
+from src.handler.interview_questions_list_handler import (
+    INTERVIEW_QUESTIONS_LIST_COMMAND,
+)
+from src.handler.interview_questions_list_handler import (
+    list_interview_questions_messages,
+)
+
 from src.handler.add_project_handler import add_project
 from src.handler.add_project_handler import ADD_PROJECT_COMMAND_NAME
 
@@ -58,10 +65,14 @@ if __name__ == "__main__":
         filters.COMMAND & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP),
         search_interviews_with_question,
     )
+    interview_questions_list_handler = CommandHandler(
+        INTERVIEW_QUESTIONS_LIST_COMMAND, list_interview_questions_messages
+    )
     inline_hello_handler = InlineQueryHandler(hello_inline_query)
 
     application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
     application.add_handler(search_interviews_with_question_handler)
+    application.add_handler(interview_questions_list_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
