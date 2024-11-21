@@ -216,19 +216,19 @@ class GSheetService:
         ┌───┬────────┬────────┬────────┬────────┐
         │ 0 │    1   │    2   │    3   │    4   │  column indices
         ├───┼────────┼────────┼────────┼────────┤
-        │ 1 │ name_1 │ name_2 │ name_3 │ name_4 │
+        │ 1 │  vlad  │ sergey │ kostya │  timur │
         ├───┼────────┼────────┼────────┼────────┤
-        │ 2 │ link_1 │ link_2 │ link_3 │ link_4 │
+        │ 2 │ link 1 │ link 2 │ link 3 │ link 4 │
         ├───┼────────┼────────┼────────┼────────┤
         │ 3 │        │        │        │        │
         └───┴────────┴────────┴────────┴────────┘
 
         Function will return this dict
         {
-            1 : (name_1, link_1),
-            2 : (name_2, link_2),
-            3 : (name_3, link_3),
-            4 : (name_4, link_4),
+            1 : InterviewInfo(vlad, link 1),
+            2 : InterviewInfo(sergey, link 2),
+            3 : InterviewInfo(kostya, link 3),
+            4 : InterviewInfo(timur, link 4),
         }
         """
 
@@ -333,7 +333,7 @@ class GSheetService:
         try:
             _ = int(x)  # pyright: ignore [reportArgumentType]
             return True
-        except Exception as e:
+        except Exception:
             return False
 
 
