@@ -101,8 +101,6 @@ async def search_interviews_with_question(
     response_header = f"Ответы на вопрос \\#{question_id}: `{question_text}` \\({question_popularity}%\\) из коллекции собеседований:\n\n"
     response = response_header + answers
 
-    log.info(response)
-
     _ = await context.bot.send_message(
         chat_id=chat.id,
         text=response,
