@@ -56,15 +56,15 @@ class GSheetService:
         self.__interview_questions: dict[int, InterviewQuestion] = dict()
 
     def add_project_to_gsheet(
-        self, project_data_object: ProjectDataDTO, gsheets_name: str
+        self, project_data_object: ProjectDataDTO, gsheets_id: str
     ):
         """
         Позволяет нам добавить информацию в google sheets по переданному объекту
         :param project_data_object: Информация извлеченная из url с помощью get_info_from_url
-        :param gsheets_name: Имя google таблицы
+        :param gsheets_id: Имя google таблицы
         :return:
         """
-        open_table = self.__google_sheet_client.open(gsheets_name)
+        open_table = self.__google_sheet_client.open_by_key(gsheets_id)
         data_object = project_data_object
 
         open_sheet = open_table.get_worksheet(
