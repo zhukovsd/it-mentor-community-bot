@@ -1,8 +1,8 @@
 import logging
-import os
 from uuid import uuid4
 
-from dotenv import load_dotenv
+from src.config import logs
+
 from telegram import (
     Update,
     InlineQueryResultArticle,
@@ -13,14 +13,29 @@ from telegram.ext import (
     ContextTypes,
     CommandHandler,
     InlineQueryHandler,
+    MessageHandler,
+    filters,
+)
+from src.config.env import TELEGRAM_BOT_TOKEN
+
+from src.handler.interview_questions_list_handler import (
+    INTERVIEW_QUESTIONS_LIST_COMMAND,
+)
+from src.handler.interview_questions_list_handler import (
+    list_interview_questions_messages,
 )
 
-from add_project_handler import add_project
-from add_project_handler import ADD_PROJECT_COMMAND_NAME
+from src.handler.add_project_handler import add_project
+from src.handler.add_project_handler import ADD_PROJECT_COMMAND_NAME
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+from src.handler.search_interviews_with_question_handler import (
+    search_interviews_with_question,
 )
+from src.handler.search_interviews_with_question_handler import (
+    SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
+)
+
+logs.configure()
 log = logging.getLogger(__name__)
 
 
@@ -35,23 +50,29 @@ async def hello_inline_query(
         )
     ]
 
-    await update.inline_query.answer(results)
+    assert update.inline_query is not None
+
+    _ = await update.inline_query.answer(results)
 
 
 if __name__ == "__main__":
-    _ = load_dotenv()
-
-    bot_token: str | None = os.getenv("TELEGRAM_BOT_TOKEN")
-
-    if bot_token is None:
-        raise EnvironmentError("'TELEGRAM_BOT_TOKEN' is not present")
-
-    application = ApplicationBuilder().token(bot_token).concurrent_updates(True).build()
+    application = (
+        ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
+    )
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
+    search_interviews_with_question_handler = MessageHandler(
+        filters.COMMAND & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP),
+        search_interviews_with_question,
+    )
+    interview_questions_list_handler = CommandHandler(
+        INTERVIEW_QUESTIONS_LIST_COMMAND, list_interview_questions_messages
+    )
     inline_hello_handler = InlineQueryHandler(hello_inline_query)
 
     application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
+    application.add_handler(search_interviews_with_question_handler)
+    application.add_handler(interview_questions_list_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
