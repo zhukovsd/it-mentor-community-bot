@@ -2,12 +2,13 @@ from urllib.parse import urlparse
 from src.google_sheet.dto.dto_project_data import ProjectDataDTO
 
 
-def get_info_from_url(url: str, lang_project: str) -> ProjectDataDTO:
+def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataDTO:
     """
     Получаем информацию о репозитории и пользователе из url
         и формируем объект для дальнейшей работы с таблицей.
     :param url: Передаем url репозитория из сообщения.
     :param lang_project: Передаем язык программирования проекта из команды.
+    :param type_project: Передаем тип проекта из команды.
     :return project_data_serializer_obj: Хранит в себе информацию для добавления в таблицу
     """
     parsed_url = urlparse(url)
@@ -27,6 +28,7 @@ def get_info_from_url(url: str, lang_project: str) -> ProjectDataDTO:
         repository_url=repo_url,
         url_owner_repo=repo_owner_url,
         program_lang_project=lang_project,
+        type_project=type_project
     )
     return project_data_dto_obj
 

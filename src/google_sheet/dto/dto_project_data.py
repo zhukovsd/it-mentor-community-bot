@@ -1,7 +1,7 @@
 class ProjectDataDTO:
     def __init__(self, name_owner_repo, url_owner_repo,
                  repository_name, repository_url,
-                 program_lang_project):
+                 program_lang_project, type_project):
         """
         Хранит корректные данные из url для дальнейшей работы с таблицами
         :param repository_name: Проект/Имя репозитория
@@ -9,11 +9,11 @@ class ProjectDataDTO:
         :param repository_url: Ссылка на репозиторий
         :param url_owner_repo: Ссылка на владельца репозитория
         :param program_lang_project: Язык программирования проекта
-        :param sheet_list: Страница в gsheet в которую будем добавлять информацию
+        :param type_project: hangman, simulation, currency exchange и прочее
         """
         self.repository_name = repository_name
         self.name_owner_repo = name_owner_repo
         self.repository_url = repository_url
         self.url_owner_repo = url_owner_repo
         self.program_lang_project = program_lang_project
-        # todo: self.sheet_list = sheet_list
+        self.type_project = type_project

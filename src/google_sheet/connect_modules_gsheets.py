@@ -16,12 +16,14 @@ log = logging.getLogger(__name__)
 
 
 def connect_modules_to_add_data_to_gsheets(
-    message: str, lang_project: str, command_check: str
+    message: str, lang_project: str, type_project: str, command_check: str
 ) -> CheckValidationAddedDataDTO:
     """
     Подключение модулей для добавления данных в гугл таблицы итогов месяца.
     :param message: Пересланное боту сообщение для добавления.
     :param lang_project: Язык программирования добавляемого проекта. Достается из параметров команды.
+    :param type_project: Тип проекта добавляемый в таблицу (hangman, simulation и пр.)
+        Получаем из аргументов команды.
     :param command_check: Проверяет какая команда была послана.
         Достается из константы "..._COMMAND_NAME"
         Нужен для работы с другими командами в рамках google_sheets
@@ -41,7 +43,7 @@ def connect_modules_to_add_data_to_gsheets(
         return err_object
 
     project_data_obj = get_info_from_url(
-        url=url, lang_project=lang_project
+        url=url, lang_project=lang_project, type_project=type_project
     )
 
     if ADDED_PROJECTS_SPREADSHEET_ID is None or ADDED_PROJECTS_SPREADSHEET_ID == "":
