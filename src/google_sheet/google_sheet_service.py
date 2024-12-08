@@ -28,61 +28,61 @@ from src.google_sheet.interview_collection_sheet_constants import (
     QUESTION_POPULRATIY_COL_INDEX,
 )
 
+from src.google_sheet.constants.added_completed_projects_constants import PROJECTS_SHEET
+
 logs.configure()
 log = logging.getLogger(__name__)
 
 
 class GSheetService:
-    def __init__(self, json_key_google_api):
+    def __init__(self, json_key_google_api: str):
         """
         Нужен для добавления проекта в таблицу итогов
+        :param json_key_google_api:
         """
         # Подключение происходит с помощью ключа превращенного в dict
         self.__dict_api_key_gsheet = json.loads(json_key_google_api)
         self.__google_sheet_client = gspread.service_account_from_dict(
             self.__dict_api_key_gsheet
         )
-        # Для получения индекса по имени листа, который используется для открытия нужного нам листа
-        self.__index_sheet_list = {
-            "hangman": 0,
-            "simulation": 1,
-            "currency-exchange": 2,
-            "tennis-scoreboard": 3,
-            "weather-viewer": 4,
-            "cloud-file-storage": 5,
-            "task-tracker": 6,
-            "другое": 7,
-        }
         self.__interview_questions: dict[int, InterviewQuestion] = dict()
 
     def add_project_to_gsheet(
-        self, project_data_object: ProjectDataDTO, gsheets_name: str
+        self, project_data_object: ProjectDataDTO, gsheets_id: str
     ):
         """
         Позволяет нам добавить информацию в google sheets по переданному объекту
         :param project_data_object: Информация извлеченная из url с помощью get_info_from_url
-        :param gsheets_name: Имя google таблицы
+        :param gsheets_id:
         :return:
         """
-        open_table = self.__google_sheet_client.open(gsheets_name)
+        open_table = self.__google_sheet_client.open_by_key(gsheets_id)
+        # Получаем дату для поля "Период" из таблицы
+        get_date_for_column_A = self.__get_date_from_sheet(gsheets_id)
+        log.debug("Информация о периоде: %s", get_date_for_column_A)
         data_object = project_data_object
 
-        open_sheet = open_table.get_worksheet(
-            self.__index_sheet_list[data_object.type_project]
-        )
+        open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
+
         # Ищем, существует ли запись с переданным url в таблице
         find_url_repo_in_sheet = open_sheet.find(data_object.repository_url)
         if find_url_repo_in_sheet is None:
-            last_filled_row = len(open_sheet.get_all_values())
+            last_filled_row = len(open_sheet.get_all_values(range_name='A:G'))
             empty_row = last_filled_row + 1
             fields_sheet_obj = GSheetFieldsDTO(open_sheet, empty_row)
 
             # Если ячейка с url пустая - то вся строка гарантированно пустая
             check_cell_sheet = open_sheet.get(fields_sheet_obj.repository_url).first()
             if check_cell_sheet is None:
-                # todo: Как вариант код ниже можно переписать диапазонным добавлением
-                #  (Например через insert row - который принимает
-                #  список с полями data_object в строгом порядке и номер добавляемой строки)
+                open_sheet.update_acell(
+                    fields_sheet_obj.date_added_project, get_date_for_column_A
+                )
+                open_sheet.update_acell(
+                    fields_sheet_obj.type_project, data_object.type_project
+                )
+                open_sheet.update_acell(
+                    fields_sheet_obj.program_lang_project, data_object.program_lang_project
+                )
                 open_sheet.update_acell(
                     fields_sheet_obj.repository_name, data_object.repository_name
                 )
@@ -94,10 +94,6 @@ class GSheetService:
                 )
                 open_sheet.update_acell(
                     fields_sheet_obj.url_owner_repo, data_object.url_owner_repo
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.program_lang_project,
-                    data_object.program_lang_project,
                 )
 
                 log.info(
@@ -117,6 +113,26 @@ class GSheetService:
                 find_url_repo_in_sheet.value,
                 find_url_repo_in_sheet.address,
             )
+
+    def __get_date_from_sheet(self, gsheets_id: str) -> str:
+        """
+        Метод позволяет получить гарантированно период за который добавляются проекты
+            из таблицы. В дальнейшем можно использовать так же для добавления ревью
+        Если Значение "Период" поменяет свое местоположение, то:
+            При смене листа - измените PROJECT_SHEET путем добавления НОВОЙ константы
+                в файл "added_completed_projects_constants.py"
+            При смене ячейки - измените значение "I1" на нужную вам ячейку
+        :param gsheets_id: id Таблицы с которым работаем
+        :return:
+        """
+        open_table = self.__google_sheet_client.open_by_key(gsheets_id)
+
+        open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
+        date_for_add_in_sheet = open_sheet.get('I2')
+
+        open_table.client.session.close()
+
+        return date_for_add_in_sheet[0][0]
 
     def get_interview_question_by_id(
         self, question_id: int

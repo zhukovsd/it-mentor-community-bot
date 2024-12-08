@@ -9,9 +9,7 @@ class ProjectDataDTO:
         :param repository_url: Ссылка на репозиторий
         :param url_owner_repo: Ссылка на владельца репозитория
         :param program_lang_project: Язык программирования проекта
-        :param type_project: Тип проекта ( "hangman", "simulation",
-            "currency-exchange", "tennis-scoreboard",
-            "weather-viewer", "cloud-file-storage", "task-tracker")
+        :param type_project: hangman, simulation, currency exchange и прочее
         """
         self.repository_name = repository_name
         self.name_owner_repo = name_owner_repo
