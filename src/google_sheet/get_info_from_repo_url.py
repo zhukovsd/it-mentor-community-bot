@@ -2,13 +2,12 @@ from urllib.parse import urlparse
 from src.google_sheet.dto.dto_project_data import ProjectDataDTO
 
 
-def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataDTO:
+def get_info_from_url(url: str, lang_project: str) -> ProjectDataDTO:
     """
     Получаем информацию о репозитории и пользователе из url
         и формируем объект для дальнейшей работы с таблицей.
     :param url: Передаем url репозитория из сообщения.
     :param lang_project: Передаем язык программирования проекта из команды.
-    :param type_project: Тип проекта (Виселица, Симуляция и т.п.) из команды.
     :return project_data_serializer_obj: Хранит в себе информацию для добавления в таблицу
     """
     parsed_url = urlparse(url)
@@ -22,15 +21,14 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
     # (например, что бы избавиться от части пути к конкретному файлу)
     repo_url = f"{parsed_url.scheme}://{parsed_url.hostname}/{repo_owner}/{repo_name}"
 
-    project_data_serializer_obj = ProjectDataDTO(
+    project_data_dto_obj = ProjectDataDTO(
         repository_name=repo_name,
         name_owner_repo=repo_owner,
         repository_url=repo_url,
         url_owner_repo=repo_owner_url,
         program_lang_project=lang_project,
-        type_project=type_project,
     )
-    return project_data_serializer_obj
+    return project_data_dto_obj
 
 
 if __name__ == "__main__":
@@ -44,5 +42,4 @@ if __name__ == "__main__":
         object_project_data.name_owner_repo,
         object_project_data.repository_name,
         object_project_data.program_lang_project,
-        object_project_data.type_project,
     )

@@ -16,14 +16,15 @@ log = logging.getLogger(__name__)
 
 
 def connect_modules_to_add_data_to_gsheets(
-    message: str, lang_project: str, type_project: str
+    message: str, lang_project: str, command_check: str
 ) -> CheckValidationAddedDataDTO:
     """
     Подключение модулей для добавления данных в гугл таблицы итогов месяца.
     :param message: Пересланное боту сообщение для добавления.
     :param lang_project: Язык программирования добавляемого проекта. Достается из параметров команды.
-    :param type_project: Тип проекта. Должен быть аналогичен итему из списка PROJECT_NAMES.
-        Достается из параметров команды.
+    :param command_check: Проверяет какая команда была послана.
+        Достается из константы "..._COMMAND_NAME"
+        Нужен для работы с другими командами в рамках google_sheets
     :return :
     """
     url = parse_url_from_message(message)
@@ -40,7 +41,7 @@ def connect_modules_to_add_data_to_gsheets(
         return err_object
 
     project_data_obj = get_info_from_url(
-        url=url, lang_project=lang_project, type_project=type_project
+        url=url, lang_project=lang_project
     )
 
     if ADDED_PROJECTS_SPREADSHEET_ID is None or ADDED_PROJECTS_SPREADSHEET_ID == "":
@@ -55,9 +56,12 @@ def connect_modules_to_add_data_to_gsheets(
         log.error(error_message)
         return err_object
 
-    add_in_sheets_obj = GSheetService(json_key_google_api=JSON_KEY_GOOGLE_API)
+    add_in_sheets_obj = GSheetService(
+        json_key_google_api=JSON_KEY_GOOGLE_API
+    )
     add_in_sheets_obj.add_project_to_gsheet(
-        project_data_object=project_data_obj, gsheets_id=ADDED_PROJECTS_SPREADSHEET_ID
+        project_data_object=project_data_obj,
+        gsheets_id=ADDED_PROJECTS_SPREADSHEET_ID
     )
     check_obj = CheckValidationAddedDataDTO()
 
