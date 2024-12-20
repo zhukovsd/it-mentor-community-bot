@@ -7,6 +7,7 @@ _ = load_dotenv()
 
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTION_CHAT_ID")  # fmt: skip
+ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
 # Константы для работы с gsheet
 JSON_KEY_GOOGLE_API: str = os.getenv("JSON_KEY_GOOGLE_API")
