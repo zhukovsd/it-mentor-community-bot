@@ -67,19 +67,26 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=
 
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
-ALLOWED_USER_IDS=
+ADD_PROJECT_ALLOWED_USER_IDS=
 
 JSON_KEY_GOOGLE_API='{JSON-string}'
 ADD_TO_SHEET_NAME='name_sheet'
 
 INTERVIEW_COLLECTION_SPREADSHEET_ID=
 SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
+
+INTERVIEW_PREP_SITE_REPO_OWNER=
+INTERVIEW_PREP_SITE_REPO_NAME=
+
+GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
+
+QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 ```
 
 `ADD_TO_SHEET_NAME` - Строка без пробелов содержащая в себе имя файла google sheet из google drive который подключается с помощью google api.  
-`ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
+`ADD_PROJECT_ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
 `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по аналогии с 
-`ALLOWED_USER_IDS`
+`ADD_PROJECT_ALLOWED_USER_IDS`
 - **Не добавлять сюда** ID другого **чат бота** или того же самого который используется
 
 `JSON_KEY_GOOGLE_API` - JSON строка формата:
@@ -98,6 +105,13 @@ SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
   "universe_domain": ""
 }
 ```
+
+`INTERVIEW_PREP_SITE_REPO_OWNER` - Владелец репозитория с методичкой
+`INTERVIEW_PREP_SITE_REPO_NAME` - Название репозитория с методичкой
+
+`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo
+
+`QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности вопросов. Указывается через запятую без пробелов = 322,511,987
 
 5. Поднять БД в контейнере командой
 
@@ -121,30 +135,9 @@ yoyo apply --database postgresql://user:password@localhost:5433/database-name ./
 
 ## Запуск в докере 
 
-1. Создать `.env.prod` файл в корне проекта. Он будет использоваться только для локального запуска
+1. Создать `.env.prod` файл в корне проекта. 
 
-```env
-TELEGRAM_BOT_TOKEN=
-
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-POSTGRES_DB=
-POSTGRES_HOST=database
-POSTGRES_PORT=5432
-
-PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
-ALLOWED_USER_IDS=
-
-JSON_KEY_GOOGLE_API='{JSON-string}'
-ADD_TO_SHEET='name_sheet'
-
-INTERVIEW_COLLECTION_SPREADSHEET_ID=
-SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
-```
-
-`POSTGRES_HOST` = название сервиса с БД в docker-compose-prod.yaml файле. Дефолт `database`
-`POSTGRES_PORT` = порт сервиса с БД в docker-compose-prod.yaml файле. Дефолт `5432` для postgres
-`ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
+`.env.prod` аналогичен `.env` файлу описанному в [4 пункте локального запуска](#локальный-запуск)
 
 2. Собрать образ бота
 

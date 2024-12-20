@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class InterviewQuestionCategory:
     name: str
     link: str
+    popularity: float
