@@ -9,6 +9,7 @@ from telegram.ext import ContextTypes
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
+from src.handler import util
 
 SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
 
@@ -17,27 +18,6 @@ log = logging.getLogger(__name__)
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
 google_sheet_service = GSheetService(json_google_api_key)
-
-special_chars = [
-    "_",
-    "*",
-    "[",
-    "]",
-    "(",
-    ")",
-    "~",
-    "`",
-    ">",
-    "#",
-    "+",
-    "-",
-    "=",
-    "|",
-    "{",
-    "}",
-    ".",
-    "!",
-]
 
 
 async def search_interviews_with_question(
@@ -96,8 +76,8 @@ async def search_interviews_with_question(
         )
         return
 
-    question_popularity = escape_special_chars(str(question.popularity))
-    question_text = escape_special_chars(question.question)
+    question_popularity = util.escape_special_chars(str(question.popularity))
+    question_text = util.escape_special_chars(question.question)
     response_header = f"Ответы на вопрос \\#{question_id}: `{question_text}` \\({question_popularity}%\\) из коллекции собеседований:\n\n"
     response = response_header + answers
 
@@ -127,21 +107,13 @@ def get_answers(question: InterviewQuestion, amount: int) -> list[str]:
         if len(answers) >= amount:
             break
 
-        name = escape_special_chars(timestamp.interview.name)
+        name = util.escape_special_chars(timestamp.interview.name)
         link = timestamp.interview.link
-        timestamp_text = escape_special_chars(timestamp.timestamp)
+        timestamp_text = util.escape_special_chars(timestamp.timestamp)
 
         answers.append(f"\\- [{name}]({link}) {timestamp_text}")
 
     return answers
-
-
-def escape_special_chars(text: str) -> str:
-    pattern = "[" + re.escape("".join(special_chars)) + "]"
-
-    escaped_text = re.sub(pattern, r"\\\g<0>", text)
-
-    return escaped_text
 
 
 def get_question_id(message: Message) -> int:
