@@ -8,18 +8,14 @@ class GSheetFieldsDTO:
         """
         # Имя листа на котором мы сейчас находимся
         self.name_list_excel_file = object_opened_sheet.title
-        # Данные репозитория
-        self.repository_name = f"A{number_row_cell_excel}"
-        self.repository_url = f"B{number_row_cell_excel}"
-        # Данные автора
-        self.name_owner_repo = f"C{number_row_cell_excel}"
-        self.url_owner_repo = f"D{number_row_cell_excel}"
-        # На каком языке написан проект
-        self.program_lang_project = f"E{number_row_cell_excel}"
-        # Данные ревью (Тип - Заметка или видео, и ссылка на ревью)
-        self.type_review = f"F{number_row_cell_excel}"
-        self.review_link = f"G{number_row_cell_excel}"
-        # Данные автора ревью
-        self.name_author_review = f"H{number_row_cell_excel}"
-        self.user_name_author_in_telegram = f"I{number_row_cell_excel}"
-        self.author_review_link = f"J{number_row_cell_excel}"
+        # Период добавляемый
+        self.date_added_project = f'A{number_row_cell_excel}'
+        # Тип проекта (hangman, simulation и т.п.) и язык
+        self.type_project = f'B{number_row_cell_excel}'
+        self.program_lang_project = f"C{number_row_cell_excel}"
+        # Информация о репозитории
+        self.repository_name = f"D{number_row_cell_excel}"
+        self.repository_url = f"E{number_row_cell_excel}"
+        # Информация о авторе
+        self.name_owner_repo = f"F{number_row_cell_excel}"
+        self.url_owner_repo = f"G{number_row_cell_excel}"

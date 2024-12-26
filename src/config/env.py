@@ -10,7 +10,7 @@ PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTIO
 
 # Константы для работы с gsheet
 JSON_KEY_GOOGLE_API: str = os.getenv("JSON_KEY_GOOGLE_API")
-ADD_TO_SHEET_NAME: str | None = os.getenv("ADD_TO_SHEET_NAME")
+ADDED_PROJECTS_SPREADSHEET_ID: str | None = os.getenv("ADDED_PROJECTS_SPREADSHEET_ID")
 
 # Константы для подключения к БД
 POSTGRES_USER: str = os.getenv("POSTGRES_USER")
@@ -27,7 +27,7 @@ assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable 
 assert PROJECTS_REVIEWS_COLLECTION_CHAT_ID is not None, "PROJECTS_REVIEWS_COLLECTION_CHAT_ID environment variable is not set"
 
 assert JSON_KEY_GOOGLE_API is not None, "JSON_KEY_GOOGLE_API environment variable is not set"
-# assert ADD_TO_SHEET_NAME is not None, "ADD_TO_SHEET_NAME environment variable is not set"
+# assert ADDED_PROJECTS_SPREADSHEET_ID is not None, "ADDED_PROJECTS_SPREADSHEET_ID environment variable is not set"
 
 assert POSTGRES_USER is not None, "POSTGRES_USER environment variable is not set"
 assert POSTGRES_PASSWORD is not None, "POSTGRES_PASSWORD environment variable is not set"
