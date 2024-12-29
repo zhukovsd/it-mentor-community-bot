@@ -198,6 +198,9 @@ def _generate_stats_message() -> str:
     top_category_incr_popularity = categories_popularity_stats[-3:]
     top_category_decr_popularity = categories_popularity_stats[:3]
 
+    top_questions_incr_popularity.reverse()
+    top_category_incr_popularity.reverse()
+
     def generate_ordered_list(questions: list[tuple[str, float]]) -> str:
         question_bullets: list[str] = list()
 
