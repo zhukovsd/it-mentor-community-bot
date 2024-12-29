@@ -31,8 +31,8 @@ CATEGORY_PATTERN = r"##\s{1}\[(.*?)\]\(.*?\)\s*\[([^%]*?)%*\]"
 # Second capturing group = 4
 QUESTION_PATTERN = r"#{4}\s{1}\d*\.*\s*\[(.*?)\]\(.*?\)\s*\[([^%]*?)%*\]"
 
-categories_popularity_change: dict[str, float] = {}
-questions_popularity_change: dict[str, float] = {}
+categories_popularity_change: dict[str, tuple[float, float]] = {}
+questions_popularity_change: dict[str, tuple[float, float]] = {}
 
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
@@ -149,8 +149,11 @@ def _update_category_popularity(
         f"Updating category '{category_name}' popularity: {gh_category_popularity} -> {gs_category_popularity}"
     )
 
-    categories_popularity_change[category_name] = gs_category_popularity - float(
-        gh_category_popularity
+    popularity_delta = gs_category_popularity - float(gh_category_popularity)
+
+    categories_popularity_change[category_name] = (
+        popularity_delta,
+        gs_category_popularity,
     )
 
     return full_match.replace(gh_category_popularity, str(gs_category_popularity))
@@ -177,8 +180,11 @@ def _update_question_popularity(
         f"Updating question '{question_name}' popularity: {gh_question_popularity} -> {gs_question_popularity}"
     )
 
-    questions_popularity_change[question_name] = gs_question_popularity - float(
-        gh_question_popularity
+    popularity_delta = gs_question_popularity - float(gh_question_popularity)
+
+    questions_popularity_change[question_name] = (
+        popularity_delta,
+        gs_question_popularity,
     )
 
     return full_match.replace(gh_question_popularity, str(gs_question_popularity))
@@ -201,11 +207,17 @@ def _generate_stats_message() -> str:
     top_questions_incr_popularity.reverse()
     top_category_incr_popularity.reverse()
 
-    def generate_ordered_list(questions: list[tuple[str, float]]) -> str:
+    def generate_ordered_list(
+        popularity_data: list[tuple[str, tuple[float, float]]]
+    ) -> str:
         question_bullets: list[str] = list()
 
-        for i, (text, popularity) in enumerate(questions):
-            question_bullet = f"{i + 1}. {text} {round(popularity)}%"
+        for i, (text, (delta, new_percent)) in enumerate(popularity_data):
+            old_percent = new_percent - delta
+
+            question_bullet = (
+                f"{i + 1}. {text} [{round(old_percent)}% -> {round(new_percent)}%]"
+            )
 
             question_bullets.append(question_bullet)
 
