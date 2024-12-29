@@ -58,6 +58,7 @@ async def update_questions_popularity(
         message = github_service.update_questions_popularity()
 
         _ = await context.bot.send_message(
+            reply_to_message_id=command_message.id,
             chat_id=chat.id,
             text=util.escape_special_chars(message),
             parse_mode=ParseMode.MARKDOWN_V2,
