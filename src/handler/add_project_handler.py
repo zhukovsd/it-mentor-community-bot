@@ -1,5 +1,4 @@
 import logging
-import os
 import asyncio
 from telegram import ChatMember, Message, Update
 from src.config import env
@@ -7,6 +6,7 @@ from src.repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
+from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.google_sheet.connect_modules_gsheets import (
     connect_modules_to_add_data_to_gsheets,
 )
@@ -158,15 +158,7 @@ def is_admin(user: ChatMember) -> bool:
 
 
 def is_allowed_user(user: ChatMember) -> bool:
-    allowed_user_ids = os.getenv("ALLOWED_USER_IDS")
-
-    if allowed_user_ids is None:
-        log.error(
-            f"{ADD_PROJECT_COMMAND_NAME} cannot find ALLOWED_USER_IDS to check permissions"
-        )
-        return False
-
-    allowed_user_ids = allowed_user_ids.split(",")
+    allowed_user_ids = ADD_PROJECT_ALLOWED_USER_IDS.split(",")
     allowed_user_ids = list(map(int, allowed_user_ids))
 
     user_id = user.user.id
