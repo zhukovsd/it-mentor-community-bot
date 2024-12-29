@@ -129,7 +129,7 @@ yoyo apply --database postgresql://user:password@localhost:5433/database-name ./
 7. Запустить проект
 
  - C помощью UI pycharm
- - Через `python src/main.py`
+ - Через `python -m src.main`
 
 
 ---
