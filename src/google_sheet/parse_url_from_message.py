@@ -56,22 +56,3 @@ def __create_base_url_form(url: str):
         return new_url
 
     return url
-
-
-if __name__ == "__main__":
-    message_text = """
-    Привет! Закончил работу над легендарной Симуляцией на Java.
-Буду рад обоснованной, sdfsdfdsafdfsfasfasfasdfas критике и предложениям по улучшению. В некоторых местах есть спорные моменты. Я умышленно их оставил на суд ревьювера. Также хотелось бы услышать общее впечатление по реализации и по стилю написания кода.
-https://github.com/violaceusflame/simulation!?,!.?,!?!,,.?.
-    """
-    message_text2 = """
-        Привет! Закончил работу над легендарной Симуляцией на Java.
-    Буду рад обоснованной, sdfsdfdsafdfsfasfasfasdfas критике и предложениям по улучшению. В некоторых местах есть спорные моменты. Я умышленно их оставил на суд ревьювера. Также хотелось бы услышать общее впечатление по реализации и по стилю написания кода.
-    github.com/violaceusflame/simulation!?,!.?,!?!,,.?.
-        """
-    old_url = parse_url_from_message(message_text2)
-    print(old_url)
-    print(__create_base_url_form(old_url))
-    old_url_2 = parse_url_from_message(message_text)
-    print(old_url_2)
-    print(__create_base_url_form(old_url_2))
