@@ -202,7 +202,7 @@ def _generate_stats_message() -> str:
         question_bullets: list[str] = list()
 
         for i, (text, popularity) in enumerate(questions):
-            question_bullet = f"{i + 1}. {text} {popularity:.2f}%"
+            question_bullet = f"{i + 1}. {text} {round(popularity)}%"
 
             question_bullets.append(question_bullet)
 
