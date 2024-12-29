@@ -8,16 +8,21 @@ def parse_url_from_message(message: str):
     :return:
     """
     # Шаблон извлекаемой ссылки
-    sample_url = "https://github.com"
+    url_samples: list[str] = [
+        "https://github.com/",
+        "github.com/"
+        ]
     list_message_words = message.split()
 
-    for word in list_message_words:
-        if len(word) <= len(sample_url):
-            continue
-        slice_word = word[: len(sample_url)]
-        if slice_word == sample_url:
-            result_url = __clear_url_of_char(word)
-            return result_url
+    for sample_url in url_samples:
+        for word in list_message_words:
+            if len(word) <= len(sample_url):
+                continue
+            slice_word = word[: len(sample_url)]
+            if slice_word == sample_url:
+                a_clean_url = __clear_url_of_char(word)
+                result_url = __create_base_url_form(a_clean_url)
+                return result_url
 
 
 def __clear_url_of_char(word: str):
@@ -36,10 +41,18 @@ def __clear_url_of_char(word: str):
     return new_word
 
 
-if __name__ == "__main__":
-    message_text = """
-    Привет! Закончил работу над легендарной Симуляцией на Java.
-Буду рад обоснованной, sdfsdfdsafdfsfasfasfasdfas критике и предложениям по улучшению. В некоторых местах есть спорные моменты. Я умышленно их оставил на суд ревьювера. Также хотелось бы услышать общее впечатление по реализации и по стилю написания кода.
-https://github.com/violaceusflame/simulation!?,!.?,!?!,,.?.
+def __create_base_url_form(url: str):
     """
-    print(parse_url_from_message(message_text))
+    Функция приводит url без протокола к стандартному виду.
+    Пример:
+        Из "github.com/violaceusflame/simulation"
+        В "https://github.com/violaceusflame/simulation"
+    :return:
+    """
+    protocol = "https://"
+
+    if protocol != url[: len(protocol)]:
+        new_url = f"{protocol}{url}"
+        return new_url
+
+    return url
