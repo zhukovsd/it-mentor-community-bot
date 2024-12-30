@@ -22,9 +22,9 @@ def approved_parse_url():
             f"Сделал проект Simulation, ссылка на проект - {url}, Кому не сложно будет - посмотрите реализацию",
             f"Строка с двумя url, первая - https://random_url.com, вторая - {url}? и еще немного текста",
             ]
+        test_cases.append(url)
         for text_sample in text_samples:
             test_cases.append(text_sample)
-            test_cases.append(url)
 
     return test_cases
 
