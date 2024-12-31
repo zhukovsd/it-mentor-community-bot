@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import re
 
 from telegram import Update
 from telegram.constants import ParseMode
@@ -10,6 +9,7 @@ from src.google_sheet.dto.interview_question_category import InterviewQuestionCa
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
+from src.handler import util
 
 INTERVIEW_QUESTIONS_LIST_COMMAND = "interviewprepquestionslist"
 
@@ -18,27 +18,6 @@ log = logging.getLogger(__name__)
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
 google_sheet_service = GSheetService(json_google_api_key)
-
-special_chars = [
-    "_",
-    "*",
-    "[",
-    "]",
-    "(",
-    ")",
-    "~",
-    "`",
-    ">",
-    "#",
-    "+",
-    "-",
-    "=",
-    "|",
-    "{",
-    "}",
-    ".",
-    "!",
-]
 
 MAX_MESSAGE_LENGTH = 4096
 
@@ -181,13 +160,13 @@ def generate_message(
     questions: list[InterviewQuestion],
     generate_q_command: bool,
 ) -> str:
-    message_header = f"[{escape_special_chars(category.name)}]({category.link})"
+    message_header = f"[{util.escape_special_chars(category.name)}]({category.link})"
 
     question_bullets: list[str] = list()
 
     for question in questions:
-        text = escape_special_chars(question.question)
-        popularity = escape_special_chars(f"{question.popularity}%")
+        text = util.escape_special_chars(question.question)
+        popularity = util.escape_special_chars(f"{question.popularity}%")
 
         question_bullet = f"\\- {text} \\[{popularity}\\]"
 
@@ -227,11 +206,3 @@ def compress_messages(messages: list[str]) -> list[str]:
             continue
 
     return compressed_messages
-
-
-def escape_special_chars(text: str) -> str:
-    pattern = "[" + re.escape("".join(special_chars)) + "]"
-
-    escaped_text = re.sub(pattern, r"\\\g<0>", text)
-
-    return escaped_text

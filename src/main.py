@@ -18,6 +18,12 @@ from telegram.ext import (
 )
 from src.config.env import TELEGRAM_BOT_TOKEN
 
+from src.handler.update_interview_questions_popularity_handler import (
+    UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
+)
+from src.handler.update_interview_questions_popularity_handler import (
+    update_questions_popularity,
+)
 from src.handler.interview_questions_list_handler import (
     INTERVIEW_QUESTIONS_LIST_COMMAND,
 )
@@ -69,10 +75,15 @@ if __name__ == "__main__":
         INTERVIEW_QUESTIONS_LIST_COMMAND, list_interview_questions_messages
     )
     inline_hello_handler = InlineQueryHandler(hello_inline_query)
+    update_interview_questions_popularity_handler = CommandHandler(
+        UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
+        update_questions_popularity,
+    )
 
     application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
     application.add_handler(search_interviews_with_question_handler)
     application.add_handler(interview_questions_list_handler)
+    application.add_handler(update_interview_questions_popularity_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

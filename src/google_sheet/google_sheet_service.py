@@ -218,6 +218,7 @@ class GSheetService:
         q_id_to_q_row: dict[int, tuple[list[Any], InterviewQuestionCategory]] = dict()
         current_category_name = ""
         current_category_link = ""
+        current_category_popularity = 0.0
 
         for i, row in enumerate(cols_rows):
             if i < FIRST_QUESTION_ROW_INDEX - 1:
@@ -225,6 +226,7 @@ class GSheetService:
 
             question_id = row[QUESTION_ID_COL_INDEX]
 
+            # Is category
             if self._is_link(question_id):
                 link = str(question_id)
                 name = str(row[QUESTION_COL_INDEX])
@@ -232,13 +234,24 @@ class GSheetService:
                 current_category_name = name
                 current_category_link = link
 
+                popularity_precents = str(row[QUESTION_POPULRATIY_COL_INDEX])
+                popularity = popularity_precents.replace("%", "")
+
+                if popularity == "":
+                    log.warn(f"Popularity percents for category {name} is not found")
+                    continue
+
+                current_category_popularity = float(popularity)
+
                 continue
 
             if not self._is_int(question_id):
                 continue
 
             q_id_to_q_row[int(question_id)] = row, InterviewQuestionCategory(
-                name=current_category_name, link=current_category_link
+                name=current_category_name,
+                link=current_category_link,
+                popularity=current_category_popularity,
             )
 
         return q_id_to_q_row
@@ -348,7 +361,7 @@ class GSheetService:
             category = row_category[1]
 
             interview_question = InterviewQuestion(
-                question_id, "", 0.0, [], InterviewQuestionCategory("", "")
+                question_id, "", 0.0, [], InterviewQuestionCategory("", "", 0.0)
             )
 
             for i, col in enumerate(row):
@@ -359,6 +372,13 @@ class GSheetService:
                 if i == QUESTION_POPULRATIY_COL_INDEX and len(col) > 0:
                     popularity_precents = str(col)
                     popularity = popularity_precents.replace("%", "")
+
+                    if popularity == "":
+                        log.warn(
+                            f"Popularity percents for question {interview_question.question} is not found"
+                        )
+                        continue
+
                     interview_question.popularity = float(popularity)
                     continue
 
