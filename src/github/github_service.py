@@ -187,7 +187,7 @@ def _update_question_popularity(
         gs_question_popularity,
     )
 
-    return full_match.replace(gh_question_popularity, str(gs_question_popularity))
+    return full_match.replace(f"{gh_question_popularity}%", f"{str(gs_question_popularity)}%")
 
 
 def _generate_stats_message() -> str:
