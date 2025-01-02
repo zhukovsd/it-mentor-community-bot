@@ -38,11 +38,11 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ), "add_project command should be used by user, it must not be None"
     assert command_message is not None, "add_project command cannot be None"
 
-    async def reply_with_error(text: str) -> None:
+    async def reply_with_error(text: str, reply_message_id: int) -> None:
         error_message = await context.bot.send_message(
             chat_id=chat.id,
             text=text,
-            reply_to_message_id=command_message.id,
+            reply_to_message_id=reply_message_id,
         )
         await asyncio.sleep(10)
         _ = await context.bot.delete_messages(
@@ -57,12 +57,12 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called by not admin user: {chat_member.user.id}-{chat_member.status}"
         )
-        await reply_with_error("У вас нет прав на использование данной команды")
+        await reply_with_error("У вас нет прав на использование данной команды", command_message.id)
         return
 
     if not is_reply(update.effective_message):
         log.error(f"{ADD_PROJECT_COMMAND_NAME} was called outside of reply")
-        await reply_with_error("Сделайте реплай на сообщение со ссылкой на проект")
+        await reply_with_error("Сделайте реплай на сообщение со ссылкой на проект", command_message.id)
         return
 
     command_text = command_message.text
@@ -76,7 +76,8 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, excpected 2"
         )
         await reply_with_error(
-            f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта"
+            f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
+            command_message.id
         )
         return
 
@@ -87,7 +88,8 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"{ADD_PROJECT_COMMAND_NAME} was called with {len(args)} arguments, excpected 2"
         )
         await reply_with_error(
-            f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта"
+            f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта",
+            command_message.id
         )
         return
 
@@ -97,7 +99,8 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with invalid project name '{project_name}' argument"
         )
-        await reply_with_error("Неправильное название проекта (второй аргумент)")
+        await reply_with_error("Неправильное название проекта (второй аргумент)",
+                               command_message.id)
         return
 
     student_message = command_message.reply_to_message
@@ -112,7 +115,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} for project '{project_name}' and '{language}' didn't find suitable reply"
         )
-        await reply_with_error("Сообщение по заданным критериям не найдено")
+        await reply_with_error("Сообщение по заданным критериям не найдено", command_message.id)
         return
 
     bot_reply_text = bot_reply_text.replace("\\n", "\n")
@@ -135,7 +138,11 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode=ParseMode.MARKDOWN_V2,
     )
 
-    message = student_message.text
+    if student_message.photo or student_message.video or student_message.document:
+        log.info(f'Пересланное сообщение содержит изображение, видео или файл, извлекаем текст.')
+        message = student_message.caption
+    else:
+        message = student_message.text
 
     assert (
         message is not None
@@ -147,7 +154,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     if check_add_data.boolean_val is False:
-        await reply_with_error(check_add_data.error_message)
+        await reply_with_error(check_add_data.error_message, student_message.id)
 
 
 def is_admin(user: ChatMember) -> bool:

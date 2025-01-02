@@ -32,10 +32,7 @@ def connect_modules_to_add_data_to_gsheets(
     url = parse_url_from_message(message)
 
     if url is None:
-        error_message = """
-Отсутствует ссылка в передаваемом сообщении 
-В gsheet ничего не добавлено
-        """
+        error_message = "Отсутствует ссылка в передаваемом сообщении - В gsheet ничего не добавлено"
         err_object = CheckValidationAddedDataDTO(
             error_message=error_message, boolean_val=False
         )
@@ -47,11 +44,9 @@ def connect_modules_to_add_data_to_gsheets(
     )
 
     if ADDED_PROJECTS_SPREADSHEET_ID is None or ADDED_PROJECTS_SPREADSHEET_ID == "":
-        error_message = """
-Данные в таблицу не могут быть добавлены
-Передайте корректное имя таблицы в которую будем добавлять данные
-Затем повторите попытку
-        """
+        error_message = "Данные в таблицу не могут быть добавлены \n" \
+                        "Передайте корректное имя таблицы в которую будем добавлять данные \n" \
+                        "Затем повторите попытку"
         err_object = CheckValidationAddedDataDTO(
             error_message=error_message, boolean_val=False
         )
