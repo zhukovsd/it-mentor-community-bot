@@ -6,7 +6,9 @@ from src.repository import find_reply_by_language_and_project
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
+from src.config.env import (
+    ADD_PROJECT_ALLOWED_USER_IDS, PROJECTS_REVIEWS_COLLECTION_CHAT_ID
+)
 from src.google_sheet.connect_modules_gsheets import (
     connect_modules_to_add_data_to_gsheets,
 )
@@ -38,15 +40,15 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ), "add_project command should be used by user, it must not be None"
     assert command_message is not None, "add_project command cannot be None"
 
-    async def reply_with_error(text: str, reply_message_id: int) -> None:
+    async def reply_with_error(text: str, reply_message_id: int | None = None, reply_chat_id: int = chat.id) -> None:
         error_message = await context.bot.send_message(
-            chat_id=chat.id,
+            chat_id=reply_chat_id,
             text=text,
             reply_to_message_id=reply_message_id,
         )
         await asyncio.sleep(10)
         _ = await context.bot.delete_messages(
-            chat_id=chat.id,
+            chat_id=reply_chat_id,
             message_ids=[command_message.id, error_message.id],
         )
         return
@@ -154,7 +156,8 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     if check_add_data.boolean_val is False:
-        await reply_with_error(check_add_data.error_message, student_message.id)
+        await reply_with_error(check_add_data.error_message,
+                               reply_chat_id=int(PROJECTS_REVIEWS_COLLECTION_CHAT_ID))
 
 
 def is_admin(user: ChatMember) -> bool:
