@@ -8,10 +8,7 @@ def parse_url_from_message(message: str):
     :return:
     """
     # Шаблон извлекаемой ссылки
-    url_samples: list[str] = [
-        "https://github.com/",
-        "github.com/"
-        ]
+    url_samples: list[str] = ["https://github.com/", "github.com/"]
     list_message_words = message.split()
 
     for sample_url in url_samples:
