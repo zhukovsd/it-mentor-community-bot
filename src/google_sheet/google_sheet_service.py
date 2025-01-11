@@ -30,7 +30,17 @@ from src.google_sheet.constants.interview_collection_sheet_constants import (
     QUESTION_POPULRATIY_COL_INDEX,
 )
 
-from src.google_sheet.constants.projects_reviews_sheet_constants import PROJECTS_SHEET
+from src.google_sheet.constants.projects_reviews_sheet_constants import (
+    FIRST_PROJECT_ROW_INDEX,
+    PROJECT_AUTHOR_LINK_COL_INDEX,
+    PROJECT_AUTHOR_NAME_COL_INDEX,
+    PROJECT_LANGUAGE_COL_INDEX,
+    PROJECT_PROJECT_NAME_COL_INDEX,
+    PROJECT_REPO_LINK_COL_INDEX,
+    PROJECT_REPO_NAME_COL_INDEX,
+    PROJECTS_SHEET,
+    PROJECT_PERIOD_COL_INDEX,
+)
 
 logs.configure()
 log = logging.getLogger(__name__)
@@ -142,6 +152,57 @@ class GSheetService:
             self._update_interview_questions()
 
         return list(self.__interview_questions.values())
+
+    def get_projects_data(self) -> list[ProjectData]:
+        log.info("Parsing projects reviews collection Google spreadsheet")
+
+        gsheets_client = gspread.auth.service_account_from_dict(
+            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
+        )
+
+        projects_reviews_spreadsheet_id = env.PROJECTS_REVIEWS_SPREADSHEET_ID
+
+        interview_collection_spreadsheet = gsheets_client.open_by_key(
+            projects_reviews_spreadsheet_id
+        )
+
+        projects_sheet = interview_collection_spreadsheet.get_worksheet(PROJECTS_SHEET)
+
+        # Col[Row[Any]]
+        projects_sheet_values: list[list[Any]] = projects_sheet.get_all_values()
+
+        project_data: list[ProjectData] = []
+
+        for i, row in enumerate(projects_sheet_values):
+            if i < FIRST_PROJECT_ROW_INDEX - 1:
+                continue
+
+            project_name = row[PROJECT_PROJECT_NAME_COL_INDEX]
+
+            # Is category
+            if project_name is None:
+                continue
+
+            period = row[PROJECT_PERIOD_COL_INDEX]
+            language = row[PROJECT_LANGUAGE_COL_INDEX]
+            repo_name = row[PROJECT_REPO_NAME_COL_INDEX]
+            repo_link = row[PROJECT_REPO_LINK_COL_INDEX]
+            author_name = row[PROJECT_AUTHOR_NAME_COL_INDEX]
+            author_link = row[PROJECT_AUTHOR_LINK_COL_INDEX]
+
+            project_data.append(
+                ProjectData(
+                    period=period,
+                    project_name=project_name,
+                    language=language,
+                    repo_name=repo_name,
+                    repo_link=repo_link,
+                    author_name=author_name,
+                    author_link=author_link,
+                )
+            )
+
+        return project_data
 
     def _update_interview_questions(self) -> None:
         log.info("Parsing interview collection Google spreadsheet")
