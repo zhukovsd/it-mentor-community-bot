@@ -6,18 +6,20 @@ import logging
 from src.config import logs
 from src.config import env
 
-from src.google_sheet.dto.dto_project_data import ProjectDataDTO
 from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
-from src.google_sheet.dto.interview_question_category import InterviewQuestionCategory
+from src.google_sheet.dto.interview_question_category_dto import (
+    InterviewQuestionCategory,
+)
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.google_sheet.dto.interview_question_timestamp_dto import (
     InterviewQuestionTimestamp,
 )
 from src.google_sheet.dto.interview_info_dto import InterviewInfo
 
+from src.google_sheet.dto.project_data_dto import ProjectData
 from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
-from src.google_sheet.interview_collection_sheet_constants import (
+from src.google_sheet.constants.interview_collection_sheet_constants import (
     QUESTION_COL_INDEX,
     SUMMARY_SHEET_INDEX,
     QUESTION_ID_COL_INDEX,
@@ -28,7 +30,17 @@ from src.google_sheet.interview_collection_sheet_constants import (
     QUESTION_POPULRATIY_COL_INDEX,
 )
 
-from src.google_sheet.constants.added_completed_projects_constants import PROJECTS_SHEET
+from src.google_sheet.constants.projects_reviews_sheet_constants import (
+    FIRST_PROJECT_ROW_INDEX,
+    PROJECT_AUTHOR_LINK_COL_INDEX,
+    PROJECT_AUTHOR_NAME_COL_INDEX,
+    PROJECT_LANGUAGE_COL_INDEX,
+    PROJECT_PROJECT_NAME_COL_INDEX,
+    PROJECT_REPO_LINK_COL_INDEX,
+    PROJECT_REPO_NAME_COL_INDEX,
+    PROJECTS_SHEET,
+    PROJECT_PERIOD_COL_INDEX,
+)
 
 logs.configure()
 log = logging.getLogger(__name__)
@@ -47,72 +59,65 @@ class GSheetService:
         )
         self.__interview_questions: dict[int, InterviewQuestion] = dict()
 
-    def add_project_to_gsheet(
-        self, project_data_object: ProjectDataDTO, gsheets_id: str
-    ):
-        """
-        Позволяет нам добавить информацию в google sheets по переданному объекту
-        :param project_data_object: Информация извлеченная из url с помощью get_info_from_url
-        :param gsheets_id:
-        :return:
-        """
+    def add_project_to_gsheet(self, project_data: ProjectData, gsheets_id: str):
         open_table = self.__google_sheet_client.open_by_key(gsheets_id)
-        # Получаем дату для поля "Период" из таблицы
-        get_date_for_column_A = self.__get_date_from_sheet(gsheets_id)
-        log.debug("Информация о периоде: %s", get_date_for_column_A)
-        data_object = project_data_object
+        project_data.period = self.__get_date_from_sheet(gsheets_id)
+        log.debug("Информация о периоде: %s", project_data.period)
 
         open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
 
-        # Ищем, существует ли запись с переданным url в таблице
-        find_url_repo_in_sheet = open_sheet.find(data_object.repository_url)
-        if find_url_repo_in_sheet is None:
-            last_filled_row = len(open_sheet.get_all_values(range_name='A:G'))
-            empty_row = last_filled_row + 1
-            fields_sheet_obj = GSheetFieldsDTO(open_sheet, empty_row)
+        repo_link = open_sheet.find(project_data.repo_link)
 
-            # Если ячейка с url пустая - то вся строка гарантированно пустая
-            check_cell_sheet = open_sheet.get(fields_sheet_obj.repository_url).first()
-            if check_cell_sheet is None:
-                open_sheet.update_acell(
-                    fields_sheet_obj.date_added_project, get_date_for_column_A
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.type_project, data_object.type_project
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.program_lang_project, data_object.program_lang_project
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.repository_name, data_object.repository_name
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.repository_url, data_object.repository_url
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.name_owner_repo, data_object.name_owner_repo
-                )
-                open_sheet.update_acell(
-                    fields_sheet_obj.url_owner_repo, data_object.url_owner_repo
-                )
-
-                log.info(
-                    "Ссылка - : %s добавлена в Таблицу gsheet",
-                    data_object.repository_url,
-                )
-            else:
-                log.warning(
-                    "В указанной ячейке: %r содержится информация: %r, пожалуйста проверьте целостность таблицы",
-                    fields_sheet_obj.repository_url,
-                    check_cell_sheet,
-                )
-        else:
-            # todo: Тут возможно надо будет добавить отправку сообщения в телегу
+        if repo_link is not None:
             log.warning(
                 "Проект: %r Существует в таблице и находится в ячейке по адресу: %r",
-                find_url_repo_in_sheet.value,
-                find_url_repo_in_sheet.address,
+                repo_link.value,
+                repo_link.address,
             )
+            return
+
+        last_filled_row = len(open_sheet.get_all_values(range_name="A:G"))
+        empty_row = last_filled_row + 1
+        fields_sheet_obj = GSheetFieldsDTO(open_sheet, empty_row)
+
+        # Если ячейка с url пустая - то вся строка гарантированно пустая
+        check_cell_sheet = open_sheet.get(fields_sheet_obj.repository_url).first()
+
+        if check_cell_sheet is not None:
+            log.warning(
+                "В указанной ячейке: %r содержится информация: %r, пожалуйста проверьте целостность таблицы",
+                fields_sheet_obj.repository_url,
+                check_cell_sheet,
+            )
+            return
+
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.date_added_project, project_data.period
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.type_project, project_data.project_name
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.program_lang_project,
+            project_data.language,
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.repository_name, project_data.repo_name
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.repository_url, project_data.repo_link
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.name_owner_repo, project_data.author_name
+        )
+        _ = open_sheet.update_acell(
+            fields_sheet_obj.url_owner_repo, project_data.author_link
+        )
+
+        log.info(
+            "Ссылка - : %s добавлена в Таблицу gsheet",
+            project_data.repo_link,
+        )
 
     def __get_date_from_sheet(self, gsheets_id: str) -> str:
         """
@@ -128,7 +133,7 @@ class GSheetService:
         open_table = self.__google_sheet_client.open_by_key(gsheets_id)
 
         open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
-        date_for_add_in_sheet = open_sheet.get('I2')
+        date_for_add_in_sheet = open_sheet.get("I2")
 
         open_table.client.session.close()
 
@@ -147,6 +152,57 @@ class GSheetService:
             self._update_interview_questions()
 
         return list(self.__interview_questions.values())
+
+    def get_projects_data(self) -> list[ProjectData]:
+        log.info("Parsing projects reviews collection Google spreadsheet")
+
+        gsheets_client = gspread.auth.service_account_from_dict(
+            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
+        )
+
+        projects_reviews_spreadsheet_id = env.PROJECTS_REVIEWS_SPREADSHEET_ID
+
+        interview_collection_spreadsheet = gsheets_client.open_by_key(
+            projects_reviews_spreadsheet_id
+        )
+
+        projects_sheet = interview_collection_spreadsheet.get_worksheet(PROJECTS_SHEET)
+
+        # Col[Row[Any]]
+        projects_sheet_values: list[list[Any]] = projects_sheet.get_all_values()
+
+        project_data: list[ProjectData] = []
+
+        for i, row in enumerate(projects_sheet_values):
+            if i < FIRST_PROJECT_ROW_INDEX - 1:
+                continue
+
+            project_name = row[PROJECT_PROJECT_NAME_COL_INDEX]
+
+            # Is category
+            if project_name is None:
+                continue
+
+            period = row[PROJECT_PERIOD_COL_INDEX]
+            language = row[PROJECT_LANGUAGE_COL_INDEX]
+            repo_name = row[PROJECT_REPO_NAME_COL_INDEX]
+            repo_link = row[PROJECT_REPO_LINK_COL_INDEX]
+            author_name = row[PROJECT_AUTHOR_NAME_COL_INDEX]
+            author_link = row[PROJECT_AUTHOR_LINK_COL_INDEX]
+
+            project_data.append(
+                ProjectData(
+                    period=period,
+                    project_name=project_name,
+                    language=language,
+                    repo_name=repo_name,
+                    repo_link=repo_link,
+                    author_name=author_name,
+                    author_link=author_link,
+                )
+            )
+
+        return project_data
 
     def _update_interview_questions(self) -> None:
         log.info("Parsing interview collection Google spreadsheet")

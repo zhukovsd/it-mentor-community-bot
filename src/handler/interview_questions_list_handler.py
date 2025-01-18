@@ -5,7 +5,9 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.google_sheet.dto.interview_question_category import InterviewQuestionCategory
+from src.google_sheet.dto.interview_question_category_dto import (
+    InterviewQuestionCategory,
+)
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
@@ -18,8 +20,6 @@ log = logging.getLogger(__name__)
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
 google_sheet_service = GSheetService(json_google_api_key)
-
-MAX_MESSAGE_LENGTH = 4096
 
 
 async def list_interview_questions_messages(
@@ -103,7 +103,7 @@ async def list_interview_questions_messages(
 
     log.debug(f"Messages before compressing: {len(messages)}")
 
-    messages = compress_messages(messages)
+    messages = util.compress_messages(messages)
 
     log.debug(f"Messages after compressing: {len(messages)}")
 
@@ -180,29 +180,7 @@ def generate_message(
     message = message_header + "\n\n" + message_body
 
     assert (
-        len(message) < MAX_MESSAGE_LENGTH
+        len(message) < util.MAX_MESSAGE_LENGTH
     ), "Rest of the code assumes that all questions of the category will fit into one telegram message"
 
     return message
-
-
-def compress_messages(messages: list[str]) -> list[str]:
-    compressed_messages: list[str] = []
-
-    compressed_message = ""
-    for message in messages:
-        updated_compressed_message = compressed_message + "\n\n" + message
-
-        if len(updated_compressed_message) < MAX_MESSAGE_LENGTH:
-            compressed_message = updated_compressed_message
-            continue
-
-        if (
-            len(updated_compressed_message) >= MAX_MESSAGE_LENGTH
-            and len(compressed_message) < MAX_MESSAGE_LENGTH
-        ):
-            compressed_messages.append(compressed_message)
-            compressed_message = message
-            continue
-
-    return compressed_messages
