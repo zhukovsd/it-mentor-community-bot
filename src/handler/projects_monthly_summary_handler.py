@@ -145,6 +145,7 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
             chat_id=chat.id,
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
+            message_thread_id=command_message.message_thread_id,
         )
         await asyncio.sleep(1)
 
