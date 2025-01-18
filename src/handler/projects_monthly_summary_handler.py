@@ -146,6 +146,7 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             message_thread_id=command_message.message_thread_id,
+            disable_web_page_preview=True,
         )
         await asyncio.sleep(1)
 
