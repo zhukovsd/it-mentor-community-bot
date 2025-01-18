@@ -70,7 +70,7 @@ PROJECTS_REVIEWS_COLLECTION_CHAT_ID=
 ADD_PROJECT_ALLOWED_USER_IDS=
 
 JSON_KEY_GOOGLE_API='{JSON-string}'
-ADDED_PROJECTS_SPREADSHEET_ID='gsheet_id'
+PROJECTS_REVIEWS_SPREADSHEET_ID='gsheet_id'
 
 INTERVIEW_COLLECTION_SPREADSHEET_ID=
 SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
@@ -83,7 +83,7 @@ GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 ```
 
-`ADDED_PROJECTS_SPREADSHEET_ID` - Строка без пробелов содержащая в себе id файла google sheet из google drive который подключается с помощью google api.
+`PROJECTS_REVIEWS_SPREADSHEET_ID` - Строка без пробелов содержащая в себе id файла google sheet из google drive который подключается с помощью google api.
 - id достается из url самой таблицы при открытии в браузере на ПК
 `ADD_PROJECT_ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
 `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по аналогии с 
