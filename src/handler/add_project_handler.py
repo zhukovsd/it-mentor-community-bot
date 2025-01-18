@@ -142,8 +142,10 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ), "Replied to message, i.e. student message with project link cannot be None"
 
     check_add_data = connect_modules_to_add_data_to_gsheets(
-        message=message, lang_project=language,
-        type_project=project_name, command_check=ADD_PROJECT_COMMAND_NAME
+        message=message,
+        lang_project=language,
+        type_project=project_name,
+        command_check=ADD_PROJECT_COMMAND_NAME,
     )
 
     if check_add_data.boolean_val is False:

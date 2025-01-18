@@ -1,8 +1,8 @@
 from urllib.parse import urlparse
-from src.google_sheet.dto.dto_project_data import ProjectDataDTO
+from src.google_sheet.dto.project_data_dto import ProjectData
 
 
-def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectDataDTO:
+def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectData:
     """
     Получаем информацию о репозитории и пользователе из url
         и формируем объект для дальнейшей работы с таблицей.
@@ -22,15 +22,15 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
     # (например, что бы избавиться от части пути к конкретному файлу)
     repo_url = f"{parsed_url.scheme}://{parsed_url.hostname}/{repo_owner}/{repo_name}"
 
-    project_data_dto_obj = ProjectDataDTO(
-        repository_name=repo_name,
-        name_owner_repo=repo_owner,
-        repository_url=repo_url,
-        url_owner_repo=repo_owner_url,
-        program_lang_project=lang_project,
-        type_project=type_project
+    return ProjectData(
+        period=None,
+        repo_name=repo_name,
+        author_name=repo_owner,
+        repo_link=repo_url,
+        author_link=repo_owner_url,
+        language=lang_project,
+        project_name=type_project,
     )
-    return project_data_dto_obj
 
 
 if __name__ == "__main__":
@@ -39,9 +39,9 @@ if __name__ == "__main__":
         "Для url репозитория", "Java", "Конвертер валют"
     )
     print(
-        object_project_data.url_owner_repo,
-        object_project_data.repository_url,
-        object_project_data.name_owner_repo,
-        object_project_data.repository_name,
-        object_project_data.program_lang_project,
+        object_project_data.author_name,
+        object_project_data.repo_link,
+        object_project_data.author_link,
+        object_project_data.repo_name,
+        object_project_data.language,
     )
