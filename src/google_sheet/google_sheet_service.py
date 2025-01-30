@@ -17,6 +17,7 @@ from src.google_sheet.dto.interview_question_timestamp_dto import (
 from src.google_sheet.dto.interview_info_dto import InterviewInfo
 
 from src.google_sheet.dto.project_data_dto import ProjectData
+from src.google_sheet.dto.review_data_dto import ReviewData
 from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
 from src.google_sheet.constants.interview_collection_sheet_constants import (
@@ -32,6 +33,7 @@ from src.google_sheet.constants.interview_collection_sheet_constants import (
 
 from src.google_sheet.constants.projects_reviews_sheet_constants import (
     FIRST_PROJECT_ROW_INDEX,
+    FIRST_REVIEW_ROW_INDEX,
     PROJECT_AUTHOR_LINK_COL_INDEX,
     PROJECT_AUTHOR_NAME_COL_INDEX,
     PROJECT_LANGUAGE_COL_INDEX,
@@ -40,6 +42,16 @@ from src.google_sheet.constants.projects_reviews_sheet_constants import (
     PROJECT_REPO_NAME_COL_INDEX,
     PROJECTS_SHEET,
     PROJECT_PERIOD_COL_INDEX,
+    REVIEW_AUTHOR_NAME_COL_INDEX,
+    REVIEW_AUTHOR_TG_LINK_COL_INDEX,
+    REVIEW_AUTHOR_TG_NICK_COL_INDEX,
+    REVIEW_LANGUAGE_COL_INDEX,
+    REVIEW_PERIOD_COL_INDEX,
+    REVIEW_PROJECT_NAME_COL_INDEX,
+    REVIEW_REPO_LINK_COL_INDEX,
+    REVIEW_REVEIW_LINK_COL_INDEX,
+    REVIEW_REVIEW_TYPE_COL_INDEX,
+    REVIEWS_SHEET,
 )
 
 logs.configure()
@@ -180,7 +192,7 @@ class GSheetService:
             project_name = row[PROJECT_PROJECT_NAME_COL_INDEX]
 
             # Is category
-            if project_name is None:
+            if project_name is None or len(project_name) == 0:
                 continue
 
             period = row[PROJECT_PERIOD_COL_INDEX]
@@ -203,6 +215,61 @@ class GSheetService:
             )
 
         return project_data
+
+    def get_reviews_data(self) -> list[ReviewData]:
+        log.info("Parsing projects reviews collection Google spreadsheet")
+
+        gsheets_client = gspread.auth.service_account_from_dict(
+            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
+        )
+
+        projects_reviews_spreadsheet_id = env.PROJECTS_REVIEWS_SPREADSHEET_ID
+
+        interview_collection_spreadsheet = gsheets_client.open_by_key(
+            projects_reviews_spreadsheet_id
+        )
+
+        reviews_sheet = interview_collection_spreadsheet.get_worksheet(REVIEWS_SHEET)
+
+        # Col[Row[Any]]
+        reviews_sheet_values: list[list[Any]] = reviews_sheet.get_all_values()
+
+        review_data: list[ReviewData] = []
+
+        for i, row in enumerate(reviews_sheet_values):
+            if i < FIRST_REVIEW_ROW_INDEX - 1:
+                continue
+
+            project_name = row[REVIEW_PROJECT_NAME_COL_INDEX]
+
+            # Is category
+            if project_name is None or len(project_name) == 0:
+                continue
+
+            period = row[REVIEW_PERIOD_COL_INDEX]
+            language = row[REVIEW_LANGUAGE_COL_INDEX]
+            repo_link = row[REVIEW_REPO_LINK_COL_INDEX]
+            review_type = row[REVIEW_REVIEW_TYPE_COL_INDEX]
+            review_link = row[REVIEW_REVEIW_LINK_COL_INDEX]
+            author_name = row[REVIEW_AUTHOR_NAME_COL_INDEX]
+            author_tg_nick = row[REVIEW_AUTHOR_TG_NICK_COL_INDEX]
+            author_tg_link = row[REVIEW_AUTHOR_TG_LINK_COL_INDEX]
+
+            review_data.append(
+                ReviewData(
+                    period=period,
+                    project_name=project_name,
+                    language=language,
+                    repo_link=repo_link,
+                    review_type=review_type,
+                    review_link=review_link,
+                    author_name=author_name,
+                    author_tg_nick=author_tg_nick,
+                    author_tg_link=author_tg_link,
+                )
+            )
+
+        return review_data
 
     def _update_interview_questions(self) -> None:
         log.info("Parsing interview collection Google spreadsheet")
