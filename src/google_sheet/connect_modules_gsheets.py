@@ -1,6 +1,6 @@
 import logging
 
-from src.config.env import ADDED_PROJECTS_SPREADSHEET_ID, JSON_KEY_GOOGLE_API
+from src.config.env import PROJECTS_REVIEWS_SPREADSHEET_ID, JSON_KEY_GOOGLE_API
 from src.config import logs
 
 from src.google_sheet.dto.dto_check_validation_added_data import (
@@ -46,24 +46,9 @@ def connect_modules_to_add_data_to_gsheets(
         url=url, lang_project=lang_project, type_project=type_project
     )
 
-    if ADDED_PROJECTS_SPREADSHEET_ID is None or ADDED_PROJECTS_SPREADSHEET_ID == "":
-        error_message = """
-Данные в таблицу не могут быть добавлены
-Передайте корректное имя таблицы в которую будем добавлять данные
-Затем повторите попытку
-        """
-        err_object = CheckValidationAddedDataDTO(
-            error_message=error_message, boolean_val=False
-        )
-        log.error(error_message)
-        return err_object
-
-    add_in_sheets_obj = GSheetService(
-        json_key_google_api=JSON_KEY_GOOGLE_API
-    )
+    add_in_sheets_obj = GSheetService(json_key_google_api=JSON_KEY_GOOGLE_API)
     add_in_sheets_obj.add_project_to_gsheet(
-        project_data_object=project_data_obj,
-        gsheets_id=ADDED_PROJECTS_SPREADSHEET_ID
+        project_data=project_data_obj, gsheets_id=PROJECTS_REVIEWS_SPREADSHEET_ID
     )
     check_obj = CheckValidationAddedDataDTO()
 

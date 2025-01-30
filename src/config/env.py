@@ -11,7 +11,7 @@ ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
 # Константы для работы с gsheet
 JSON_KEY_GOOGLE_API: str = os.getenv("JSON_KEY_GOOGLE_API")
-ADDED_PROJECTS_SPREADSHEET_ID: str | None = os.getenv("ADDED_PROJECTS_SPREADSHEET_ID")
+PROJECTS_REVIEWS_SPREADSHEET_ID: str = os.getenv("PROJECTS_REVIEWS_SPREADSHEET_ID")  # fmt: skip
 
 # Константы для подключения к БД
 POSTGRES_USER: str = os.getenv("POSTGRES_USER")
@@ -36,7 +36,7 @@ assert PROJECTS_REVIEWS_COLLECTION_CHAT_ID is not None, "PROJECTS_REVIEWS_COLLEC
 assert ADD_PROJECT_ALLOWED_USER_IDS is not None, "ADD_PROJECT_ALLOWED_USER_IDS environment variable is not set"
 
 assert JSON_KEY_GOOGLE_API is not None, "JSON_KEY_GOOGLE_API environment variable is not set"
-# assert ADDED_PROJECTS_SPREADSHEET_ID is not None, "ADDED_PROJECTS_SPREADSHEET_ID environment variable is not set"
+assert PROJECTS_REVIEWS_SPREADSHEET_ID is not None, "PROJECTS_REVIEWS_SPREADSHEET_ID environment variable is not set"
 
 assert POSTGRES_USER is not None, "POSTGRES_USER environment variable is not set"
 assert POSTGRES_PASSWORD is not None, "POSTGRES_PASSWORD environment variable is not set"
