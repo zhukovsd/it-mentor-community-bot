@@ -97,9 +97,9 @@ async def reviews_monthly_summary(update: Update, context: ContextTypes.DEFAULT_
         await reply_with_error("Не найдены ревью в таблице с проектами")
         return
 
-    reviews = filter(lambda x: x.period == period, reviews)
+    reviews = list(filter(lambda x: x.period == period, reviews))
 
-    if len(list(reviews)) == 0:
+    if len(reviews) == 0:
         log.error(
             f"No reviews found in the Google sheet with projects for period {period}"
         )

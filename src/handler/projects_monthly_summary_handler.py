@@ -97,9 +97,9 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
         await reply_with_error("Не найдены проекты в таблице с проектами")
         return
 
-    projects = filter(lambda x: x.period == period, projects)
+    projects = list(filter(lambda x: x.period == period, projects))
 
-    if len(list(projects)) == 0:
+    if len(projects) == 0:
         log.error(
             f"No projects found in the Google sheet with projects for period: {period}"
         )
