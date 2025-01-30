@@ -192,7 +192,7 @@ class GSheetService:
             project_name = row[PROJECT_PROJECT_NAME_COL_INDEX]
 
             # Is category
-            if project_name is None:
+            if project_name is None or len(project_name) == 0:
                 continue
 
             period = row[PROJECT_PERIOD_COL_INDEX]
@@ -243,7 +243,7 @@ class GSheetService:
             project_name = row[REVIEW_PROJECT_NAME_COL_INDEX]
 
             # Is category
-            if project_name is None:
+            if project_name is None or len(project_name) == 0:
                 continue
 
             period = row[REVIEW_PERIOD_COL_INDEX]
