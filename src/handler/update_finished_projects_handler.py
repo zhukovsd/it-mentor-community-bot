@@ -1,5 +1,4 @@
 import asyncio
-from dataclasses import dataclass
 import logging
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
@@ -7,8 +6,10 @@ from telegram.ext import ContextTypes
 
 from src.config import env
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
+from src.github import github_service
 from src.google_sheet.google_sheet_service import GSheetService
-from src.jinja import template_service
+from src import template_service
+from src.handler import util
 from src.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
@@ -93,20 +94,26 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
 
         projects_with_reviews.append(project_with_review)
 
-    result = template_service.render_java_hangman_template(projects_with_reviews)
+    try:
+        java_repo_pr = github_service.update_java_projects(projects_with_reviews)
 
-    _ = await context.bot.delete_message(
-        chat_id=chat.id,
-        message_id=command_message.id,
-    )
+        log.info(java_repo_pr)
 
-    _ = await context.bot.send_message(
-        chat_id=chat.id,
-        text=result,
-        parse_mode=ParseMode.MARKDOWN_V2,
-        message_thread_id=command_message.message_thread_id,
-        disable_web_page_preview=True,
-    )
+        _ = await context.bot.delete_message(
+            chat_id=chat.id,
+            message_id=command_message.id,
+        )
+
+        _ = await context.bot.send_message(
+            chat_id=chat.id,
+            text=f"PR: {util.escape_special_chars(java_repo_pr)}",
+            parse_mode=ParseMode.MARKDOWN_V2,
+            message_thread_id=command_message.message_thread_id,
+            disable_web_page_preview=True,
+        )
+
+    except Exception as e:
+        await reply_with_error(str(e))
 
 
 def is_admin(user: ChatMember) -> bool:

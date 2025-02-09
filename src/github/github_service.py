@@ -3,9 +3,11 @@ import logging
 import re
 import textwrap
 from re import Match
+from src import template_service
 from src.github import github_client
 from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
+from src.project_with_review_dto import ProjectWithReview
 
 
 log = logging.getLogger(__name__)
@@ -37,6 +39,16 @@ questions_popularity_change: dict[str, tuple[float, float]] = {}
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
 google_sheet_service = GSheetService(json_google_api_key)
+
+project_names = [
+    "hangman",
+    "simulation",
+    "currency-exchange",
+    "tennis-scoreboard",
+    "weather-viewer",
+    "cloud-file-storage",
+    "task-tracker",
+]
 
 
 def update_questions_popularity() -> str:
@@ -128,14 +140,93 @@ def update_questions_popularity() -> str:
     return stats + "\n---\n\n" + pr_link
 
 
-def get_java_template(name: str) -> str | None:
-    file = github_client.get_file_content(
-        f"/templates/{name}.md", repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+def update_java_projects(projects: list[ProjectWithReview]) -> str:
+    log.info(
+        f"Updating finished projects in the {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} repository"
     )
-    if file is None:
-        return None
 
-    return file[0]
+    last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
+        "main", repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+    )
+
+    if last_master_commit_sha is None:
+        log.error(
+            "Hash of the last commit in the master branch is unknown, cannot continue"
+        )
+        raise Exception("Ошибка при создании новой ветки для изменений")
+
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+
+    branch_name = f"finished-projects-update-{timestamp}"
+
+    branch_created = github_client.create_branch(
+        branch_name, last_master_commit_sha, repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+    )
+
+    if not branch_created:
+        log.error(f"Branch {branch_name} was not created, cannot continue")
+        raise Exception(
+            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов"
+        )
+
+    for project_name in project_names:
+        file = github_client.get_file_content(
+            f"/content/finished-projects/{project_name}.md",
+            repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+        )
+
+        if file is None:
+            log.error(
+                f"/content/finished-projects/{project_name}.md is None, cannot continue"
+            )
+            raise Exception(
+                f"Ошибка чтения файла `/content/finished-projects/{project_name}.md` из {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
+            )
+
+        file_sha = file[1]
+
+        updated_file = template_service.render_java_template(projects, project_name)
+
+        commit_message = (
+            f"finished projects: updated {project_name} projects by bot at {timestamp}"
+        )
+
+        file_content_updated = github_client.update_file_content(
+            sha=file_sha,
+            path=f"/content/finished-projects/{project_name}.md",
+            content=updated_file,
+            branch=branch_name,
+            commit_message=commit_message,
+            repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+        )
+
+        if not file_content_updated:
+            log.error(
+                f"Content of file /content/finished-projects/{project_name}.md in the branch {branch_name} was not updated, cannot continue"
+            )
+            raise Exception(
+                f"Ошибка при попытке создать коммит с обновленным списком проектов {project_name} в ветке `{branch_name}`"
+            )
+
+    pr_title = branch_name.replace("-", " ", 3).capitalize()
+
+    pr_link = github_client.create_pull_request(
+        head=branch_name,
+        base="main",
+        title=pr_title,
+        body="Jokerge",
+        repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if pr_link is None:
+        log.error(
+            f"Pull request from {branch_name} to main was not created, cannot continue"
+        )
+        raise Exception(
+            f"Ошибка при попытке создать PR из ветки `{branch_name}` в main"
+        )
+
+    return pr_link
 
 
 def _update_category_popularity(
