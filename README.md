@@ -81,6 +81,9 @@ SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
 INTERVIEW_PREP_SITE_REPO_OWNER=
 INTERVIEW_PREP_SITE_REPO_NAME=
 
+JAVA_BACKEND_COURSE_SITE_REPO_OWNER=
+JAVA_BACKEND_COURSE_SITE_REPO_NAME=
+
 GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
@@ -112,6 +115,9 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 
 `INTERVIEW_PREP_SITE_REPO_OWNER` - Владелец репозитория с методичкой
 `INTERVIEW_PREP_SITE_REPO_NAME` - Название репозитория с методичкой
+
+`JAVA_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с java роадмапом
+`JAVA_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с java роадмапом
 
 `GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo
 
