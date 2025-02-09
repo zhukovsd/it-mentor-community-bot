@@ -1,6 +1,7 @@
 import logging
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FunctionLoader
 
+from src.github.github_service import get_java_template
 from src.google_sheet.dto.review_dto import Review
 from src.project_with_review_dto import ProjectWithReview
 
@@ -115,21 +116,21 @@ def _review_author(project: ProjectWithReview) -> str:
     return ", ".join(map(to_author_link, project.reviews))
 
 
-templates = Environment(loader=PackageLoader("src"))
+java_templates = Environment(loader=FunctionLoader(get_java_template))
 
-templates.filters["unique_languages"] = _unique_languages
-templates.filters["review_count"] = _review_count
-templates.filters["project_count"] = _project_count
-templates.filters["repo"] = _repo
-templates.filters["author"] = _author
-templates.filters["language"] = _language
-templates.filters["review"] = _review
-templates.filters["review_author"] = _review_author
+java_templates.filters["unique_languages"] = _unique_languages
+java_templates.filters["review_count"] = _review_count
+java_templates.filters["project_count"] = _project_count
+java_templates.filters["repo"] = _repo
+java_templates.filters["author"] = _author
+java_templates.filters["language"] = _language
+java_templates.filters["review"] = _review
+java_templates.filters["review_author"] = _review_author
 
 
 def render_java_hangman_template(projects: list[ProjectWithReview]) -> str:
     projects = list(filter(lambda x: x.project_name.lower() == "hangman", projects))
 
-    template = templates.get_template("java/hangman.md")
+    template = java_templates.get_template("hangman")
 
     return template.render(projects=projects)

@@ -128,6 +128,16 @@ def update_questions_popularity() -> str:
     return stats + "\n---\n\n" + pr_link
 
 
+def get_java_template(name: str) -> str | None:
+    file = github_client.get_file_content(
+        f"/templates/{name}.md", repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+    )
+    if file is None:
+        return None
+
+    return file[0]
+
+
 def _update_category_popularity(
     category_match: Match[str], gs_categories_popularity: dict[str, float]
 ) -> str:
@@ -210,7 +220,7 @@ def _generate_stats_message() -> str:
     top_category_incr_popularity.reverse()
 
     def generate_ordered_list(
-        popularity_data: list[tuple[str, tuple[float, float]]]
+        popularity_data: list[tuple[str, tuple[float, float]]],
     ) -> str:
         question_bullets: list[str] = list()
 
