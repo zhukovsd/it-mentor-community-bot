@@ -27,14 +27,16 @@ session = LimiterSession(per_hour=5000, max_delay=0)
 log = logging.getLogger(__name__)
 
 
-def get_file_content(path: str) -> tuple[str, str] | None:
+def get_file_content(
+    path: str, repo: str = REPO, owner: str = OWNER
+) -> tuple[str, str] | None:
     log.info(f"Getting content of the '{path}' file")
 
     try:
         if path.startswith("/"):
             path = path[1:]
 
-        url = f"{BASE_API_URL}/repos/{OWNER}/{REPO}/contents/{path}"
+        url = f"{BASE_API_URL}/repos/{owner}/{repo}/contents/{path}"
 
         response = session.get(url, headers=headers)
 
@@ -57,7 +59,13 @@ def get_file_content(path: str) -> tuple[str, str] | None:
 
 
 def update_file_content(
-    sha: str, path: str, content: str, branch: str, commit_message: str
+    sha: str,
+    path: str,
+    content: str,
+    branch: str,
+    commit_message: str,
+    repo: str = REPO,
+    owner: str = OWNER,
 ) -> bool:
     log.info(f"Updating '{path}' file content in the {branch} branch")
 
@@ -65,7 +73,7 @@ def update_file_content(
         if path.startswith("/"):
             path = path[1:]
 
-        url = f"{BASE_API_URL}/repos/{OWNER}/{REPO}/contents/{path}"
+        url = f"{BASE_API_URL}/repos/{owner}/{repo}/contents/{path}"
 
         request_body = {
             "message": commit_message,
@@ -89,11 +97,15 @@ def update_file_content(
         return False
 
 
-def get_last_commit_sha_of_branch(branch: str) -> str | None:
+def get_last_commit_sha_of_branch(
+    branch: str,
+    repo: str = REPO,
+    owner: str = OWNER,
+) -> str | None:
     log.info(f"Getting info of {branch} branch")
 
     try:
-        url = f"{BASE_API_URL}/repos/{OWNER}/{REPO}/git/refs/heads/{branch}"
+        url = f"{BASE_API_URL}/repos/{owner}/{repo}/git/refs/heads/{branch}"
 
         response = session.get(url, headers=headers)
 
@@ -112,11 +124,16 @@ def get_last_commit_sha_of_branch(branch: str) -> str | None:
         return None
 
 
-def create_branch(branch: str, parent_sha: str) -> bool:
+def create_branch(
+    branch: str,
+    parent_sha: str,
+    repo: str = REPO,
+    owner: str = OWNER,
+) -> bool:
     log.info(f"Creating branch {branch} with parent commit {parent_sha}")
 
     try:
-        url = f"{BASE_API_URL}/repos/{OWNER}/{REPO}/git/refs"
+        url = f"{BASE_API_URL}/repos/{owner}/{repo}/git/refs"
 
         request_body = {
             "ref": f"refs/heads/{branch}",
@@ -139,12 +156,17 @@ def create_branch(branch: str, parent_sha: str) -> bool:
 
 
 def create_pull_request(
-    head: str, base: str, title: str, body: str | None
+    head: str,
+    base: str,
+    title: str,
+    body: str | None,
+    repo: str = REPO,
+    owner: str = OWNER,
 ) -> str | None:
     log.info(f"Creating pull request from {head} to {base} with title: {title}")
 
     try:
-        url = f"{BASE_API_URL}/repos/{OWNER}/{REPO}/pulls"
+        url = f"{BASE_API_URL}/repos/{owner}/{repo}/pulls"
 
         request_body = {
             "title": title,
