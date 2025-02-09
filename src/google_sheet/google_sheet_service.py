@@ -16,8 +16,8 @@ from src.google_sheet.dto.interview_question_timestamp_dto import (
 )
 from src.google_sheet.dto.interview_info_dto import InterviewInfo
 
-from src.google_sheet.dto.project_data_dto import ProjectData
-from src.google_sheet.dto.review_data_dto import ReviewData
+from src.google_sheet.dto.project_dto import Project
+from src.google_sheet.dto.review_dto import Review
 from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
 from src.google_sheet.constants.interview_collection_sheet_constants import (
@@ -71,7 +71,7 @@ class GSheetService:
         )
         self.__interview_questions: dict[int, InterviewQuestion] = dict()
 
-    def add_project_to_gsheet(self, project_data: ProjectData, gsheets_id: str):
+    def add_project_to_gsheet(self, project_data: Project, gsheets_id: str):
         open_table = self.__google_sheet_client.open_by_key(gsheets_id)
         project_data.period = self.__get_date_from_sheet(gsheets_id)
         log.debug("Информация о периоде: %s", project_data.period)
@@ -165,7 +165,7 @@ class GSheetService:
 
         return list(self.__interview_questions.values())
 
-    def get_projects_data(self) -> list[ProjectData]:
+    def get_projects_data(self) -> list[Project]:
         log.info("Parsing projects reviews collection Google spreadsheet")
 
         gsheets_client = gspread.auth.service_account_from_dict(
@@ -183,7 +183,7 @@ class GSheetService:
         # Col[Row[Any]]
         projects_sheet_values: list[list[Any]] = projects_sheet.get_all_values()
 
-        project_data: list[ProjectData] = []
+        project_data: list[Project] = []
 
         for i, row in enumerate(projects_sheet_values):
             if i < FIRST_PROJECT_ROW_INDEX - 1:
@@ -203,7 +203,7 @@ class GSheetService:
             author_link = row[PROJECT_AUTHOR_LINK_COL_INDEX]
 
             project_data.append(
-                ProjectData(
+                Project(
                     period=period,
                     project_name=project_name,
                     language=language,
@@ -216,7 +216,7 @@ class GSheetService:
 
         return project_data
 
-    def get_reviews_data(self) -> list[ReviewData]:
+    def get_reviews_data(self) -> list[Review]:
         log.info("Parsing projects reviews collection Google spreadsheet")
 
         gsheets_client = gspread.auth.service_account_from_dict(
@@ -234,7 +234,7 @@ class GSheetService:
         # Col[Row[Any]]
         reviews_sheet_values: list[list[Any]] = reviews_sheet.get_all_values()
 
-        review_data: list[ReviewData] = []
+        review_data: list[Review] = []
 
         for i, row in enumerate(reviews_sheet_values):
             if i < FIRST_REVIEW_ROW_INDEX - 1:
@@ -256,7 +256,7 @@ class GSheetService:
             author_tg_link = row[REVIEW_AUTHOR_TG_LINK_COL_INDEX]
 
             review_data.append(
-                ReviewData(
+                Review(
                     period=period,
                     project_name=project_name,
                     language=language,

@@ -1,8 +1,8 @@
 from urllib.parse import urlparse
-from src.google_sheet.dto.project_data_dto import ProjectData
+from src.google_sheet.dto.project_dto import Project
 
 
-def get_info_from_url(url: str, lang_project: str, type_project: str) -> ProjectData:
+def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project:
     """
     Получаем информацию о репозитории и пользователе из url
         и формируем объект для дальнейшей работы с таблицей.
@@ -22,7 +22,7 @@ def get_info_from_url(url: str, lang_project: str, type_project: str) -> Project
     # (например, что бы избавиться от части пути к конкретному файлу)
     repo_url = f"{parsed_url.scheme}://{parsed_url.hostname}/{repo_owner}/{repo_name}"
 
-    return ProjectData(
+    return Project(
         period=None,
         repo_name=repo_name,
         author_name=repo_owner,

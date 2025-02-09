@@ -2,11 +2,13 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ProjectData:
-    period: str | None
+class Review:
+    period: str
     project_name: str
     language: str
-    repo_name: str
     repo_link: str
+    review_type: str
+    review_link: str
     author_name: str
-    author_link: str
+    author_tg_nick: str
+    author_tg_link: str
