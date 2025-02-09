@@ -186,7 +186,7 @@ class GSheetService:
         project_data: list[Project] = []
 
         for i, row in enumerate(projects_sheet_values):
-            if i < FIRST_PROJECT_ROW_INDEX - 1:
+            if i < FIRST_PROJECT_ROW_INDEX:
                 continue
 
             project_name = row[PROJECT_PROJECT_NAME_COL_INDEX]
@@ -237,7 +237,7 @@ class GSheetService:
         review_data: list[Review] = []
 
         for i, row in enumerate(reviews_sheet_values):
-            if i < FIRST_REVIEW_ROW_INDEX - 1:
+            if i < FIRST_REVIEW_ROW_INDEX:
                 continue
 
             project_name = row[REVIEW_PROJECT_NAME_COL_INDEX]
