@@ -20,6 +20,16 @@ def _get_java_template(name: str) -> str | None:
     return file[0]
 
 
+def _get_python_template(name: str) -> str | None:
+    file = github_client.get_file_content(
+        f"/templates/{name}.md", repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME
+    )
+    if file is None:
+        return None
+
+    return file[0]
+
+
 def _to_correct_language_spelling(language: str) -> str:
     language = language.lower()
 
@@ -134,6 +144,7 @@ def _review_author(project: ProjectWithReview) -> str:
 
 
 java_templates = Environment(loader=FunctionLoader(_get_java_template))
+python_templates = Environment(loader=FunctionLoader(_get_python_template))
 
 java_templates.filters["unique_languages"] = _unique_languages
 java_templates.filters["review_count"] = _review_count
@@ -144,6 +155,14 @@ java_templates.filters["language"] = _language
 java_templates.filters["review"] = _review
 java_templates.filters["review_author"] = _review_author
 
+python_templates.filters["review_count"] = _review_count
+python_templates.filters["project_count"] = _project_count
+python_templates.filters["repo"] = _repo
+python_templates.filters["author"] = _author
+python_templates.filters["language"] = _language
+python_templates.filters["review"] = _review
+python_templates.filters["review_author"] = _review_author
+
 
 def render_java_template(projects: list[ProjectWithReview], project_name: str) -> str:
     projects = list(
@@ -151,5 +170,13 @@ def render_java_template(projects: list[ProjectWithReview], project_name: str) -
     )
 
     template = java_templates.get_template(project_name.lower())
+
+    return template.render(projects=projects)
+
+
+def render_python_template(projects: list[ProjectWithReview]) -> str:
+    projects = list(filter(lambda x: x.language.lower() == "python", projects))
+
+    template = python_templates.get_template("finished-projects")
 
     return template.render(projects=projects)
