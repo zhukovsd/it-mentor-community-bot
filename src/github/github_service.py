@@ -140,7 +140,7 @@ def update_questions_popularity() -> str:
     return stats + "\n---\n\n" + pr_link
 
 
-def update_java_projects(projects: list[ProjectWithReview]) -> str:
+def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
     log.info(
         f"Updating finished projects in the {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} repository"
     )
@@ -170,6 +170,8 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str:
             f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов"
         )
 
+    commits = 0
+
     for project_name in project_names:
         file = github_client.get_file_content(
             f"/content/finished-projects/{project_name}.md",
@@ -184,9 +186,16 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str:
                 f"Ошибка чтения файла `/content/finished-projects/{project_name}.md` из {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
             )
 
+        file_content = file[0]
         file_sha = file[1]
 
         updated_file = template_service.render_java_template(projects, project_name)
+
+        if file_content == updated_file:
+            log.warn(
+                f"File /content/finished-projects/{project_name}.md has no changes, nothing to commit"
+            )
+            continue
 
         commit_message = (
             f"finished projects: updated {project_name} projects by bot at {timestamp}"
@@ -209,6 +218,12 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str:
                 f"Ошибка при попытке создать коммит с обновленным списком проектов {project_name} в ветке `{branch_name}`"
             )
 
+        commits += 1
+
+    if commits == 0:
+        log.warn("No commits were made, PR will not be created")
+        return None
+
     pr_title = branch_name.replace("-", " ", 3).capitalize()
 
     pr_link = github_client.create_pull_request(
@@ -230,7 +245,7 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str:
     return pr_link
 
 
-def update_python_projects(projects: list[ProjectWithReview]) -> str:
+def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
     log.info(
         f"Updating finished projects in the {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} repository"
     )
@@ -273,9 +288,14 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str:
             f"Ошибка чтения файла `/content/finished-projects.md` из {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
         )
 
+    file_content = file[0]
     file_sha = file[1]
 
     updated_file = template_service.render_python_template(projects)
+
+    if file_content == updated_file:
+        log.warn("File /content/finished-projects.md has no changes, nothing to commit")
+        return None
 
     commit_message = f"finished projects: updated projects by bot at {timestamp}"
 
