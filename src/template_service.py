@@ -87,7 +87,7 @@ def _review(project: ProjectWithReview) -> str:
             )
             return ""
 
-        return f"{icon} ({name})[{link}]"
+        return f"{icon} [{name}]({link})"
 
     reviews = project.reviews
 
