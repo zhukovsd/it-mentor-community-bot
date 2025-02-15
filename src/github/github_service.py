@@ -3,9 +3,11 @@ import logging
 import re
 import textwrap
 from re import Match
+from src import template_service
 from src.github import github_client
 from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
+from src.project_with_review_dto import ProjectWithReview
 
 
 log = logging.getLogger(__name__)
@@ -37,6 +39,16 @@ questions_popularity_change: dict[str, tuple[float, float]] = {}
 json_google_api_key = env.JSON_KEY_GOOGLE_API
 
 google_sheet_service = GSheetService(json_google_api_key)
+
+project_names = [
+    "hangman",
+    "simulation",
+    "currency-exchange",
+    "tennis-scoreboard",
+    "weather-viewer",
+    "cloud-file-storage",
+    "task-tracker",
+]
 
 
 def update_questions_popularity() -> str:
@@ -128,6 +140,203 @@ def update_questions_popularity() -> str:
     return stats + "\n---\n\n" + pr_link
 
 
+def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
+    log.info(
+        f"Updating finished projects in the {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} repository"
+    )
+
+    last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
+        "main",
+        repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if last_master_commit_sha is None:
+        log.error(
+            "Hash of the last commit in the main branch is unknown, cannot continue"
+        )
+        raise Exception("Ошибка при создании новой ветки для изменений")
+
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+
+    branch_name = f"finished-projects-update-{timestamp}"
+
+    branch_created = github_client.create_branch(
+        branch_name, last_master_commit_sha, repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+    )
+
+    if not branch_created:
+        log.error(f"Branch {branch_name} was not created, cannot continue")
+        raise Exception(
+            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов"
+        )
+
+    commits = 0
+
+    for project_name in project_names:
+        file = github_client.get_file_content(
+            f"/content/finished-projects/{project_name}.md",
+            repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+        )
+
+        if file is None:
+            log.error(
+                f"/content/finished-projects/{project_name}.md is None, cannot continue"
+            )
+            raise Exception(
+                f"Ошибка чтения файла `/content/finished-projects/{project_name}.md` из {env.JAVA_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
+            )
+
+        file_content = file[0]
+        file_sha = file[1]
+
+        updated_file = template_service.render_java_template(projects, project_name)
+
+        if file_content == updated_file:
+            log.warn(
+                f"File /content/finished-projects/{project_name}.md has no changes, nothing to commit"
+            )
+            continue
+
+        commit_message = (
+            f"finished projects: updated {project_name} projects by bot at {timestamp}"
+        )
+
+        file_content_updated = github_client.update_file_content(
+            sha=file_sha,
+            path=f"/content/finished-projects/{project_name}.md",
+            content=updated_file,
+            branch=branch_name,
+            commit_message=commit_message,
+            repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+        )
+
+        if not file_content_updated:
+            log.error(
+                f"Content of file /content/finished-projects/{project_name}.md in the branch {branch_name} was not updated, cannot continue"
+            )
+            raise Exception(
+                f"Ошибка при попытке создать коммит с обновленным списком проектов {project_name} в ветке `{branch_name}`"
+            )
+
+        commits += 1
+
+    if commits == 0:
+        log.warn("No commits were made, PR will not be created")
+        return None
+
+    pr_title = branch_name.replace("-", " ", 3).capitalize()
+
+    pr_link = github_client.create_pull_request(
+        head=branch_name,
+        base="main",
+        title=pr_title,
+        body=pr_title,
+        repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if pr_link is None:
+        log.error(
+            f"Pull request from {branch_name} to main was not created, cannot continue"
+        )
+        raise Exception(
+            f"Ошибка при попытке создать PR из ветки `{branch_name}` в main"
+        )
+
+    return pr_link
+
+
+def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
+    log.info(
+        f"Updating finished projects in the {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} repository"
+    )
+
+    last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
+        "main",
+        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if last_master_commit_sha is None:
+        log.error(
+            "Hash of the last commit in the main branch is unknown, cannot continue"
+        )
+        raise Exception("Ошибка при создании новой ветки для изменений")
+
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+
+    branch_name = f"finished-projects-update-{timestamp}"
+
+    branch_created = github_client.create_branch(
+        branch_name,
+        last_master_commit_sha,
+        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if not branch_created:
+        log.error(f"Branch {branch_name} was not created, cannot continue")
+        raise Exception(
+            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов в {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитории"
+        )
+
+    file = github_client.get_file_content(
+        f"/content/finished-projects.md",
+        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if file is None:
+        log.error(f"/content/finished-projects.md is None, cannot continue")
+        raise Exception(
+            f"Ошибка чтения файла `/content/finished-projects.md` из {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
+        )
+
+    file_content = file[0]
+    file_sha = file[1]
+
+    updated_file = template_service.render_python_template(projects)
+
+    if file_content == updated_file:
+        log.warn("File /content/finished-projects.md has no changes, nothing to commit")
+        return None
+
+    commit_message = f"finished projects: updated projects by bot at {timestamp}"
+
+    file_content_updated = github_client.update_file_content(
+        sha=file_sha,
+        path=f"/content/finished-projects.md",
+        content=updated_file,
+        branch=branch_name,
+        commit_message=commit_message,
+        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if not file_content_updated:
+        log.error(
+            f"Content of file /content/finished-projects.md in the branch {branch_name} was not updated, cannot continue"
+        )
+        raise Exception(
+            f"Ошибка при попытке создать коммит с обновленным списком проектов в ветке `{branch_name}`"
+        )
+
+    pr_title = branch_name.replace("-", " ", 3).capitalize()
+
+    pr_link = github_client.create_pull_request(
+        head=branch_name,
+        base="main",
+        title=pr_title,
+        body=pr_title,
+        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+    )
+
+    if pr_link is None:
+        log.error(
+            f"Pull request from {branch_name} to main was not created, cannot continue"
+        )
+        raise Exception(
+            f"Ошибка при попытке создать PR из ветки `{branch_name}` в main"
+        )
+
+    return pr_link
+
+
 def _update_category_popularity(
     category_match: Match[str], gs_categories_popularity: dict[str, float]
 ) -> str:
@@ -210,7 +419,7 @@ def _generate_stats_message() -> str:
     top_category_incr_popularity.reverse()
 
     def generate_ordered_list(
-        popularity_data: list[tuple[str, tuple[float, float]]]
+        popularity_data: list[tuple[str, tuple[float, float]]],
     ) -> str:
         question_bullets: list[str] = list()
 

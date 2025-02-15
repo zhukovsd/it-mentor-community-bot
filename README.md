@@ -1,5 +1,8 @@
 ## Информация
 
+> [!IMPORTANT]  
+> Проект разработан на версии python == 3.12, работоспособность на других версиях не гарантируется (на 3.13 проект не запускается)
+
 - Создание бота и получение токена - https://t.me/BotFather
 - При создании бота нужно отправить BotFather команду `/setinline`, иначе бот не будет работать через `@` в чате
 - Бот должен быть админом в чатах в которых вызываются его команды и в чате в который он будет пересылать сообщения
@@ -31,7 +34,6 @@
 - API & Services > Library
 - Ввести `Google Drive API` и `Google Sheets API` в поиск
 - И включить эти две либы (Нажать Enable) 
-- Для работы с Google Docs надо будет 
 
 ## Локальный запуск 
 
@@ -78,6 +80,12 @@ SEARCH_INTERVIEW_QUESTIONS_COMMAND_CHAT_IDS=
 INTERVIEW_PREP_SITE_REPO_OWNER=
 INTERVIEW_PREP_SITE_REPO_NAME=
 
+JAVA_BACKEND_COURSE_SITE_REPO_OWNER=
+JAVA_BACKEND_COURSE_SITE_REPO_NAME=
+
+PYTHON_BACKEND_COURSE_SITE_REPO_OWNER=
+PYTHON_BACKEND_COURSE_SITE_REPO_NAME=
+
 GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
@@ -110,7 +118,13 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 `INTERVIEW_PREP_SITE_REPO_OWNER` - Владелец репозитория с методичкой
 `INTERVIEW_PREP_SITE_REPO_NAME` - Название репозитория с методичкой
 
-`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo
+`JAVA_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с java роадмапом
+`JAVA_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с java роадмапом
+
+`PYTHON_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с python роадмапом
+`PYTHON_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с python роадмапом
+
+`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория куда он должен сделать PR
 
 `QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности вопросов. Указывается через запятую без пробелов = 322,511,987
 
@@ -130,7 +144,6 @@ yoyo apply --database postgresql://user:password@localhost:5433/database-name ./
 
  - C помощью UI pycharm
  - Через `python -m src.main`
-
 
 ---
 

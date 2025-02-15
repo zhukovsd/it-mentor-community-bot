@@ -39,6 +39,10 @@ from src.handler.reviews_monthly_summary_handler import (
     REVIEWS_MONTHLY_SUMMARY_COMMAND_NAME,
     reviews_monthly_summary,
 )
+from src.handler.update_finished_projects_handler import (
+    UPDATE_FINISHED_PROJECTS_COMMAND,
+    update_finished_projects,
+)
 
 logs.configure()
 log = logging.getLogger(__name__)
@@ -84,6 +88,9 @@ if __name__ == "__main__":
     reviews_monthly_summary_handler = CommandHandler(
         REVIEWS_MONTHLY_SUMMARY_COMMAND_NAME, reviews_monthly_summary
     )
+    update_finished_projects_handler = CommandHandler(
+        UPDATE_FINISHED_PROJECTS_COMMAND, update_finished_projects
+    )
 
     application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
@@ -92,5 +99,6 @@ if __name__ == "__main__":
     application.add_handler(update_interview_questions_popularity_handler)
     application.add_handler(projects_monthly_summary_handler)
     application.add_handler(reviews_monthly_summary_handler)
+    application.add_handler(update_finished_projects_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
