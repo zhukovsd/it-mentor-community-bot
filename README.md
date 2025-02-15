@@ -34,7 +34,6 @@
 - API & Services > Library
 - Ввести `Google Drive API` и `Google Sheets API` в поиск
 - И включить эти две либы (Нажать Enable) 
-- Для работы с Google Docs надо будет 
 
 ## Локальный запуск 
 
@@ -84,6 +83,9 @@ INTERVIEW_PREP_SITE_REPO_NAME=
 JAVA_BACKEND_COURSE_SITE_REPO_OWNER=
 JAVA_BACKEND_COURSE_SITE_REPO_NAME=
 
+PYTHON_BACKEND_COURSE_SITE_REPO_OWNER=
+PYTHON_BACKEND_COURSE_SITE_REPO_NAME=
+
 GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
@@ -119,7 +121,10 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 `JAVA_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с java роадмапом
 `JAVA_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с java роадмапом
 
-`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo
+`PYTHON_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с python роадмапом
+`PYTHON_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с python роадмапом
+
+`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория куда он должен сделать PR
 
 `QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности вопросов. Указывается через запятую без пробелов = 322,511,987
 
@@ -139,7 +144,6 @@ yoyo apply --database postgresql://user:password@localhost:5433/database-name ./
 
  - C помощью UI pycharm
  - Через `python -m src.main`
-
 
 ---
 
