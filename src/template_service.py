@@ -45,15 +45,16 @@ def _to_correct_language_spelling(language: str) -> str:
 
 
 def _unique_languages(projects: list[ProjectWithReview]) -> str:
-    unique_languages: set[str] = {project.language.lower() for project in projects}
+    languages = [project.language.lower() for project in projects]
+    normalized_languages = list(map(_to_correct_language_spelling, languages))
 
-    unique_languages = set(map(_to_correct_language_spelling, unique_languages))
+    counter = Counter(normalized_languages)
 
-    unique_languages_counter = Counter(unique_languages)
+    unique_languages = set(normalized_languages)
 
     # sorting by number of occurrences then alphabetically
     unique_languages_sorted = sorted(
-        unique_languages, key=lambda x: (-unique_languages_counter[x], x)
+        unique_languages, key=lambda lang: (-counter[lang], lang)
     )
 
     return ", ".join(unique_languages_sorted)
