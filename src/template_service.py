@@ -116,15 +116,21 @@ def _review(project: ProjectWithReview) -> str:
 
 
 def _review_author(project: ProjectWithReview) -> str:
-    def to_author_link(review: Review) -> str:
+    unique_authors: set[str] = set()
+
+    def to_author_link(review: Review) -> str | None:
         if review.author_tg_link == "":
             return f"{review.author_name}"
 
+        if review.author_tg_nick in unique_authors:
+            return None
+
+        unique_authors.add(review.author_tg_nick)
         return (
             f"{review.author_name} [{review.author_tg_nick}]({review.author_tg_link})"
         )
 
-    return ", ".join(map(to_author_link, project.reviews))
+    return ", ".join(filter(None, map(to_author_link, project.reviews)))
 
 
 java_templates = Environment(loader=FunctionLoader(_get_java_template))
