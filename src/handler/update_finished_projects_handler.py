@@ -8,7 +8,6 @@ from src.config import env
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
 from src.google_sheet.google_sheet_service import GSheetService
-from src import template_service
 from src.handler import util
 from src.project_with_review_dto import ProjectWithReview
 
@@ -96,8 +95,7 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
 
     try:
         java_repo_pr = github_service.update_java_projects(projects_with_reviews)
-
-        log.info(java_repo_pr)
+        python_repo_pr = github_service.update_python_projects(projects_with_reviews)
 
         _ = await context.bot.delete_message(
             chat_id=chat.id,
@@ -106,7 +104,7 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
 
         _ = await context.bot.send_message(
             chat_id=chat.id,
-            text=f"PR: {util.escape_special_chars(java_repo_pr)}",
+            text=f"[Java projects update PR]({util.escape_special_chars(java_repo_pr)})\n\n[Python project update PR]({util.escape_special_chars(python_repo_pr)})",
             parse_mode=ParseMode.MARKDOWN_V2,
             message_thread_id=command_message.message_thread_id,
             disable_web_page_preview=True,
