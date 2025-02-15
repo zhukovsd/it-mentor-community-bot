@@ -146,7 +146,8 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str:
     )
 
     last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
-        "main", repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME
+        "feature/finished-projects-and-reviews-generation",
+        repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,
     )
 
     if last_master_commit_sha is None:
