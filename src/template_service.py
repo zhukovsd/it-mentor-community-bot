@@ -1,4 +1,5 @@
 import logging
+from collections import Counter
 from jinja2 import Environment, FunctionLoader
 
 from src.config import env
@@ -48,7 +49,14 @@ def _unique_languages(projects: list[ProjectWithReview]) -> str:
 
     unique_languages = set(map(_to_correct_language_spelling, unique_languages))
 
-    return ", ".join(unique_languages)
+    unique_languages_counter = Counter(unique_languages)
+
+    # sorting by number of occurrences then alphabetically
+    unique_languages_sorted = sorted(
+        unique_languages, key=lambda x: (-unique_languages_counter[x], x)
+    )
+
+    return ", ".join(unique_languages_sorted)
 
 
 def _review_count(projects: list[ProjectWithReview]) -> str:
