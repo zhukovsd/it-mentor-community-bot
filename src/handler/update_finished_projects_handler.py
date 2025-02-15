@@ -97,6 +97,17 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
         java_repo_pr = github_service.update_java_projects(projects_with_reviews)
         python_repo_pr = github_service.update_python_projects(projects_with_reviews)
 
+        text = ""
+
+        if java_repo_pr is None and python_repo_pr is None:
+            text = "Никаких изменений не было обнаружено, PR'ы не созданы"
+
+        if java_repo_pr is not None:
+            text += _to_link("Java projects update PR", java_repo_pr) + "\n"
+
+        if python_repo_pr is not None:
+            text += _to_link("Python projects update PR", python_repo_pr)
+
         _ = await context.bot.delete_message(
             chat_id=chat.id,
             message_id=command_message.id,
@@ -104,7 +115,7 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
 
         _ = await context.bot.send_message(
             chat_id=chat.id,
-            text=f"[Java projects update PR]({util.escape_special_chars(java_repo_pr)})\n\n[Python project update PR]({util.escape_special_chars(python_repo_pr)})",
+            text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             message_thread_id=command_message.message_thread_id,
             disable_web_page_preview=True,
@@ -141,3 +152,7 @@ def is_reply(message: Message | None) -> bool:
     if message.reply_to_message.id == message.reply_to_message.message_thread_id:
         return False
     return True
+
+
+def _to_link(name: str, link: str) -> str:
+    return f"[{name}]({util.escape_special_chars(link)})"
