@@ -67,9 +67,9 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     assert command_text is not None, "Command text cannot be None"
 
-    project_link = command_text[len("/" + ADD_PROJECT_COMMAND_NAME) :]
+    message_text = command_text[len("/" + ADD_PROJECT_COMMAND_NAME) :]
 
-    if len(project_link.strip()) == 0:
+    if len(message_text.strip()) == 0:
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, excpected 2"
         )
@@ -78,7 +78,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    args: list[str] = project_link.strip().split(" ")
+    args: list[str] = message_text.strip().split(" ")
 
     if len(args) != 2:
         log.error(
