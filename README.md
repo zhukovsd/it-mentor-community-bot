@@ -89,6 +89,8 @@ PYTHON_BACKEND_COURSE_SITE_REPO_NAME=
 GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
+
+SEND_PROJECTS_TO_CHAT=
 ```
 
 `PROJECTS_REVIEWS_SPREADSHEET_ID` - Строка без пробелов содержащая в себе id файла google sheet из google drive который подключается с помощью google api.
@@ -127,6 +129,8 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 `GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория куда он должен сделать PR
 
 `QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности вопросов. Указывается через запятую без пробелов = 322,511,987
+
+`SEND_PROJECTS_TO_CHAT` - Контролирует нужно ли пересылать сообщения пользователей в чат указанный в `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` при использовании команды /addproject. Любое значение кроме `true` расценивается как `false`. Дефолтное значение `false`
 
 5. Поднять БД в контейнере командой
 

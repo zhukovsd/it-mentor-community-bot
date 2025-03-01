@@ -132,11 +132,17 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=chat.id,
             message_id=command_message.id,
         )
-        _ = await context.bot.forward_message(
-            from_chat_id=chat.id,
-            chat_id=projects_reviews_collection_chat_id,
-            message_id=student_message.id,
-        )
+
+        if env.SEND_PROJECTS_TO_CHAT:
+            log.info(
+                f"forwarding message because SEND_PROJECTS_TO_CHAT is {env.SEND_PROJECTS_TO_CHAT}"
+            )
+            _ = await context.bot.forward_message(
+                from_chat_id=chat.id,
+                chat_id=projects_reviews_collection_chat_id,
+                message_id=student_message.id,
+            )
+
         _ = await context.bot.send_message(
             chat_id=chat.id,
             text=bot_reply_text,
