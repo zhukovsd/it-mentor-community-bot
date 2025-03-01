@@ -7,7 +7,7 @@ from src import template_service
 from src.github import github_client
 from src.config import env
 from src.google_sheet import google_sheet_service
-from src.project_with_review_dto import ProjectWithReview
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 
 log = logging.getLogger(__name__)

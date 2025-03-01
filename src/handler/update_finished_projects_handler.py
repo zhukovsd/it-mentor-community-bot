@@ -8,7 +8,7 @@ from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
 from src.google_sheet import google_sheet_service
 from src.handler import util
-from src.project_with_review_dto import ProjectWithReview
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
 

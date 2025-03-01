@@ -5,7 +5,7 @@ from jinja2 import Environment, FunctionLoader
 from src.config import env
 from src.github import github_client
 from src.google_sheet.dto.review_dto import Review
-from src.project_with_review_dto import ProjectWithReview
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 log = logging.getLogger(__name__)
 
