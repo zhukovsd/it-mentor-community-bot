@@ -6,18 +6,14 @@ from telegram import Message, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
-from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
 from src.handler import util
 
 SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
 
 log = logging.getLogger(__name__)
-
-json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
-
-google_sheet_service = GSheetService(json_google_api_key)
 
 
 async def search_interviews_with_question(

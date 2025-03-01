@@ -1,13 +1,13 @@
 import logging
 import asyncio
+
 from telegram import ChatMember, Message, MessageEntity, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
-from src.config import env
-from src.google_sheet.google_sheet_service import GSheetService
-from src.repository import find_reply_by_language_and_project
 
-from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
+from src.config import env
+from src.google_sheet import google_sheet_service
+from src import repository
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
 PROJECT_NAMES = [
@@ -21,10 +21,6 @@ PROJECT_NAMES = [
 ]
 
 log = logging.getLogger(__name__)
-
-json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
-
-google_sheet_service = GSheetService(json_google_api_key)
 
 
 async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -108,7 +104,9 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         student_message is not None
     ), "Replied to message, i.e. student message with project link cannot be None"
 
-    bot_reply_text = find_reply_by_language_and_project(language, project_name)
+    bot_reply_text = repository.find_reply_by_language_and_project(
+        language, project_name
+    )
 
     if bot_reply_text is None:
         log.error(
@@ -193,7 +191,7 @@ def is_admin(user: ChatMember) -> bool:
 
 
 def is_allowed_user(user: ChatMember) -> bool:
-    allowed_user_ids = ADD_PROJECT_ALLOWED_USER_IDS.split(",")
+    allowed_user_ids = env.ADD_PROJECT_ALLOWED_USER_IDS.split(",")
     allowed_user_ids = list(map(int, allowed_user_ids))
 
     user_id = user.user.id
