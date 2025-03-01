@@ -1,4 +1,7 @@
+# pyright: reportExplicitAny=false
+
 from typing import Any
+from urllib.parse import urlparse
 import gspread
 import json
 import logging
@@ -6,7 +9,6 @@ import logging
 from src.google_sheet import google_sheet_client
 
 
-from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
 from src.google_sheet.dto.interview_question_category_dto import (
     InterviewQuestionCategory,
 )
@@ -18,7 +20,6 @@ from src.google_sheet.dto.interview_info_dto import InterviewInfo
 
 from src.google_sheet.dto.project_dto import Project
 from src.google_sheet.dto.review_dto import Review
-from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
 from src.google_sheet.constants.interview_collection_sheet_constants import (
     QUESTION_COL_INDEX,
@@ -31,6 +32,8 @@ from src.google_sheet.constants.interview_collection_sheet_constants import (
 )
 
 from src.google_sheet.constants.projects_reviews_sheet_constants import (
+    CURRENT_PERIOD_COL_INDEX,
+    CURRENT_PERIOD_ROW_INDEX,
     FIRST_PROJECT_ROW_INDEX,
     FIRST_REVIEW_ROW_INDEX,
     PROJECT_AUTHOR_LINK_COL_INDEX,
@@ -39,7 +42,6 @@ from src.google_sheet.constants.projects_reviews_sheet_constants import (
     PROJECT_PROJECT_NAME_COL_INDEX,
     PROJECT_REPO_LINK_COL_INDEX,
     PROJECT_REPO_NAME_COL_INDEX,
-    PROJECTS_SHEET,
     PROJECT_PERIOD_COL_INDEX,
     REVIEW_AUTHOR_NAME_COL_INDEX,
     REVIEW_AUTHOR_TG_LINK_COL_INDEX,
@@ -68,85 +70,33 @@ class GSheetService:
         )
         self.__interview_questions: dict[int, InterviewQuestion] = dict()
 
-    def add_project_to_gsheet(self, project_data: Project, gsheets_id: str):
-        open_table = self.__google_sheet_client.open_by_key(gsheets_id)
-        project_data.period = self.__get_date_from_sheet(gsheets_id)
-        log.debug("Информация о периоде: %s", project_data.period)
+    def add_project(self, project_name: str, language: str, link: str):
+        parsed_url = urlparse(link)
+        author, repo, *_ = parsed_url.path.strip("/").split("/")
 
-        open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
+        author_url = f"{parsed_url.scheme}://{parsed_url.hostname}/{author}"
+        repo_url = f"{parsed_url.scheme}://{parsed_url.hostname}/{author}/{repo}"
 
-        repo_link = open_sheet.find(project_data.repo_link)
+        projects_sheet = google_sheet_client.get_projects_sheet(editable=True)
 
-        if repo_link is not None:
-            log.warning(
-                "Проект: %r Существует в таблице и находится в ячейке по адресу: %r",
-                repo_link.value,
-                repo_link.address,
+        project_added = (
+            projects_sheet.find(repo_url, in_column=PROJECT_REPO_LINK_COL_INDEX + 1)
+            is not None
+        )
+
+        if project_added:
+            raise Exception(
+                f"Project '{project_name}' from '{author}' already added to the Google Sheet"
             )
-            return
 
-        last_filled_row = len(open_sheet.get_all_values(range_name="A:G"))
-        empty_row = last_filled_row + 1
-        fields_sheet_obj = GSheetFieldsDTO(open_sheet, empty_row)
-
-        # Если ячейка с url пустая - то вся строка гарантированно пустая
-        check_cell_sheet = open_sheet.get(fields_sheet_obj.repository_url).first()
-
-        if check_cell_sheet is not None:
-            log.warning(
-                "В указанной ячейке: %r содержится информация: %r, пожалуйста проверьте целостность таблицы",
-                fields_sheet_obj.repository_url,
-                check_cell_sheet,
-            )
-            return
-
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.date_added_project, project_data.period
+        current_period_cell = projects_sheet.cell(
+            CURRENT_PERIOD_ROW_INDEX + 1, CURRENT_PERIOD_COL_INDEX + 1
         )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.type_project, project_data.project_name
-        )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.program_lang_project,
-            project_data.language,
-        )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.repository_name, project_data.repo_name
-        )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.repository_url, project_data.repo_link
-        )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.name_owner_repo, project_data.author_name
-        )
-        _ = open_sheet.update_acell(
-            fields_sheet_obj.url_owner_repo, project_data.author_link
-        )
+        current_period = str(current_period_cell.value)
 
-        log.info(
-            "Ссылка - : %s добавлена в Таблицу gsheet",
-            project_data.repo_link,
+        _ = projects_sheet.append_row(
+            [current_period, project_name, language, repo, repo_url, author, author_url]
         )
-
-    def __get_date_from_sheet(self, gsheets_id: str) -> str:
-        """
-        Метод позволяет получить гарантированно период за который добавляются проекты
-            из таблицы. В дальнейшем можно использовать так же для добавления ревью
-        Если Значение "Период" поменяет свое местоположение, то:
-            При смене листа - измените PROJECT_SHEET путем добавления НОВОЙ константы
-                в файл "added_completed_projects_constants.py"
-            При смене ячейки - измените значение "I1" на нужную вам ячейку
-        :param gsheets_id: id Таблицы с которым работаем
-        :return:
-        """
-        open_table = self.__google_sheet_client.open_by_key(gsheets_id)
-
-        open_sheet = open_table.get_worksheet(PROJECTS_SHEET)
-        date_for_add_in_sheet = open_sheet.get("I2")
-
-        open_table.client.session.close()
-
-        return date_for_add_in_sheet[0][0]
 
     def get_interview_question_by_id(
         self, question_id: int
@@ -501,11 +451,3 @@ class GSheetService:
             return x_str.startswith("http")
         except Exception:
             return False
-
-
-if __name__ == "__main__":
-    project_object = get_info_from_url("Для url repo", "Java", "currency-exchange")
-    add_project_in_sheet_object = GSheetService("api_json_key")
-    add_project_in_sheet_object.add_project_to_gsheet(
-        project_object, "monthly_results_for_it_mentor"
-    )

@@ -1,15 +1,13 @@
 import logging
 import asyncio
-from telegram import ChatMember, Message, Update
-from src.config import env
-from src.repository import find_reply_by_language_and_project
+from telegram import ChatMember, Message, MessageEntity, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
+from src.config import env
+from src.google_sheet.google_sheet_service import GSheetService
+from src.repository import find_reply_by_language_and_project
 
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
-from src.google_sheet.connect_modules_gsheets import (
-    connect_modules_to_add_data_to_gsheets,
-)
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
 PROJECT_NAMES = [
@@ -23,6 +21,10 @@ PROJECT_NAMES = [
 ]
 
 log = logging.getLogger(__name__)
+
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
+
+google_sheet_service = GSheetService(json_google_api_key)
 
 
 async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -69,9 +71,9 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     assert command_text is not None, "Command text cannot be None"
 
-    message_text = command_text[len("/" + ADD_PROJECT_COMMAND_NAME) :]
+    project_link = command_text[len("/" + ADD_PROJECT_COMMAND_NAME) :]
 
-    if len(message_text.strip()) == 0:
+    if len(project_link.strip()) == 0:
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, excpected 2"
         )
@@ -80,7 +82,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    args: list[str] = message_text.strip().split(" ")
+    args: list[str] = project_link.strip().split(" ")
 
     if len(args) != 2:
         log.error(
@@ -119,37 +121,68 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     projects_reviews_collection_chat_id = env.PROJECTS_REVIEWS_COLLECTION_CHAT_ID
 
-    _ = await context.bot.delete_message(
-        chat_id=chat.id,
-        message_id=command_message.id,
-    )
-    _ = await context.bot.forward_message(
-        from_chat_id=chat.id,
-        chat_id=projects_reviews_collection_chat_id,
-        message_id=student_message.id,
-    )
-    _ = await context.bot.send_message(
-        chat_id=chat.id,
-        text=bot_reply_text,
-        reply_to_message_id=student_message.id,
-        parse_mode=ParseMode.MARKDOWN_V2,
-    )
+    project_link = parse_link(student_message)
 
-    message = student_message.text
+    if project_link is None:
+        await reply_with_error("В сообщении нет ссылки на проект")
+        return
 
-    assert (
-        message is not None
-    ), "Replied to message, i.e. student message with project link cannot be None"
+    try:
+        google_sheet_service.add_project(project_name, language, project_link)
 
-    check_add_data = connect_modules_to_add_data_to_gsheets(
-        message=message,
-        lang_project=language,
-        type_project=project_name,
-        command_check=ADD_PROJECT_COMMAND_NAME,
-    )
+        _ = await context.bot.delete_message(
+            chat_id=chat.id,
+            message_id=command_message.id,
+        )
+        _ = await context.bot.forward_message(
+            from_chat_id=chat.id,
+            chat_id=projects_reviews_collection_chat_id,
+            message_id=student_message.id,
+        )
+        _ = await context.bot.send_message(
+            chat_id=chat.id,
+            text=bot_reply_text,
+            reply_to_message_id=student_message.id,
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+    except Exception as e:
+        log.error(f"Error on {ADD_PROJECT_COMMAND_NAME}, message: {str(e)}")
+        await reply_with_error(str(e))
+        return
 
-    if check_add_data.boolean_val is False:
-        await reply_with_error(check_add_data.error_message)
+
+def parse_link(message: Message) -> str | None:
+    links_types = [MessageEntity.URL, MessageEntity.TEXT_LINK]
+
+    message_links: dict[MessageEntity, str]
+
+    if message.caption is not None:
+        message_links = message.parse_caption_entities(links_types)
+    else:
+        message_links = message.parse_entities(links_types)
+
+    if len(message_links) == 0:
+        return None
+
+    normalized_links = set(map(normalize_link, message_links.values()))
+
+    if len(normalized_links) == 1:
+        return normalized_links.pop()
+
+    for link in normalized_links:
+        if link.find("github.com") != -1:
+            return link
+        if link.find("gitlab.com") != -1:
+            return link
+
+    return None
+
+
+def normalize_link(link: str) -> str:
+    if link.startswith("http"):
+        return link
+
+    return "https://" + link
 
 
 def is_admin(user: ChatMember) -> bool:
