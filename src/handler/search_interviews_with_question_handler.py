@@ -15,7 +15,7 @@ SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
 
 log = logging.getLogger(__name__)
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 
 google_sheet_service = GSheetService(json_google_api_key)
 

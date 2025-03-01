@@ -13,7 +13,7 @@ from src.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 
 google_sheet_service = GSheetService(json_google_api_key)
 

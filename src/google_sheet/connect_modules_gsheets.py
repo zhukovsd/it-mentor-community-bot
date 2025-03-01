@@ -1,6 +1,9 @@
 import logging
 
-from src.config.env import PROJECTS_REVIEWS_SPREADSHEET_ID, JSON_KEY_GOOGLE_API
+from src.config.env import (
+    PROJECTS_REVIEWS_SPREADSHEET_ID,
+    GOOGLE_SERVICE_ACCOUNT_JSON_KEY,
+)
 
 from src.google_sheet.dto.dto_check_validation_added_data import (
     CheckValidationAddedDataDTO,
@@ -44,7 +47,9 @@ def connect_modules_to_add_data_to_gsheets(
         url=url, lang_project=lang_project, type_project=type_project
     )
 
-    add_in_sheets_obj = GSheetService(json_key_google_api=JSON_KEY_GOOGLE_API)
+    add_in_sheets_obj = GSheetService(
+        json_key_google_api=GOOGLE_SERVICE_ACCOUNT_JSON_KEY
+    )
     add_in_sheets_obj.add_project_to_gsheet(
         project_data=project_data_obj, gsheets_id=PROJECTS_REVIEWS_SPREADSHEET_ID
     )

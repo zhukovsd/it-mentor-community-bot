@@ -36,7 +36,7 @@ QUESTION_PATTERN = r"#{4}\s{1}\d*\.*\s*\[(.*?)\]\(.*?\)\s*\[([^%]*?)%*\]"
 categories_popularity_change: dict[str, tuple[float, float]] = {}
 questions_popularity_change: dict[str, tuple[float, float]] = {}
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 
 google_sheet_service = GSheetService(json_google_api_key)
 

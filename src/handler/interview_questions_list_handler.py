@@ -17,7 +17,7 @@ INTERVIEW_QUESTIONS_LIST_COMMAND = "interviewprepquestionslist"
 
 log = logging.getLogger(__name__)
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 
 google_sheet_service = GSheetService(json_google_api_key)
 

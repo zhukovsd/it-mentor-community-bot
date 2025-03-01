@@ -10,7 +10,7 @@ TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTION_CHAT_ID")
 ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
-JSON_KEY_GOOGLE_API: str = os.getenv("JSON_KEY_GOOGLE_API")
+GOOGLE_SERVICE_ACCOUNT_JSON_KEY: str = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_KEY")
 PROJECTS_REVIEWS_SPREADSHEET_ID: str = os.getenv("PROJECTS_REVIEWS_SPREADSHEET_ID")
 
 POSTGRES_USER: str = os.getenv("POSTGRES_USER")
@@ -40,7 +40,7 @@ assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable 
 assert PROJECTS_REVIEWS_COLLECTION_CHAT_ID is not None, "PROJECTS_REVIEWS_COLLECTION_CHAT_ID environment variable is not set"
 assert ADD_PROJECT_ALLOWED_USER_IDS is not None, "ADD_PROJECT_ALLOWED_USER_IDS environment variable is not set"
 
-assert JSON_KEY_GOOGLE_API is not None, "JSON_KEY_GOOGLE_API environment variable is not set"
+assert GOOGLE_SERVICE_ACCOUNT_JSON_KEY is not None, "GOOGLE_SERVICE_ACCOUNT_JSON_KEY environment variable is not set"
 assert PROJECTS_REVIEWS_SPREADSHEET_ID is not None, "PROJECTS_REVIEWS_SPREADSHEET_ID environment variable is not set"
 
 assert POSTGRES_USER is not None, "POSTGRES_USER environment variable is not set"

@@ -11,7 +11,7 @@ from src.handler import util
 
 PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME = "projectsmonthlysummary"
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
+json_google_api_key = env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY
 
 google_sheet_service = GSheetService(json_google_api_key)
 
