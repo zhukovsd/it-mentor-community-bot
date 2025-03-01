@@ -1,7 +1,6 @@
 import logging
 
 from src.config.env import PROJECTS_REVIEWS_SPREADSHEET_ID, JSON_KEY_GOOGLE_API
-from src.config import logs
 
 from src.google_sheet.dto.dto_check_validation_added_data import (
     CheckValidationAddedDataDTO,
@@ -11,7 +10,6 @@ from src.google_sheet.google_sheet_service import GSheetService
 from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
 
-logs.configure()
 log = logging.getLogger(__name__)
 
 

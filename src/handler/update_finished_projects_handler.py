@@ -18,7 +18,6 @@ json_google_api_key = env.JSON_KEY_GOOGLE_API
 google_sheet_service = GSheetService(json_google_api_key)
 
 log = logging.getLogger(__name__)
-log.level = logging.DEBUG
 
 
 async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):

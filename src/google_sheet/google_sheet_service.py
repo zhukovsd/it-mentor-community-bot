@@ -3,7 +3,6 @@ import gspread
 import json
 import logging
 
-from src.config import logs
 from src.config import env
 
 from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
@@ -54,7 +53,6 @@ from src.google_sheet.constants.projects_reviews_sheet_constants import (
     REVIEWS_SHEET,
 )
 
-logs.configure()
 log = logging.getLogger(__name__)
 
 

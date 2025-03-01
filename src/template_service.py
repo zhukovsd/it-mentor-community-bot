@@ -8,7 +8,6 @@ from src.google_sheet.dto.review_dto import Review
 from src.project_with_review_dto import ProjectWithReview
 
 log = logging.getLogger(__name__)
-log.level = logging.DEBUG
 
 
 def _get_java_template(name: str) -> str | None:

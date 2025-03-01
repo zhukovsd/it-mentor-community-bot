@@ -12,7 +12,6 @@ from src.handler import util
 UPDATE_INTERVIEW_QUESTIONS_POPULARITY = "updatequestionspopularity"
 
 log = logging.getLogger(__name__)
-log.level = logging.DEBUG
 
 
 async def update_questions_popularity(
