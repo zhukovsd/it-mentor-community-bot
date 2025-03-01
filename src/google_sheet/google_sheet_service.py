@@ -3,7 +3,8 @@ import gspread
 import json
 import logging
 
-from src.config import env
+from src.google_sheet import google_sheet_client
+
 
 from src.google_sheet.dto.dto_gsheet_fields import GSheetFieldsDTO
 from src.google_sheet.dto.interview_question_category_dto import (
@@ -21,7 +22,6 @@ from src.google_sheet.get_info_from_repo_url import get_info_from_url
 
 from src.google_sheet.constants.interview_collection_sheet_constants import (
     QUESTION_COL_INDEX,
-    SUMMARY_SHEET_INDEX,
     QUESTION_ID_COL_INDEX,
     FIRST_QUESTION_ROW_INDEX,
     INTERVIEW_NAME_ROW_INDEX,
@@ -50,7 +50,6 @@ from src.google_sheet.constants.projects_reviews_sheet_constants import (
     REVIEW_REPO_LINK_COL_INDEX,
     REVIEW_REVEIW_LINK_COL_INDEX,
     REVIEW_REVIEW_TYPE_COL_INDEX,
-    REVIEWS_SHEET,
 )
 
 log = logging.getLogger(__name__)
@@ -166,17 +165,7 @@ class GSheetService:
     def get_projects_data(self) -> list[Project]:
         log.info("Parsing projects reviews collection Google spreadsheet")
 
-        gsheets_client = gspread.auth.service_account_from_dict(
-            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
-        )
-
-        projects_reviews_spreadsheet_id = env.PROJECTS_REVIEWS_SPREADSHEET_ID
-
-        interview_collection_spreadsheet = gsheets_client.open_by_key(
-            projects_reviews_spreadsheet_id
-        )
-
-        projects_sheet = interview_collection_spreadsheet.get_worksheet(PROJECTS_SHEET)
+        projects_sheet = google_sheet_client.get_projects_sheet()
 
         # Col[Row[Any]]
         projects_sheet_values: list[list[Any]] = projects_sheet.get_all_values()
@@ -217,17 +206,7 @@ class GSheetService:
     def get_reviews_data(self) -> list[Review]:
         log.info("Parsing projects reviews collection Google spreadsheet")
 
-        gsheets_client = gspread.auth.service_account_from_dict(
-            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
-        )
-
-        projects_reviews_spreadsheet_id = env.PROJECTS_REVIEWS_SPREADSHEET_ID
-
-        interview_collection_spreadsheet = gsheets_client.open_by_key(
-            projects_reviews_spreadsheet_id
-        )
-
-        reviews_sheet = interview_collection_spreadsheet.get_worksheet(REVIEWS_SHEET)
+        reviews_sheet = google_sheet_client.get_reviews_sheet()
 
         # Col[Row[Any]]
         reviews_sheet_values: list[list[Any]] = reviews_sheet.get_all_values()
@@ -272,29 +251,17 @@ class GSheetService:
     def _update_interview_questions(self) -> None:
         log.info("Parsing interview collection Google spreadsheet")
 
-        gsheets_client = gspread.auth.service_account_from_dict(
-            self.__dict_api_key_gsheet, scopes=gspread.auth.READONLY_SCOPES
-        )
-
-        interview_collection_spreadsheet_id = env.INTERVIEW_COLLECTION_SPREADSHEET_ID
-
-        interview_collection_spreadsheet = gsheets_client.open_by_key(
-            interview_collection_spreadsheet_id
-        )
-
-        summary_sheet = interview_collection_spreadsheet.get_worksheet(
-            SUMMARY_SHEET_INDEX
-        )
+        interviews_sheet = google_sheet_client.get_interviews_sheet()
 
         # Col[Row[Any]]
-        summary_sheet_values: list[list[Any]] = summary_sheet.get_all_values()
+        interviews_sheet_values: list[list[Any]] = interviews_sheet.get_all_values()
 
         question_id_to_row_category = self._map_question_id_to_row_category(
-            summary_sheet_values
+            interviews_sheet_values
         )
 
         col_to_interview_info = self._map_col_index_to_interview_info(
-            summary_sheet_values
+            interviews_sheet_values
         )
 
         questions = self._map_question_id_to_question(
@@ -476,10 +443,7 @@ class GSheetService:
         id_to_question: dict[int, InterviewQuestion] = dict()
 
         for question_id in question_id_to_row_category:
-            row_category = question_id_to_row_category[question_id]
-
-            row = row_category[0]
-            category = row_category[1]
+            [row, category] = question_id_to_row_category[question_id]
 
             interview_question = InterviewQuestion(
                 question_id, "", 0.0, [], InterviewQuestionCategory("", "", 0.0)
