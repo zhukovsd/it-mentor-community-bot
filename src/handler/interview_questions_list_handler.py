@@ -5,21 +5,17 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
     InterviewQuestionCategory,
 )
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
-from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
 from src.handler import util
 
 INTERVIEW_QUESTIONS_LIST_COMMAND = "interviewprepquestionslist"
 
 log = logging.getLogger(__name__)
-
-json_google_api_key = env.JSON_KEY_GOOGLE_API
-
-google_sheet_service = GSheetService(json_google_api_key)
 
 
 async def list_interview_questions_messages(

@@ -45,6 +45,7 @@ from src.handler.update_finished_projects_handler import (
 )
 
 logs.configure()
+
 log = logging.getLogger(__name__)
 
 

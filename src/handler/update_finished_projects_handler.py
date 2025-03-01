@@ -4,21 +4,16 @@ from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.config import env
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
-from src.google_sheet.google_sheet_service import GSheetService
+from src.google_sheet import google_sheet_service
 from src.handler import util
-from src.project_with_review_dto import ProjectWithReview
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
-
-google_sheet_service = GSheetService(json_google_api_key)
 
 log = logging.getLogger(__name__)
-log.level = logging.DEBUG
 
 
 async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):
