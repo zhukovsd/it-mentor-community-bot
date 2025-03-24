@@ -1,5 +1,8 @@
 import asyncio
 import logging
+import sys
+import traceback
+
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
@@ -117,6 +120,12 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
         )
 
     except Exception as e:
+        file_name, line_number, func_name, _ = traceback.extract_tb(sys.exc_info()[2])[
+            -1
+        ]
+        log.error(
+            f"Error on {UPDATE_FINISHED_PROJECTS_COMMAND} at {file_name}:{line_number} in {func_name}, message: {str(e)}"
+        )
         await reply_with_error(str(e))
 
 
