@@ -1,5 +1,7 @@
 import logging
 import asyncio
+import traceback
+import sys
 
 from telegram import ChatMember, Message, MessageEntity, Update
 from telegram.constants import ChatMemberStatus, ParseMode
@@ -150,7 +152,12 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode=ParseMode.MARKDOWN_V2,
         )
     except Exception as e:
-        log.error(f"Error on {ADD_PROJECT_COMMAND_NAME}, message: {str(e)}")
+        file_name, line_number, func_name, _ = traceback.extract_tb(sys.exc_info()[2])[
+            -1
+        ]
+        log.error(
+            f"Error on {ADD_PROJECT_COMMAND_NAME} at {file_name}:{line_number} in {func_name}, message: {str(e)}"
+        )
         await reply_with_error(str(e))
         return
 
@@ -158,22 +165,30 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def parse_link(message: Message) -> str | None:
     links_types = [MessageEntity.URL, MessageEntity.TEXT_LINK]
 
-    message_links: dict[MessageEntity, str]
+    message_entities: dict[MessageEntity, str]
 
     if message.caption is not None:
-        message_links = message.parse_caption_entities(links_types)
+        message_entities = message.parse_caption_entities(links_types)
     else:
-        message_links = message.parse_entities(links_types)
+        message_entities = message.parse_entities(links_types)
 
-    if len(message_links) == 0:
+    if len(message_entities) == 0:
         return None
 
-    normalized_links = set(map(normalize_link, message_links.values()))
+    message_links: set[str] = set()
 
-    if len(normalized_links) == 1:
-        return normalized_links.pop()
+    for message_entity, value in message_entities.items():
+        link = extract_link(message_entity, value)
 
-    for link in normalized_links:
+        if link is None:
+            continue
+
+        message_links.add(normalize_link(link))
+
+    if len(message_links) == 1:
+        return message_links.pop()
+
+    for link in message_links:
         if link.find("github.com") != -1:
             return link
         if link.find("gitlab.com") != -1:
@@ -187,6 +202,13 @@ def normalize_link(link: str) -> str:
         return link
 
     return "https://" + link
+
+
+def extract_link(message_entity: MessageEntity, value: str) -> str | None:
+    if message_entity.type is MessageEntity.TEXT_LINK:
+        return message_entity.url
+
+    return value
 
 
 def is_admin(user: ChatMember) -> bool:
