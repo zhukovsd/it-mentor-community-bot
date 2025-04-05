@@ -5,9 +5,9 @@ import textwrap
 from re import Match
 from src import template_service
 from src.github import github_client
-from src.google_sheet.google_sheet_service import GSheetService
 from src.config import env
-from src.project_with_review_dto import ProjectWithReview
+from src.google_sheet import google_sheet_service
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 
 log = logging.getLogger(__name__)
@@ -36,9 +36,6 @@ QUESTION_PATTERN = r"#{4}\s{1}\d*\.*\s*\[(.*?)\]\(.*?\)\s*\[([^%]*?)%*\]"
 categories_popularity_change: dict[str, tuple[float, float]] = {}
 questions_popularity_change: dict[str, tuple[float, float]] = {}
 
-json_google_api_key = env.JSON_KEY_GOOGLE_API
-
-google_sheet_service = GSheetService(json_google_api_key)
 
 project_names = [
     "hangman",
@@ -192,7 +189,7 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
         updated_file = template_service.render_java_template(projects, project_name)
 
         if file_content == updated_file:
-            log.warn(
+            log.warning(
                 f"File /content/finished-projects/{project_name}.md has no changes, nothing to commit"
             )
             continue
@@ -221,7 +218,7 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
         commits += 1
 
     if commits == 0:
-        log.warn("No commits were made, PR will not be created")
+        log.warning("No commits were made, PR will not be created")
         return None
 
     pr_title = branch_name.replace("-", " ", 3).capitalize()
@@ -294,7 +291,9 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
     updated_file = template_service.render_python_template(projects)
 
     if file_content == updated_file:
-        log.warn("File /content/finished-projects.md has no changes, nothing to commit")
+        log.warning(
+            "File /content/finished-projects.md has no changes, nothing to commit"
+        )
         return None
 
     commit_message = f"finished projects: updated projects by bot at {timestamp}"
@@ -347,7 +346,7 @@ def _update_category_popularity(
     gs_category_popularity = gs_categories_popularity.get(str.lower(category_name))
 
     if gs_category_popularity is None:
-        log.warn(
+        log.warning(
             f"Popularity percents for category '{category_name}' not found in data from Google sheet"
         )
         return full_match
@@ -378,7 +377,7 @@ def _update_question_popularity(
     gs_question_popularity = gs_questions_popularity.get(str.lower(question_name))
 
     if gs_question_popularity is None:
-        log.warn(
+        log.warning(
             f"Popularity percents for question '{question_name}' not found in data from Google sheet"
         )
         return full_match

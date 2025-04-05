@@ -1,15 +1,15 @@
 import logging
 import asyncio
-from telegram import ChatMember, Message, Update
-from src.config import env
-from src.repository import find_reply_by_language_and_project
+import traceback
+import sys
+
+from telegram import ChatMember, Message, MessageEntity, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
-from src.google_sheet.connect_modules_gsheets import (
-    connect_modules_to_add_data_to_gsheets,
-)
+from src.config import env
+from src.google_sheet import google_sheet_service
+from src import repository
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
 PROJECT_NAMES = [
@@ -106,7 +106,9 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
         student_message is not None
     ), "Replied to message, i.e. student message with project link cannot be None"
 
-    bot_reply_text = find_reply_by_language_and_project(language, project_name)
+    bot_reply_text = repository.find_reply_by_language_and_project(
+        language, project_name
+    )
 
     if bot_reply_text is None:
         log.error(
@@ -119,37 +121,94 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     projects_reviews_collection_chat_id = env.PROJECTS_REVIEWS_COLLECTION_CHAT_ID
 
-    _ = await context.bot.delete_message(
-        chat_id=chat.id,
-        message_id=command_message.id,
-    )
-    _ = await context.bot.forward_message(
-        from_chat_id=chat.id,
-        chat_id=projects_reviews_collection_chat_id,
-        message_id=student_message.id,
-    )
-    _ = await context.bot.send_message(
-        chat_id=chat.id,
-        text=bot_reply_text,
-        reply_to_message_id=student_message.id,
-        parse_mode=ParseMode.MARKDOWN_V2,
-    )
+    project_link = parse_link(student_message)
 
-    message = student_message.text
+    if project_link is None:
+        await reply_with_error("В сообщении нет ссылки на проект")
+        return
 
-    assert (
-        message is not None
-    ), "Replied to message, i.e. student message with project link cannot be None"
+    try:
+        google_sheet_service.add_project(project_name, language, project_link)
 
-    check_add_data = connect_modules_to_add_data_to_gsheets(
-        message=message,
-        lang_project=language,
-        type_project=project_name,
-        command_check=ADD_PROJECT_COMMAND_NAME,
-    )
+        _ = await context.bot.delete_message(
+            chat_id=chat.id,
+            message_id=command_message.id,
+        )
 
-    if check_add_data.boolean_val is False:
-        await reply_with_error(check_add_data.error_message)
+        if env.SEND_PROJECTS_TO_CHAT:
+            log.info(
+                f"forwarding message because SEND_PROJECTS_TO_CHAT is {env.SEND_PROJECTS_TO_CHAT}"
+            )
+            _ = await context.bot.forward_message(
+                from_chat_id=chat.id,
+                chat_id=projects_reviews_collection_chat_id,
+                message_id=student_message.id,
+            )
+
+        _ = await context.bot.send_message(
+            chat_id=chat.id,
+            text=bot_reply_text,
+            reply_to_message_id=student_message.id,
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+    except Exception as e:
+        file_name, line_number, func_name, _ = traceback.extract_tb(sys.exc_info()[2])[
+            -1
+        ]
+        log.error(
+            f"Error on {ADD_PROJECT_COMMAND_NAME} at {file_name}:{line_number} in {func_name}, message: {str(e)}"
+        )
+        await reply_with_error(str(e))
+        return
+
+
+def parse_link(message: Message) -> str | None:
+    links_types = [MessageEntity.URL, MessageEntity.TEXT_LINK]
+
+    message_entities: dict[MessageEntity, str]
+
+    if message.caption is not None:
+        message_entities = message.parse_caption_entities(links_types)
+    else:
+        message_entities = message.parse_entities(links_types)
+
+    if len(message_entities) == 0:
+        return None
+
+    message_links: set[str] = set()
+
+    for message_entity, value in message_entities.items():
+        link = extract_link(message_entity, value)
+
+        if link is None:
+            continue
+
+        message_links.add(normalize_link(link))
+
+    if len(message_links) == 1:
+        return message_links.pop()
+
+    for link in message_links:
+        if link.find("github.com") != -1:
+            return link
+        if link.find("gitlab.com") != -1:
+            return link
+
+    return None
+
+
+def normalize_link(link: str) -> str:
+    if link.startswith("http"):
+        return link
+
+    return "https://" + link
+
+
+def extract_link(message_entity: MessageEntity, value: str) -> str | None:
+    if message_entity.type is MessageEntity.TEXT_LINK:
+        return message_entity.url
+
+    return value
 
 
 def is_admin(user: ChatMember) -> bool:
@@ -160,7 +219,7 @@ def is_admin(user: ChatMember) -> bool:
 
 
 def is_allowed_user(user: ChatMember) -> bool:
-    allowed_user_ids = ADD_PROJECT_ALLOWED_USER_IDS.split(",")
+    allowed_user_ids = env.ADD_PROJECT_ALLOWED_USER_IDS.split(",")
     allowed_user_ids = list(map(int, allowed_user_ids))
 
     user_id = user.user.id

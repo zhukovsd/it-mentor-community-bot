@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import sys
+import traceback
 from telegram import ChatMember, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
@@ -12,7 +14,6 @@ from src.handler import util
 UPDATE_INTERVIEW_QUESTIONS_POPULARITY = "updatequestionspopularity"
 
 log = logging.getLogger(__name__)
-log.level = logging.DEBUG
 
 
 async def update_questions_popularity(
@@ -65,6 +66,12 @@ async def update_questions_popularity(
         )
 
     except Exception as e:
+        file_name, line_number, func_name, _ = traceback.extract_tb(sys.exc_info()[2])[
+            -1
+        ]
+        log.error(
+            f"Error on {UPDATE_INTERVIEW_QUESTIONS_POPULARITY} at {file_name}:{line_number} in {func_name}, message: {str(e)}"
+        )
         await reply_with_error(str(e))
 
 
