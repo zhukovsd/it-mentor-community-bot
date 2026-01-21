@@ -1,6 +1,7 @@
 import logging
 from uuid import uuid4
 
+from src.custom_filters import EDITED_MESSAGE, MESSAGE_REACTION
 from src.config import logs
 
 from telegram import (
@@ -72,7 +73,7 @@ if __name__ == "__main__":
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     search_interviews_with_question_handler = MessageHandler(
-        filters.COMMAND & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP),
+        filters.COMMAND & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP) & ~ EDITED_MESSAGE & ~ MESSAGE_REACTION,
         search_interviews_with_question,
     )
     interview_questions_list_handler = CommandHandler(
