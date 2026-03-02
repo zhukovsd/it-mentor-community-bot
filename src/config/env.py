@@ -44,6 +44,8 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS: str = os.getenv("QUESTIONS_POPULAR
 
 SEND_PROJECTS_TO_CHAT: bool = os.getenv("SEND_PROJECTS_TO_CHAT", "false").lower() == "true"
 
+AI_COMMAND_STICKER_REPLY: bool = os.getenv("AI_COMMAND_STICKER_REPLY", "false").lower() == "true"
+
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
 
 assert MAIN_CHANNEL_CHAT_ID is not None, "MAIN_CHANNEL_CHAT_ID environment variable is not set"
