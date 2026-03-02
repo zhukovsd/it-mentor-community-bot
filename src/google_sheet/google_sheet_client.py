@@ -5,13 +5,12 @@ from gspread.worksheet import Worksheet
 
 from src.config import env
 from src.google_sheet.constants.interview_collection_sheet_constants import (
-    SUMMARY_SHEET,
+    SUMMARY_SHEET_TITLE,
 )
 from src.google_sheet.constants.projects_reviews_sheet_constants import (
     PROJECTS_SHEET,
     REVIEWS_SHEET,
 )
-
 
 service_account_key = json.loads(env.GOOGLE_SERVICE_ACCOUNT_JSON_KEY)
 
@@ -44,6 +43,6 @@ def get_interviews_sheet(editable: bool = False) -> Worksheet:
         scopes=(DEFAULT_SCOPES if editable else READONLY_SCOPES),
     )
 
-    return client.open_by_key(env.INTERVIEW_COLLECTION_SPREADSHEET_ID).get_worksheet(
-        SUMMARY_SHEET
+    return client.open_by_key(env.INTERVIEW_COLLECTION_SPREADSHEET_ID).worksheet(
+        SUMMARY_SHEET_TITLE
     )
