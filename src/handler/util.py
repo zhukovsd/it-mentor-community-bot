@@ -1,4 +1,5 @@
 import logging
+import re
 import mistune
 from typing import Any, override
 
@@ -9,6 +10,15 @@ from mistune.plugins.table import table
 MAX_MESSAGE_LENGTH = 4096
 
 log = logging.getLogger(__name__)
+
+
+def escape_special_chars(text: str) -> str:
+    special_chars = r"_*[]()~`>#+-=|{}.!"
+    pattern = "[" + re.escape(special_chars) + "]"
+
+    escaped_text = re.sub(pattern, r"\\\g<0>", text)
+
+    return escaped_text
 
 
 def compress_messages(messages: list[str]) -> list[str]:
