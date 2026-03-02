@@ -3,7 +3,6 @@ import asyncio
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
-from telegram.helpers import escape_markdown
 
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.google_sheet import google_sheet_service
@@ -120,7 +119,7 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
         if bullets is None:
             bullets = []
 
-        bullet = f" • [{escape_markdown(project.repo_name)}]({project.repo_link}) от [{escape_markdown(project.author_name)}]({project.author_link}) на {project.language}"
+        bullet = f" • [{util.escape_special_chars(project.repo_name)}]({project.repo_link}) от [{util.escape_special_chars(project.author_name)}]({project.author_link}) на {project.language}"
 
         bullets.append(bullet)
 

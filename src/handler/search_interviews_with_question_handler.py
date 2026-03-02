@@ -5,11 +5,11 @@ import re
 from telegram import Message, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
-from telegram.helpers import escape_markdown
 
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
 from src.config import env
+from src.handler import util
 
 SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
 
@@ -72,8 +72,8 @@ async def search_interviews_with_question(
         )
         return
 
-    question_popularity = escape_markdown(str(question.popularity))
-    question_text = escape_markdown(question.question)
+    question_popularity = util.escape_special_chars(str(question.popularity))
+    question_text = util.escape_special_chars(question.question)
     response_header = f"Ответы на вопрос \\#{question_id}: `{question_text}` \\({question_popularity}%\\) из коллекции собеседований:\n\n"
     response = response_header + answers
 
@@ -103,9 +103,9 @@ def get_answers(question: InterviewQuestion, amount: int) -> list[str]:
         if len(answers) >= amount:
             break
 
-        name = escape_markdown(timestamp.interview.name)
+        name = util.escape_special_chars(timestamp.interview.name)
         link = timestamp.interview.link
-        timestamp_text = escape_markdown(timestamp.timestamp)
+        timestamp_text = util.escape_special_chars(timestamp.timestamp)
 
         answers.append(f"\\- [{name}]({link}) {timestamp_text}")
 

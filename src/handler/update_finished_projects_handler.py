@@ -6,11 +6,11 @@ import traceback
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
-from telegram.helpers import escape_markdown
 
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
 from src.google_sheet import google_sheet_service
+from src.handler import util
 from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
@@ -159,4 +159,4 @@ def is_reply(message: Message | None) -> bool:
 
 
 def _to_link(name: str, link: str) -> str:
-    return f"[{name}]({escape_markdown(link)})"
+    return f"[{name}]({util.escape_special_chars(link)})"
