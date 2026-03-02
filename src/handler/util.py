@@ -42,21 +42,18 @@ def chunk_string(big_string: str) -> list[str]:
         return [big_string]
 
     current_chunk = ""
-
     lines = big_string.split("\n")
 
     for line in lines:
         if not current_chunk:
-            potential_chunk = line
+            current_chunk = line
             continue
 
         potential_chunk = current_chunk + "\n" + line
 
         if len(potential_chunk) <= MAX_MESSAGE_LENGTH:
             current_chunk = potential_chunk
-            continue
-
-        if current_chunk:
+        else:
             chunks.append(current_chunk)
             current_chunk = line
 
