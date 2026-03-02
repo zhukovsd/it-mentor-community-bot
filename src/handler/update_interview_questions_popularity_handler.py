@@ -5,10 +5,11 @@ import traceback
 from telegram import ChatMember, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
-from telegram.helpers import escape_markdown
 
 from src.config.env import QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS
 from src.github import github_service
+from src.handler import util
+
 
 UPDATE_INTERVIEW_QUESTIONS_POPULARITY = "updatequestionspopularity"
 
@@ -60,7 +61,7 @@ async def update_questions_popularity(
         _ = await context.bot.send_message(
             reply_to_message_id=command_message.id,
             chat_id=chat.id,
-            text=escape_markdown(message),
+            text=util.escape_special_chars(message),
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
