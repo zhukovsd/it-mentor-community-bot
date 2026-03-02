@@ -3,6 +3,7 @@ import asyncio
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.google_sheet import google_sheet_service
@@ -119,11 +120,11 @@ async def reviews_monthly_summary(update: Update, context: ContextTypes.DEFAULT_
         if bullets is None:
             bullets = []
 
-        repo_name = util.escape_special_chars(get_repo_name(project.repo_link))
-        author = util.escape_special_chars(get_author_name(project.repo_link))
+        repo_name = escape_markdown(get_repo_name(project.repo_link))
+        author = escape_markdown(get_author_name(project.repo_link))
         author_link = get_author_link(project.repo_link)
-        reviewer = util.escape_special_chars(project.author_name)
-        reviewer_tg_nick = util.escape_special_chars(project.author_tg_nick)
+        reviewer = escape_markdown(project.author_name)
+        reviewer_tg_nick = escape_markdown(project.author_tg_nick)
 
         bullet = f" • [{repo_name}]({project.repo_link}) от [{author}]({author_link}) на {project.language}, [ревью]({project.review_link}) от {reviewer} [{reviewer_tg_nick}]({project.author_tg_link})"
 
