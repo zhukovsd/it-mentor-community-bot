@@ -4,6 +4,7 @@ import logging
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
@@ -157,13 +158,13 @@ def generate_message(
     questions: list[InterviewQuestion],
     generate_q_command: bool,
 ) -> str:
-    message_header = f"[{util.escape_special_chars(category.name)}]({category.link})"
+    message_header = f"[{escape_markdown(category.name)}]({category.link})"
 
     question_bullets: list[str] = list()
 
     for question in questions:
-        text = util.escape_special_chars(question.question)
-        popularity = util.escape_special_chars(f"{question.popularity}%")
+        text = escape_markdown(question.question)
+        popularity = escape_markdown(f"{question.popularity}%")
 
         question_bullet = f"\\- {text} \\[{popularity}\\]"
 

@@ -44,6 +44,10 @@ from src.handler.update_finished_projects_handler import (
     UPDATE_FINISHED_PROJECTS_COMMAND,
     update_finished_projects,
 )
+from src.handler.ai_handler import (
+    AI_COMMAND,
+    ask_ai,
+)
 
 logs.configure()
 
@@ -93,6 +97,7 @@ if __name__ == "__main__":
     update_finished_projects_handler = CommandHandler(
         UPDATE_FINISHED_PROJECTS_COMMAND, update_finished_projects
     )
+    ai_handler = CommandHandler(AI_COMMAND, ask_ai)
 
     application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
@@ -102,5 +107,6 @@ if __name__ == "__main__":
     application.add_handler(projects_monthly_summary_handler)
     application.add_handler(reviews_monthly_summary_handler)
     application.add_handler(update_finished_projects_handler)
+    application.add_handler(ai_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)

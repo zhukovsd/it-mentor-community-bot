@@ -7,7 +7,14 @@ _ = load_dotenv()
 
 # pyright: reportAssignmentType=false
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
+
+MAIN_CHANNEL_CHAT_ID : str = os.getenv("MAIN_CHANNEL_CHAT_ID")
+EMPLOYMENT_MENTORING_CHAT_ID : str = os.getenv("EMPLOYMENT_MENTORING_CHAT_ID")
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTION_CHAT_ID")
+
+MCP_SERVER_API_KEY : str = os.getenv("MCP_SERVER_API_KEY")
+MCP_SERVER_URL : str = os.getenv("MCP_SERVER_URL")
+
 ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
 GOOGLE_SERVICE_ACCOUNT_JSON_KEY: str = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_KEY")
@@ -37,8 +44,17 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS: str = os.getenv("QUESTIONS_POPULAR
 
 SEND_PROJECTS_TO_CHAT: bool = os.getenv("SEND_PROJECTS_TO_CHAT", "false").lower() == "true"
 
+AI_COMMAND_STICKER_REPLY: bool = os.getenv("AI_COMMAND_STICKER_REPLY", "false").lower() == "true"
+
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
+
+assert MAIN_CHANNEL_CHAT_ID is not None, "MAIN_CHANNEL_CHAT_ID environment variable is not set"
+assert EMPLOYMENT_MENTORING_CHAT_ID is not None, "EMPLOYMENT_MENTORING_CHAT_ID environment variable is not set"
 assert PROJECTS_REVIEWS_COLLECTION_CHAT_ID is not None, "PROJECTS_REVIEWS_COLLECTION_CHAT_ID environment variable is not set"
+
+assert MCP_SERVER_API_KEY is not None, "MCP_SERVER_API_KEY environment variable is not set"
+assert MCP_SERVER_URL is not None, "MCP_SERVER_URL environment variable is not set"
+
 assert ADD_PROJECT_ALLOWED_USER_IDS is not None, "ADD_PROJECT_ALLOWED_USER_IDS environment variable is not set"
 
 assert GOOGLE_SERVICE_ACCOUNT_JSON_KEY is not None, "GOOGLE_SERVICE_ACCOUNT_JSON_KEY environment variable is not set"
