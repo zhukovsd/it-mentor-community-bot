@@ -1,6 +1,6 @@
 import logging
+from typing import Any, cast
 from openai import (
-    APIConnectionError,
     APIError,
     APIStatusError,
     AuthenticationError,
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 def call_llm(user_input: str, is_admin: bool) -> str:
-    allowed_tools = ["find_interviews"]
+    allowed_tools = ["find_interviews", "find_interview_questions"]
     if is_admin:
         allowed_tools.append("sync_interviews")
 
@@ -46,12 +46,6 @@ def call_llm(user_input: str, is_admin: bool) -> str:
         )
         return resp.output_text
 
-    except APIConnectionError as e:
-        log.error(f"OpenAI API connection error: {e}")
-        return (
-            "Не удалось подключиться к сервису LLM. Проверьте подключение к интернету."
-        )
-
     except RateLimitError as e:
         headers = getattr(e.response, "headers", {}) if hasattr(e, "response") else {}
 
@@ -59,33 +53,34 @@ def call_llm(user_input: str, is_admin: bool) -> str:
         remaining = headers.get("x-ratelimit-remaining-requests")
         reset = headers.get("x-ratelimit-reset-requests")
         retry_after = headers.get("retry-after")
+        body = cast(dict[str, Any], e.body)
 
         log.error(
             f"Rate limit error status_code={e.status_code} limit={limit} remaining={remaining} reset={reset} retry_after={retry_after} body={e.body}"
         )
-        return f"Превышен лимит запросов. limit = {limit}; remaining = {remaining}, reset = {reset}, retry_after = {retry_after}"
+        return f"Превышен лимит запросов.\n\nmessage: {body['message']}\n\nlimit = {limit}; remaining = {remaining}, reset = {reset}, retry_after = {retry_after}"
 
     except AuthenticationError as e:
         log.error(f"OpenAI authentication error: {e}")
-        return "Ошибка аутентификации при обращении к сервису LLM."
+        body = cast(dict[str, Any], e.body)
+        return f"Ошибка аутентификации при обращении к сервису LLM. message: {body['message']}"
 
     except APIStatusError as e:
-        respone_text = (
-            e.response.text
-            if hasattr(e, "response") and hasattr(e.response, "text")
-            else "No response body"
-        )
-        body = e.body if hasattr(e, "body") else "No error body"
         log.error(
-            f"OpenAI API status error status_code={e.status_code} response={e.response} response_text={respone_text} error_body={body}"
+            f"OpenAI API status error status_code={e.status_code} error_body={e.body}"
         )
-        return (
-            f"Ошибка подключения к сервису LLM. OpenAI API status_code: {e.status_code}"
-        )
+
+        body = cast(dict[str, Any], e.body)
+
+        if e.code == "context_length_exceeded":
+            return f"{body['message']}\n\nДругими словами - сузь контекст запроса"
+
+        return f"OpenAI API response status_code: {e.status_code}, message: {e.message}"
 
     except APIError as e:
         log.error(f"OpenAI API error: {e}")
-        return "Произошла ошибка при обработке запроса."
+        body = cast(dict[str, Any], e.body)
+        return f"Произошла ошибка при обработке запроса. message: {body['message']}"
 
     except Exception as e:
         log.error(f"Unexpected error in call_llm: {e}")
