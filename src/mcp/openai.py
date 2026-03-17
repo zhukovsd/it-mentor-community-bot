@@ -1,4 +1,3 @@
-from enum import Enum
 import logging
 from typing import Any, cast
 from openai import (
@@ -14,21 +13,15 @@ from openai.types.shared_params.responses_model import ResponsesModel
 from src.config import env
 
 client = OpenAI()
-model: ResponsesModel = "gpt-5.2"
 
 log = logging.getLogger(__name__)
 
-CHAT_TYPE = Enum("CHAT_TYPE", ["EMPLOYMENT_MENTORING", "GLOBAL"])
+
+class ContextExceededError(Exception):
+    pass
 
 
-def call_llm(user_input: str, chat_type: CHAT_TYPE) -> str:
-    allowed_tools: list[str] = []
-
-    if chat_type == CHAT_TYPE.EMPLOYMENT_MENTORING:
-        allowed_tools.extend(["find_interviews", "find_interview_questions"])
-    if chat_type == CHAT_TYPE.GLOBAL:
-        allowed_tools.extend(["find_interview_questions_limited"])
-
+def call_llm(user_input: str, allowed_tools: list[str], model: ResponsesModel) -> str:
     try:
         resp = client.responses.create(
             instructions=(
@@ -79,7 +72,8 @@ def call_llm(user_input: str, chat_type: CHAT_TYPE) -> str:
         body = cast(dict[str, Any], e.body)
 
         if e.code == "context_length_exceeded":
-            return f"{body['message']}\n\nДругими словами - сузь контекст запроса"
+            log.error(f"Context exceeded error: {body['message']}")
+            raise ContextExceededError()
 
         return f"OpenAI API response status_code: {e.status_code}, message: {e.message}"
 

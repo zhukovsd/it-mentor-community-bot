@@ -48,7 +48,9 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    if not get_chat_type(chat.id):
+    tool_set = get_tool_set_for_chat(chat.id)
+
+    if tool_set is None:
         log.error(
             f"{AI_COMMAND} was called outside of allowed chats, in chat: {chat.effective_name}"
         )
@@ -80,9 +82,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=command_message.id,
         )
-        llm_response = mcp_client.get_result(
-            message_text.strip(), get_chat_type(chat.id)
-        )
+        llm_response = mcp_client.get_result(message_text.strip(), tool_set)
 
         _ = await context.bot.delete_message(
             chat_id=chat.id,
@@ -108,8 +108,17 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=command_message.id,
         )
+
+        def edit_message(text: str) -> None:
+            _ = asyncio.create_task(
+                context.bot.edit_message_text(
+                    chat_id=chat.id, message_id=sent_message.message_id, text=text
+                )
+            )
+            return
+
         llm_response = mcp_client.get_result(
-            message_text.strip(), get_chat_type(chat.id)
+            message_text.strip(), tool_set, on_switch=edit_message
         )
 
         messages = util.chunk_string(llm_response)
@@ -137,16 +146,16 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(1)
 
 
-def get_chat_type(chat_id: int) -> mcp_client.CHAT_TYPE:
+def get_tool_set_for_chat(chat_id: int) -> mcp_client.ToolSet | None:
     employement_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
     global_chat_id = int(env.MAIN_CHANNEL_CHAT_ID)
 
     if chat_id == employement_mentoring_chat_id:
-        return mcp_client.CHAT_TYPE.EMPLOYMENT_MENTORING
+        return mcp_client.ToolSet.EMPLOYMENT_MENTORING
     if chat_id == global_chat_id:
-        return mcp_client.CHAT_TYPE.GLOBAL
+        return mcp_client.ToolSet.GLOBAL
 
-    return mcp_client.CHAT_TYPE.UNKNOWN
+    return None
 
 
 def is_admin(user: ChatMember) -> bool:
