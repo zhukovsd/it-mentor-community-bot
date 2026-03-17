@@ -112,7 +112,7 @@ class TelegramRenderer(HTMLRenderer):
 
     @override
     def thematic_break(self) -> str:
-        return "\n---\n"
+        return "\n———\n"
 
     def strikethrough(self, text: str) -> str:
         return f"<s>{text}</s>"
