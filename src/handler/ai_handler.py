@@ -48,7 +48,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    if not is_allowed_chat(chat.id):
+    if not get_chat_type(chat.id):
         log.error(
             f"{AI_COMMAND} was called outside of allowed chats, in chat: {chat.effective_name}"
         )
@@ -81,7 +81,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=command_message.id,
         )
         llm_response = mcp_client.get_result(
-            message_text.strip(), is_admin(chat_member)
+            message_text.strip(), get_chat_type(chat.id)
         )
 
         _ = await context.bot.delete_message(
@@ -109,7 +109,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=command_message.id,
         )
         llm_response = mcp_client.get_result(
-            message_text.strip(), is_admin(chat_member)
+            message_text.strip(), get_chat_type(chat.id)
         )
 
         messages = util.chunk_string(llm_response)
@@ -137,13 +137,16 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(1)
 
 
-def is_allowed_chat(chat_id: int) -> bool:
-    allowed_chat = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
+def get_chat_type(chat_id: int) -> mcp_client.CHAT_TYPE:
+    employement_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
+    global_chat_id = int(env.MAIN_CHANNEL_CHAT_ID)
 
-    if chat_id == allowed_chat:
-        return True
+    if chat_id == employement_mentoring_chat_id:
+        return mcp_client.CHAT_TYPE.EMPLOYMENT_MENTORING
+    if chat_id == global_chat_id:
+        return mcp_client.CHAT_TYPE.GLOBAL
 
-    return False
+    return mcp_client.CHAT_TYPE.UNKNOWN
 
 
 def is_admin(user: ChatMember) -> bool:

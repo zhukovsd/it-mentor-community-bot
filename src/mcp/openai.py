@@ -1,3 +1,4 @@
+from enum import Enum
 import logging
 from typing import Any, cast
 from openai import (
@@ -17,11 +18,16 @@ model: ResponsesModel = "gpt-5.2"
 
 log = logging.getLogger(__name__)
 
+CHAT_TYPE = Enum("CHAT_TYPE", ["EMPLOYMENT_MENTORING", "GLOBAL"])
 
-def call_llm(user_input: str, is_admin: bool) -> str:
-    allowed_tools = ["find_interviews", "find_interview_questions"]
-    if is_admin:
-        allowed_tools.append("sync_interviews")
+
+def call_llm(user_input: str, chat_type: CHAT_TYPE) -> str:
+    allowed_tools: list[str] = []
+
+    if chat_type == CHAT_TYPE.EMPLOYMENT_MENTORING:
+        allowed_tools.extend(["find_interviews", "find_interview_questions"])
+    if chat_type == CHAT_TYPE.GLOBAL:
+        allowed_tools.extend(["find_interview_questions_limited"])
 
     try:
         resp = client.responses.create(
