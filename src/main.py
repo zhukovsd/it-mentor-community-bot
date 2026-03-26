@@ -47,6 +47,7 @@ from src.handler.ai_handler import (
     AI_COMMAND,
     ask_ai,
 )
+from src.handler.error_handler import error_handler
 
 logs.configure()
 
@@ -107,5 +108,6 @@ if __name__ == "__main__":
     application.add_handler(reviews_monthly_summary_handler)
     application.add_handler(update_finished_projects_handler)
     application.add_handler(ai_handler)
+    application.add_error_handler(error_handler)
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
