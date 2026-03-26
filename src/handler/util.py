@@ -84,7 +84,7 @@ class TelegramRenderer(HTMLRenderer):
 
     @override
     def text(self, text: str) -> str:
-        return text
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
     @override
     def link(self, text: str, url: str, title: str | None = None) -> str:
