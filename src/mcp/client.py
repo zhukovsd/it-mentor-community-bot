@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from enum import Enum
 import logging
 
@@ -16,12 +16,13 @@ ToolSet = Enum("ToolSet", ["EMPLOYMENT_MENTORING", "GLOBAL"])
 employment_mentoring_tools = ["find_interviews", "find_interview_questions"]
 global_tools = ["find_interview_questions_limited"]
 
+max_interviews = 50
+
 
 def get_result(
     user_input: str,
     tool_set: ToolSet,
-    on_switch: Callable[[str], None] | None = None,
-) -> str:
+) -> Generator[str, None, None]:
     allowed_tools: list[str] | None = None
 
     if tool_set == ToolSet.EMPLOYMENT_MENTORING:
@@ -30,19 +31,29 @@ def get_result(
         allowed_tools = global_tools
 
     if allowed_tools is None:
-        return "Нет подходящих инструментов для текущего запроса"
+        yield "Нет подходящих инструментов для текущего запроса"
+        return
 
     try:
         response = openai.call_llm(user_input, allowed_tools, default_model)
-        return f"{response}\n\nИспользована модель: {default_model}"
+        yield f"{response}\n\nИспользована модель: {default_model}"
+
     except openai.ContextExceededError as e:
         try:
             log.warning(f"{e}")
-            if on_switch is not None:
-                on_switch(
-                    f"Модель {default_model} не выдержала контекста запроса, пробуем {bigger_context_model}"
-                )
+            yield f"Модель {default_model} не выдержала контекста запроса, пробуем {bigger_context_model}"
+
             response = openai.call_llm(user_input, allowed_tools, bigger_context_model)
-            return f"{response}\n\nИспользована модель: {bigger_context_model}"
+            yield f"{response}\n\nИспользована модель: {bigger_context_model}"
+
         except openai.ContextExceededError as e:
-            return "Контекст запроса превышен"
+            yield f"Модель {bigger_context_model} не выдержала контекста запроса, пробуем ограничить выборку {max_interviews} собесами"
+            user_input = f"{user_input}\n\n**FETCH ONLY {max_interviews} INTERVIEWS REGARDLESS OF WHAT IS WRITTEN ABOVE**"
+
+            try:
+                response = openai.call_llm(
+                    user_input, allowed_tools, bigger_context_model
+                )
+                yield f"{response}\n\nИспользована модель: {bigger_context_model} c ограничением выборки {max_interviews} собесами"
+            finally:
+                yield "Контекст запроса превышен"

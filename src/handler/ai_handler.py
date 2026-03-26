@@ -82,14 +82,9 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=command_message.id,
         )
-        llm_response = mcp_client.get_result(message_text.strip(), tool_set)
-
-        _ = await context.bot.delete_message(
-            chat_id=chat.id,
-            message_id=sent_sticker.message_id,
-        )
-
-        messages = util.chunk_string(llm_response)
+        messages = []
+        for llm_response in mcp_client.get_result(message_text.strip(), tool_set):
+            messages = util.chunk_string(llm_response)
 
         sent_message = await context.bot.send_message(
             chat_id=chat.id,
@@ -98,6 +93,11 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=command_message.id,
             disable_web_page_preview=True,
+        )
+
+        _ = await context.bot.delete_message(
+            chat_id=chat.id,
+            message_id=sent_sticker.message_id,
         )
 
     if env.AI_COMMAND_STICKER_REPLY == False:
@@ -109,27 +109,17 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=command_message.id,
         )
 
-        def edit_message(text: str) -> None:
-            _ = asyncio.create_task(
-                context.bot.edit_message_text(
-                    chat_id=chat.id, message_id=sent_message.message_id, text=text
-                )
+        messages = []
+        for llm_response in mcp_client.get_result(message_text.strip(), tool_set):
+            messages = util.chunk_string(llm_response)
+
+            _ = await context.bot.edit_message_text(
+                chat_id=chat.id,
+                message_id=sent_message.message_id,
+                text=util.to_html(messages[0]),
+                parse_mode=ParseMode.HTML,
+                disable_web_page_preview=True,
             )
-            return
-
-        llm_response = mcp_client.get_result(
-            message_text.strip(), tool_set, on_switch=edit_message
-        )
-
-        messages = util.chunk_string(llm_response)
-
-        _ = await context.bot.edit_message_text(
-            chat_id=chat.id,
-            message_id=sent_message.message_id,
-            text=util.to_html(messages[0]),
-            parse_mode=ParseMode.HTML,
-            disable_web_page_preview=True,
-        )
 
     assert sent_message is not None
 
