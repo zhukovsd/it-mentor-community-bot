@@ -84,11 +84,11 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         messages = []
         for llm_response in mcp_client.get_result(message_text.strip(), tool_set):
-            messages = util.chunk_string(llm_response)
+            messages = util.chunk_string(util.to_html(llm_response))
 
         sent_message = await context.bot.send_message(
             chat_id=chat.id,
-            text=util.to_html(messages[0]),
+            text=messages[0],
             parse_mode=ParseMode.HTML,
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=command_message.id,
@@ -111,12 +111,12 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         messages = []
         for llm_response in mcp_client.get_result(message_text.strip(), tool_set):
-            messages = util.chunk_string(llm_response)
+            messages = util.chunk_string(util.to_html(llm_response))
 
             _ = await context.bot.edit_message_text(
                 chat_id=chat.id,
                 message_id=sent_message.message_id,
-                text=util.to_html(messages[0]),
+                text=messages[0],
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
             )
@@ -127,7 +127,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for text in messages[1:]:
         prev_message = await context.bot.send_message(
             chat_id=chat.id,
-            text=util.to_html(text),
+            text=text,
             parse_mode=ParseMode.HTML,
             message_thread_id=command_message.message_thread_id,
             reply_to_message_id=prev_message.id,
