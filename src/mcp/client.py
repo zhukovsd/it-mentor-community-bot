@@ -1,4 +1,4 @@
-from collections.abc import Callable, Generator
+from collections.abc import Generator
 from enum import Enum
 import logging
 
@@ -55,5 +55,5 @@ def get_result(
                     user_input, allowed_tools, bigger_context_model
                 )
                 yield f"{response}\n\nИспользована модель: {bigger_context_model} c ограничением выборки {max_interviews} собесами"
-            finally:
+            except openai.ContextExceededError as e:
                 yield "Контекст запроса превышен"
