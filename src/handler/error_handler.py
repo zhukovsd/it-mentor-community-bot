@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-    error_msg = f"Unexpected error occured: {context.error}"
+    error_msg = f"Unexpected error occurred: {context.error}"
 
     log.error(error_msg)
 

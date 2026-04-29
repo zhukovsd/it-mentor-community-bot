@@ -137,10 +137,10 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def get_tool_set_for_chat(chat_id: int) -> mcp_client.ToolSet | None:
-    employement_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
+    employment_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
     global_chat_id = int(env.MAIN_CHANNEL_CHAT_ID)
 
-    if chat_id == employement_mentoring_chat_id:
+    if chat_id == employment_mentoring_chat_id:
         return mcp_client.ToolSet.EMPLOYMENT_MENTORING
     if chat_id == global_chat_id:
         return mcp_client.ToolSet.GLOBAL
