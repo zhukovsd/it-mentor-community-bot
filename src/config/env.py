@@ -11,6 +11,7 @@ TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
 MAIN_CHANNEL_CHAT_ID : str = os.getenv("MAIN_CHANNEL_CHAT_ID")
 EMPLOYMENT_MENTORING_CHAT_ID : str = os.getenv("EMPLOYMENT_MENTORING_CHAT_ID")
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTION_CHAT_ID")
+ERRORS_CHAT_ID: str = os.getenv("ERRORS_CHAT_ID")
 
 MCP_SERVER_API_KEY : str = os.getenv("MCP_SERVER_API_KEY")
 MCP_SERVER_URL : str = os.getenv("MCP_SERVER_URL")
@@ -51,6 +52,7 @@ assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable 
 assert MAIN_CHANNEL_CHAT_ID is not None, "MAIN_CHANNEL_CHAT_ID environment variable is not set"
 assert EMPLOYMENT_MENTORING_CHAT_ID is not None, "EMPLOYMENT_MENTORING_CHAT_ID environment variable is not set"
 assert PROJECTS_REVIEWS_COLLECTION_CHAT_ID is not None, "PROJECTS_REVIEWS_COLLECTION_CHAT_ID environment variable is not set"
+assert ERRORS_CHAT_ID is not None, "ERRORS_CHAT_ID environment variable is not set"
 
 assert MCP_SERVER_API_KEY is not None, "MCP_SERVER_API_KEY environment variable is not set"
 assert MCP_SERVER_URL is not None, "MCP_SERVER_URL environment variable is not set"

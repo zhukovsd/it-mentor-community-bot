@@ -72,7 +72,20 @@ def call_llm(user_input: str, allowed_tools: list[str], model: ResponsesModel) -
         body = cast(dict[str, Any], e.body)
 
         if e.code == "context_length_exceeded":
-            log.error(f"Context exceeded error: {body['message']}")
+            headers = (
+                getattr(e.response, "headers", {}) if hasattr(e, "response") else {}
+            )
+
+            limit = headers.get("x-ratelimit-limit-tokens")
+            remaining = headers.get("x-ratelimit-remaining-tokens")
+            reset = headers.get("x-ratelimit-reset-tokens")
+
+            body = cast(dict[str, Any], e.body)
+
+            log.error(
+                f"Context length exceeded error: status_code={e.status_code} limit={limit} remaining={remaining} reset={reset} body={body['message']}"
+            )
+
             raise ContextExceededError()
 
         return f"OpenAI API response status_code: {e.status_code}, message: {e.message}"
