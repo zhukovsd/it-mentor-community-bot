@@ -9,7 +9,6 @@ from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
-
 log = logging.getLogger(__name__)
 
 # 1. `##\s{1}` matches header level 2 and exactly one space
@@ -60,19 +59,19 @@ def update_questions_popularity() -> str:
     gh_questions = file[0]
     questions_file_sha = file[1]
 
-    gs_questsions = google_sheet_service.get_interview_questions()
-    gs_question_categories = set(map(lambda x: x.category, gs_questsions))
+    gs_questions = google_sheet_service.get_interview_questions()
+    gs_question_categories = set(map(lambda x: x.category, gs_questions))
 
     gs_question_popularity: dict[str, float] = {
-        str.lower(q.question): q.popularity for q in gs_questsions
+        str.lower(q.question): q.popularity for q in gs_questions
     }
-    gs_queston_category_popularity: dict[str, float] = {
+    gs_question_category_popularity: dict[str, float] = {
         str.lower(c.name): c.popularity for c in gs_question_categories
     }
 
     updated_questions = re.sub(
         CATEGORY_PATTERN,
-        lambda m: _update_category_popularity(m, gs_queston_category_popularity),
+        lambda m: _update_category_popularity(m, gs_question_category_popularity),
         gh_questions,
     )
     updated_questions = re.sub(
@@ -368,11 +367,11 @@ def _update_category_popularity(
 
 
 def _update_question_popularity(
-    quesiton_match: Match[str], gs_questions_popularity: dict[str, float]
+    question_match: Match[str], gs_questions_popularity: dict[str, float]
 ) -> str:
-    full_match = quesiton_match.group(0)
-    question_name = quesiton_match.group(1)
-    gh_question_popularity = quesiton_match.group(2)
+    full_match = question_match.group(0)
+    question_name = question_match.group(1)
+    gh_question_popularity = question_match.group(2)
 
     gs_question_popularity = gs_questions_popularity.get(str.lower(question_name))
 
@@ -433,8 +432,7 @@ def _generate_stats_message() -> str:
 
         return "\n".join(question_bullets)
 
-    return textwrap.dedent(
-        f"""Топ вопросов популярность которых увеличилась:
+    return textwrap.dedent(f"""Топ вопросов популярность которых увеличилась:
 
 {generate_ordered_list(top_questions_incr_popularity)}
 
@@ -451,5 +449,4 @@ def _generate_stats_message() -> str:
 Категории потерявшие больше всего популярности:
 
 {generate_ordered_list(top_category_decr_popularity)}
-"""
-    )
+""")

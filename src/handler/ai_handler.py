@@ -66,7 +66,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text = command_text[len("/" + AI_COMMAND) :]
 
     if len(message_text.strip()) == 0:
-        log.error(f"{AI_COMMAND} was called with no argument, excpected 1")
+        log.error(f"{AI_COMMAND} was called with no argument, expected 1")
         await reply_with_error(
             f"Команда {AI_COMMAND} должна вызываться с запросом к LLM"
         )

@@ -261,8 +261,8 @@ def _map_question_id_to_row_category(
             current_category_name = name
             current_category_link = link
 
-            popularity_precents = str(row[QUESTION_POPULRATIY_COL_INDEX])
-            popularity = popularity_precents.replace("%", "")
+            popularity_percents = str(row[QUESTION_POPULRATIY_COL_INDEX])
+            popularity = popularity_percents.replace("%", "")
 
             if popularity == "":
                 log.warning(f"Popularity percents for category {name} is not found")
@@ -375,7 +375,7 @@ def _map_question_id_to_question(
     question_id_to_row_category: dict[int, tuple[list[Any], InterviewQuestionCategory]],
     col_to_interview_info: dict[int, InterviewInfo],
 ) -> dict[int, InterviewQuestion]:
-    """Maps question id to the IntervewQuestion."""
+    """Maps question id to the InterviewQuestion."""
 
     id_to_question: dict[int, InterviewQuestion] = dict()
 
@@ -392,8 +392,8 @@ def _map_question_id_to_question(
                 continue
 
             if i == QUESTION_POPULRATIY_COL_INDEX and len(col) > 0:
-                popularity_precents = str(col)
-                popularity = popularity_precents.replace("%", "")
+                popularity_percents = str(col)
+                popularity = popularity_percents.replace("%", "")
 
                 if popularity == "":
                     log.warning(

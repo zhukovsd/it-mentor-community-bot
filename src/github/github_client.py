@@ -41,7 +41,7 @@ def get_file_content(
         response = session.get(url, headers=headers)
 
         if response.status_code != 200:
-            log.warn(
+            log.warning(
                 f"GitHub returned status code {response.status_code} & message: '{_get_message(response)}' for read file '{path}' content request"
             )
             return None
@@ -85,7 +85,7 @@ def update_file_content(
         response = session.put(url, headers=headers, json=request_body)
 
         if response.status_code != 200:
-            log.warn(
+            log.warning(
                 f"GitHub returned status code {response.status_code} & message: '{_get_message(response)}' for update file '{path}' content request"
             )
             return False
@@ -110,7 +110,7 @@ def get_last_commit_sha_of_branch(
         response = session.get(url, headers=headers)
 
         if response.status_code != 200:
-            log.warn(
+            log.warning(
                 f"GitHub returned status code {response.status_code} & message: '{_get_message(response)}' for getting info about {branch} branch"
             )
             return None
@@ -143,7 +143,7 @@ def create_branch(
         response = session.post(url, headers=headers, json=request_body)
 
         if response.status_code != 201:
-            log.warn(
+            log.warning(
                 f"GitHub returned status code {response.status_code} & message: '{_get_message(response)}' for creating new branch {branch}"
             )
             return False
@@ -180,7 +180,7 @@ def create_pull_request(
         response = session.post(url, headers=headers, json=request_body)
 
         if response.status_code != 201:
-            log.warn(
+            log.warning(
                 f"GitHub returned status code {response.status_code} & message: '{_get_message(response)}' for creating pull request from {head} to {base}"
             )
             return None
