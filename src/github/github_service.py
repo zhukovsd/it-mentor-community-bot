@@ -3,6 +3,7 @@ import logging
 import re
 import textwrap
 from re import Match
+from collections.abc import Callable
 from src import template_service
 from src.github import github_client
 from src.config import env
@@ -242,13 +243,31 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
 
 
 def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
-    log.info(
-        f"Updating finished projects in the {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} repository"
+    return _update_projects(
+        projects,
+        env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        template_service.render_python_template,
     )
+
+
+def update_go_projects(projects: list[ProjectWithReview]) -> str | None:
+    return _update_projects(
+        projects,
+        env.GOLANG_BACKEND_COURSE_SITE_REPO_NAME,
+        template_service.render_go_template,
+    )
+
+
+def _update_projects(
+    projects: list[ProjectWithReview],
+    repo: str,
+    template_fun: Callable[[list[ProjectWithReview]], str],
+) -> str | None:
+    log.info(f"Updating finished projects in the {repo} repository")
 
     last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
         "main",
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if last_master_commit_sha is None:
@@ -264,30 +283,30 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
     branch_created = github_client.create_branch(
         branch_name,
         last_master_commit_sha,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if not branch_created:
         log.error(f"Branch {branch_name} was not created, cannot continue")
         raise Exception(
-            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов в {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитории"
+            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов в {repo} репозитории"
         )
 
     file = github_client.get_file_content(
         f"/content/finished-projects.md",
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if file is None:
         log.error(f"/content/finished-projects.md is None, cannot continue")
         raise Exception(
-            f"Ошибка чтения файла `/content/finished-projects.md` из {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
+            f"Ошибка чтения файла `/content/finished-projects.md` из {repo} репозитория"
         )
 
     file_content = file[0]
     file_sha = file[1]
 
-    updated_file = template_service.render_python_template(projects)
+    updated_file = template_fun(projects)
 
     if file_content == updated_file:
         log.warning(
@@ -303,7 +322,7 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
         content=updated_file,
         branch=branch_name,
         commit_message=commit_message,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if not file_content_updated:
@@ -321,7 +340,7 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
         base="main",
         title=pr_title,
         body=pr_title,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if pr_link is None:
