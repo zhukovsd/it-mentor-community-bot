@@ -92,6 +92,9 @@ JAVA_BACKEND_COURSE_SITE_REPO_NAME=
 PYTHON_BACKEND_COURSE_SITE_REPO_OWNER=
 PYTHON_BACKEND_COURSE_SITE_REPO_NAME=
 
+GOLANG_BACKEND_COURSE_SITE_REPO_OWNER=
+GOLANG_BACKEND_COURSE_SITE_REPO_NAME=
+
 GITHUB_COMMUNITY_BOT_ACCESS_TOKEN=
 
 QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
@@ -131,6 +134,9 @@ SEND_PROJECTS_TO_CHAT=
 
 `PYTHON_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с python роадмапом
 `PYTHON_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с python роадмапом
+
+`GOLANG_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с go роадмапом
+`GOLANG_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с go роадмапом
 
 `GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория куда он должен сделать PR
 
@@ -174,4 +180,3 @@ docker build -t zhukovsd/it-mentor-community-bot:main .
 ```bash
 docker compose -f docker-compose-prod.yaml --env-file .env.prod up -d
 ```
-
