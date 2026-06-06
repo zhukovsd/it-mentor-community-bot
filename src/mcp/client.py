@@ -14,7 +14,7 @@ bigger_context_model: ResponsesModel = "gpt-5.4"
 ToolSet = Enum("ToolSet", ["EMPLOYMENT_MENTORING", "GLOBAL"])
 
 employment_mentoring_tools = ["find_interviews", "find_interview_questions"]
-global_tools = ["find_interview_questions_limited"]
+global_tools = ["find_interview_questions_limited", "find_resources"]
 
 max_interviews = 50
 
