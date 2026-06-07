@@ -3,12 +3,12 @@ import logging
 import re
 import textwrap
 from re import Match
+from collections.abc import Callable
 from src import template_service
 from src.github import github_client
 from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
-
 
 log = logging.getLogger(__name__)
 
@@ -60,19 +60,19 @@ def update_questions_popularity() -> str:
     gh_questions = file[0]
     questions_file_sha = file[1]
 
-    gs_questsions = google_sheet_service.get_interview_questions()
-    gs_question_categories = set(map(lambda x: x.category, gs_questsions))
+    gs_questions = google_sheet_service.get_interview_questions()
+    gs_question_categories = set(map(lambda x: x.category, gs_questions))
 
     gs_question_popularity: dict[str, float] = {
-        str.lower(q.question): q.popularity for q in gs_questsions
+        str.lower(q.question): q.popularity for q in gs_questions
     }
-    gs_queston_category_popularity: dict[str, float] = {
+    gs_question_category_popularity: dict[str, float] = {
         str.lower(c.name): c.popularity for c in gs_question_categories
     }
 
     updated_questions = re.sub(
         CATEGORY_PATTERN,
-        lambda m: _update_category_popularity(m, gs_queston_category_popularity),
+        lambda m: _update_category_popularity(m, gs_question_category_popularity),
         gh_questions,
     )
     updated_questions = re.sub(
@@ -243,13 +243,31 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
 
 
 def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
-    log.info(
-        f"Updating finished projects in the {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} repository"
+    return _update_projects(
+        projects,
+        env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        template_service.render_python_template,
     )
+
+
+def update_go_projects(projects: list[ProjectWithReview]) -> str | None:
+    return _update_projects(
+        projects,
+        env.GOLANG_BACKEND_COURSE_SITE_REPO_NAME,
+        template_service.render_go_template,
+    )
+
+
+def _update_projects(
+    projects: list[ProjectWithReview],
+    repo: str,
+    template_fun: Callable[[list[ProjectWithReview]], str],
+) -> str | None:
+    log.info(f"Updating finished projects in the {repo} repository")
 
     last_master_commit_sha = github_client.get_last_commit_sha_of_branch(
         "main",
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if last_master_commit_sha is None:
@@ -265,30 +283,30 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
     branch_created = github_client.create_branch(
         branch_name,
         last_master_commit_sha,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if not branch_created:
         log.error(f"Branch {branch_name} was not created, cannot continue")
         raise Exception(
-            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов в {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитории"
+            f"Ошибка при создании `{branch_name}` ветки для коммита изменений списка проектов в {repo} репозитории"
         )
 
     file = github_client.get_file_content(
         f"/content/finished-projects.md",
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if file is None:
         log.error(f"/content/finished-projects.md is None, cannot continue")
         raise Exception(
-            f"Ошибка чтения файла `/content/finished-projects.md` из {env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME} репозитория"
+            f"Ошибка чтения файла `/content/finished-projects.md` из {repo} репозитория"
         )
 
     file_content = file[0]
     file_sha = file[1]
 
-    updated_file = template_service.render_python_template(projects)
+    updated_file = template_fun(projects)
 
     if file_content == updated_file:
         log.warning(
@@ -304,7 +322,7 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
         content=updated_file,
         branch=branch_name,
         commit_message=commit_message,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if not file_content_updated:
@@ -322,7 +340,7 @@ def update_python_projects(projects: list[ProjectWithReview]) -> str | None:
         base="main",
         title=pr_title,
         body=pr_title,
-        repo=env.PYTHON_BACKEND_COURSE_SITE_REPO_NAME,
+        repo=repo,
     )
 
     if pr_link is None:
@@ -368,11 +386,11 @@ def _update_category_popularity(
 
 
 def _update_question_popularity(
-    quesiton_match: Match[str], gs_questions_popularity: dict[str, float]
+    question_match: Match[str], gs_questions_popularity: dict[str, float]
 ) -> str:
-    full_match = quesiton_match.group(0)
-    question_name = quesiton_match.group(1)
-    gh_question_popularity = quesiton_match.group(2)
+    full_match = question_match.group(0)
+    question_name = question_match.group(1)
+    gh_question_popularity = question_match.group(2)
 
     gs_question_popularity = gs_questions_popularity.get(str.lower(question_name))
 
@@ -433,8 +451,7 @@ def _generate_stats_message() -> str:
 
         return "\n".join(question_bullets)
 
-    return textwrap.dedent(
-        f"""Топ вопросов популярность которых увеличилась:
+    return textwrap.dedent(f"""Топ вопросов популярность которых увеличилась:
 
 {generate_ordered_list(top_questions_incr_popularity)}
 
@@ -451,5 +468,4 @@ def _generate_stats_message() -> str:
 Категории потерявшие больше всего популярности:
 
 {generate_ordered_list(top_category_decr_popularity)}
-"""
-    )
+""")

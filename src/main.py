@@ -1,19 +1,14 @@
 import logging
-from uuid import uuid4
 
 from src.custom_filters import EDITED_MESSAGE, MESSAGE_REACTION
 from src.config import logs
 
 from telegram import (
     Update,
-    InlineQueryResultArticle,
-    InputTextMessageContent,
 )
 from telegram.ext import (
     ApplicationBuilder,
-    ContextTypes,
     CommandHandler,
-    InlineQueryHandler,
     MessageHandler,
     filters,
 )
@@ -55,22 +50,6 @@ logs.configure()
 log = logging.getLogger(__name__)
 
 
-async def hello_inline_query(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
-    results = [
-        InlineQueryResultArticle(
-            id=str(uuid4()),
-            title="hello world",
-            input_message_content=InputTextMessageContent("Hello, World"),
-        )
-    ]
-
-    assert update.inline_query is not None
-
-    _ = await update.inline_query.answer(results)
-
-
 if __name__ == "__main__":
     application = (
         ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
@@ -84,7 +63,6 @@ if __name__ == "__main__":
     interview_questions_list_handler = CommandHandler(
         INTERVIEW_QUESTIONS_LIST_COMMAND, list_interview_questions_messages
     )
-    inline_hello_handler = InlineQueryHandler(hello_inline_query)
     update_interview_questions_popularity_handler = CommandHandler(
         UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
         update_questions_popularity,
@@ -100,7 +78,6 @@ if __name__ == "__main__":
     )
     ai_handler = CommandHandler(AI_COMMAND, ask_ai)
 
-    application.add_handler(inline_hello_handler)
     application.add_handler(add_project_handler)
     application.add_handler(search_interviews_with_question_handler)
     application.add_handler(interview_questions_list_handler)

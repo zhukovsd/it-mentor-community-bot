@@ -94,17 +94,21 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
     try:
         java_repo_pr = github_service.update_java_projects(projects_with_reviews)
         python_repo_pr = github_service.update_python_projects(projects_with_reviews)
+        golang_repo_pr = github_service.update_go_projects(projects_with_reviews)
 
         text = ""
 
-        if java_repo_pr is None and python_repo_pr is None:
+        if java_repo_pr is None and python_repo_pr is None and golang_repo_pr is None:
             text = "Никаких изменений не было обнаружено, PR'ы не созданы"
 
         if java_repo_pr is not None:
             text += _to_link("Java projects update PR", java_repo_pr) + "\n"
 
         if python_repo_pr is not None:
-            text += _to_link("Python projects update PR", python_repo_pr)
+            text += _to_link("Python projects update PR", python_repo_pr) + "\n"
+
+        if golang_repo_pr is not None:
+            text += _to_link("Go projects update PR", golang_repo_pr)
 
         _ = await context.bot.delete_message(
             chat_id=chat.id,

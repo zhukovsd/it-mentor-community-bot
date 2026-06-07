@@ -79,7 +79,7 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
 
     if len(period) == 0:
         log.error(
-            f"{PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME} was called with no argument, excpected 1"
+            f"{PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME} was called with no argument, expected 1"
         )
         await reply_with_error(
             f"Команда {PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME} должна вызываться с текущим периодом для генерации сообщения в виде параметра"

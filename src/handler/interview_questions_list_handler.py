@@ -55,7 +55,7 @@ async def list_interview_questions_messages(
 
     if len(message_text.strip()) == 0:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, excpected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, expected 1"
         )
         await reply_with_error(
             f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
@@ -66,7 +66,7 @@ async def list_interview_questions_messages(
 
     if len(args) != 1:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, excpected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, expected 1"
         )
         await reply_with_error(
             f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"

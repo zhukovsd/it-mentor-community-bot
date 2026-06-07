@@ -73,7 +73,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(message_text.strip()) == 0:
         log.error(
-            f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, excpected 2"
+            f"{ADD_PROJECT_COMMAND_NAME} was called with no arguments, expected 2"
         )
         await reply_with_error(
             f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта"
@@ -84,7 +84,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(args) != 2:
         log.error(
-            f"{ADD_PROJECT_COMMAND_NAME} was called with {len(args)} arguments, excpected 2"
+            f"{ADD_PROJECT_COMMAND_NAME} was called with {len(args)} arguments, expected 2"
         )
         await reply_with_error(
             f"Команда {ADD_PROJECT_COMMAND_NAME} должна вызываться с двумя параметрами - язык проекта и название проекта"

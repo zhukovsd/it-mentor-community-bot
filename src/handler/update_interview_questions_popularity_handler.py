@@ -10,7 +10,6 @@ from src.config.env import QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS
 from src.github import github_service
 from src.handler import util
 
-
 UPDATE_INTERVIEW_QUESTIONS_POPULARITY = "updatequestionspopularity"
 
 log = logging.getLogger(__name__)
