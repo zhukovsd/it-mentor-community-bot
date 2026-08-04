@@ -13,17 +13,6 @@ REVIEWS_MONTHLY_SUMMARY_COMMAND_NAME = "reviewsmonthlysummary"
 
 log = logging.getLogger(__name__)
 
-PROJECT_RUSSIAN_NAMES = {
-    "hangman": "Виселица",
-    "simulation": "Симуляция",
-    "currency-exchange": "Обмен валют",
-    "tennis-scoreboard": "Теннисное табло",
-    "weather-viewer": "Погода",
-    "cloud-file-storage": "Облачное хранилище файлов",
-    "task-tracker": "Планировщик задач",
-    "other": "Другое",
-}
-
 
 async def reviews_monthly_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -106,7 +95,7 @@ async def reviews_monthly_summary(update: Update, context: ContextTypes.DEFAULT_
 
     reviews = sorted(
         reviews,
-        key=lambda project: list(PROJECT_RUSSIAN_NAMES.keys()).index(
+        key=lambda project: list(util.PROJECT_RUSSIAN_NAMES.keys()).index(
             project.project_name
         ),
     )
@@ -134,7 +123,7 @@ async def reviews_monthly_summary(update: Update, context: ContextTypes.DEFAULT_
     review_blocks: list[str] = []
 
     for project, bullets in bullets_by_project_name.items():
-        reviews_header = f"*{PROJECT_RUSSIAN_NAMES[project]}*"
+        reviews_header = f"*{util.PROJECT_RUSSIAN_NAMES[project]}*"
         reviews = "\n".join(bullets)
 
         review_block = reviews_header + "\n\n" + reviews

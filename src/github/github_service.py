@@ -7,6 +7,7 @@ from collections.abc import Callable
 from src import template_service
 from src.github import github_client
 from src.config import env
+from src.config import constants
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
@@ -35,17 +36,6 @@ QUESTION_PATTERN = r"#{4}\s{1}\d*\.*\s*\[(.*?)\]\(.*?\)\s*\[([^%]*?)%*\]"
 
 categories_popularity_change: dict[str, tuple[float, float]] = {}
 questions_popularity_change: dict[str, tuple[float, float]] = {}
-
-
-project_names = [
-    "hangman",
-    "simulation",
-    "currency-exchange",
-    "tennis-scoreboard",
-    "weather-viewer",
-    "cloud-file-storage",
-    "task-tracker",
-]
 
 
 def update_questions_popularity() -> str:
@@ -169,7 +159,7 @@ def update_java_projects(projects: list[ProjectWithReview]) -> str | None:
 
     commits = 0
 
-    for project_name in project_names:
+    for project_name in constants.PROJECT_NAMES:
         file = github_client.get_file_content(
             f"/content/finished-projects/{project_name}.md",
             repo=env.JAVA_BACKEND_COURSE_SITE_REPO_NAME,

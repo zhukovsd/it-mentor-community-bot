@@ -11,6 +11,17 @@ MAX_MESSAGE_LENGTH = 4096
 
 log = logging.getLogger(__name__)
 
+PROJECT_RUSSIAN_NAMES = {
+    "hangman": "Виселица",
+    "simulation": "Симуляция",
+    "currency-exchange": "Обмен валют",
+    "tennis-scoreboard": "Теннисное табло",
+    "weather-viewer": "Погода",
+    "cloud-file-storage": "Облачное хранилище файлов",
+    "task-tracker": "Планировщик задач",
+    "other": "Другое",
+}
+
 
 def escape_special_chars(text: str) -> str:
     special_chars = r"_*[]()~`>#+-=|{}.!"
