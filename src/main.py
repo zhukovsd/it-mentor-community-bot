@@ -1,9 +1,10 @@
+import asyncio
 import logging
 
-from telegram import (
-    Update,
-)
+import uvicorn
+from telegram import Update
 from telegram.ext import (
+    Application,
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
@@ -43,12 +44,40 @@ from src.handler.update_interview_questions_popularity_handler import (
     UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
     update_questions_popularity,
 )
+from src.metrics import metrics_app
 
 logs.configure()
 
 log = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+async def start_metrics_server() -> None:
+    config: uvicorn.Config = uvicorn.Config(
+        app=metrics_app,
+        host="0.0.0.0",
+        port=8080,  # TODO надо узнать у Сережи бот будет самостоятельной единицей или внутри it платформы?
+        log_level="info"
+    )
+    server: uvicorn.Server = uvicorn.Server(config)
+    await server.serve()
+
+
+async def start_bot(application: Application) -> None:
+    async with application:
+        await application.start()
+
+        await application.updater.start_polling(
+            allowed_updates=Update.ALL_TYPES
+        )
+
+        try:
+            await asyncio.Event().wait()
+        finally:
+            await application.updater.stop()
+            await application.stop()
+
+
+async def main() -> None:
     application = (
         ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
     )
@@ -87,4 +116,10 @@ if __name__ == "__main__":
     application.add_handler(ai_handler)
     application.add_error_handler(error_handler)
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(start_bot(application))
+        tg.create_task(start_metrics_server())
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
