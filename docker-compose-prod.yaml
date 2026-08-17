@@ -5,8 +5,16 @@ services:
     restart: always
     depends_on:
       - database
+    networks:
+      - default
+      - local-stack_net
     
   database:
     image: postgres
     env_file: .env.prod
     restart: always
+
+networks:
+  local-stack_net:
+    external: true
+    name: local-stack_default

@@ -1,8 +1,5 @@
 import logging
 
-from src.custom_filters import EDITED_MESSAGE, MESSAGE_REACTION
-from src.config import logs
-
 from telegram import (
     Update,
 )
@@ -12,20 +9,19 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from src.config.env import TELEGRAM_BOT_TOKEN
 
+from src.config import logs
+from src.config.env import TELEGRAM_BOT_TOKEN
+from src.custom_filters import EDITED_MESSAGE, MESSAGE_REACTION
 from src.handler.add_project_handler import ADD_PROJECT_COMMAND_NAME, add_project
-from src.handler.search_interviews_with_question_handler import (
-    SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
-    search_interviews_with_question,
+from src.handler.ai_handler import (
+    AI_COMMAND,
+    ask_ai,
 )
+from src.handler.error_handler import error_handler
 from src.handler.interview_questions_list_handler import (
     INTERVIEW_QUESTIONS_LIST_COMMAND,
     list_interview_questions_messages,
-)
-from src.handler.update_interview_questions_popularity_handler import (
-    UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
-    update_questions_popularity,
 )
 from src.handler.projects_monthly_summary_handler import (
     PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME,
@@ -35,20 +31,22 @@ from src.handler.reviews_monthly_summary_handler import (
     REVIEWS_MONTHLY_SUMMARY_COMMAND_NAME,
     reviews_monthly_summary,
 )
+from src.handler.search_interviews_with_question_handler import (
+    SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
+    search_interviews_with_question,
+)
 from src.handler.update_finished_projects_handler import (
     UPDATE_FINISHED_PROJECTS_COMMAND,
     update_finished_projects,
 )
-from src.handler.ai_handler import (
-    AI_COMMAND,
-    ask_ai,
+from src.handler.update_interview_questions_popularity_handler import (
+    UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
+    update_questions_popularity,
 )
-from src.handler.error_handler import error_handler
 
 logs.configure()
 
 log = logging.getLogger(__name__)
-
 
 if __name__ == "__main__":
     application = (
@@ -57,7 +55,8 @@ if __name__ == "__main__":
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     search_interviews_with_question_handler = MessageHandler(
-        filters.COMMAND & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP) & ~ EDITED_MESSAGE & ~ MESSAGE_REACTION,
+        filters.COMMAND & filters.Regex(
+            SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP) & ~ EDITED_MESSAGE & ~ MESSAGE_REACTION,
         search_interviews_with_question,
     )
     interview_questions_list_handler = CommandHandler(
