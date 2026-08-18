@@ -55,7 +55,7 @@ async def start_metrics_server() -> None:
     config: uvicorn.Config = uvicorn.Config(
         app=metrics_app,
         host="0.0.0.0",
-        port=8080,  # TODO надо узнать у Сережи бот будет самостоятельной единицей или внутри it платформы?
+        port=8080,
         log_level="info"
     )
     server: uvicorn.Server = uvicorn.Server(config)
