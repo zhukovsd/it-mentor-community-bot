@@ -1,6 +1,5 @@
-
-
 from pg import DB
+
 from src.config.env import (
     POSTGRES_USER,
     POSTGRES_PASSWORD,

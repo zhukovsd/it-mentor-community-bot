@@ -12,7 +12,7 @@ from telegram.ext import (
 )
 
 from src.config import logs
-from src.config.env import TELEGRAM_BOT_TOKEN
+from src.config.env import TELEGRAM_BOT_TOKEN, METRICS_PORT
 from src.custom_filters import EDITED_MESSAGE, MESSAGE_REACTION
 from src.handler.add_project_handler import ADD_PROJECT_COMMAND_NAME, add_project
 from src.handler.ai_handler import (
@@ -55,29 +55,14 @@ async def start_metrics_server() -> None:
     config: uvicorn.Config = uvicorn.Config(
         app=metrics_app,
         host="0.0.0.0",
-        port=8080,
+        port=METRICS_PORT,
         log_level="info"
     )
     server: uvicorn.Server = uvicorn.Server(config)
     await server.serve()
 
 
-async def start_bot(application: Application) -> None:
-    async with application:
-        await application.start()
-
-        await application.updater.start_polling(
-            allowed_updates=Update.ALL_TYPES
-        )
-
-        try:
-            await asyncio.Event().wait()
-        finally:
-            await application.updater.stop()
-            await application.stop()
-
-
-async def main() -> None:
+async def start_bot() -> None:
     application = (
         ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
     )
@@ -116,8 +101,23 @@ async def main() -> None:
     application.add_handler(ai_handler)
     application.add_error_handler(error_handler)
 
+    async with application:
+        await application.start()
+
+        await application.updater.start_polling(
+            allowed_updates=Update.ALL_TYPES
+        )
+
+        try:
+            await asyncio.Event().wait()
+        finally:
+            await application.updater.stop()
+            await application.stop()
+
+
+async def main() -> None:
     async with asyncio.TaskGroup() as tg:
-        tg.create_task(start_bot(application))
+        tg.create_task(start_bot())
         tg.create_task(start_metrics_server())
 
 
