@@ -4,7 +4,6 @@ import logging
 import uvicorn
 from telegram import Update
 from telegram.ext import (
-    Application,
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
@@ -55,7 +54,7 @@ async def start_metrics_server() -> None:
     config: uvicorn.Config = uvicorn.Config(
         app=metrics_app,
         host="0.0.0.0",
-        port=METRICS_PORT,
+        port=int(METRICS_PORT),
         log_level="info"
     )
     server: uvicorn.Server = uvicorn.Server(config)

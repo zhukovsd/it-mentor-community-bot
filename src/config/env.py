@@ -53,7 +53,7 @@ AI_COMMAND_STICKER_REPLY: bool = os.getenv("AI_COMMAND_STICKER_REPLY", "false").
 
 METRICS_USER: str = os.getenv("METRICS_USER")
 METRICS_PASS: str = os.getenv("METRICS_PASS")
-METRICS_PORT: int = int(os.getenv("METRICS_PORT"))
+METRICS_PORT: int = os.getenv("METRICS_PORT")
 
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
 
