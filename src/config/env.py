@@ -51,6 +51,10 @@ SEND_PROJECTS_TO_CHAT: bool = os.getenv("SEND_PROJECTS_TO_CHAT", "false").lower(
 
 AI_COMMAND_STICKER_REPLY: bool = os.getenv("AI_COMMAND_STICKER_REPLY", "false").lower() == "true"
 
+METRICS_USER: str = os.getenv("METRICS_USER")
+METRICS_PASS: str = os.getenv("METRICS_PASS")
+METRICS_PORT: int = os.getenv("METRICS_PORT")
+
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
 
 assert MAIN_CHANNEL_CHAT_ID is not None, "MAIN_CHANNEL_CHAT_ID environment variable is not set"
@@ -88,3 +92,7 @@ assert PYTHON_BACKEND_COURSE_SITE_REPO_NAME is not None, "PYTHON_BACKEND_COURSE_
 assert GITHUB_COMMUNITY_BOT_ACCESS_TOKEN is not None, "GITHUB_COMMUNITY_BOT_ACCESS_TOKEN environment variable is not set"
 
 assert QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS is not None, "QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS environment variable is not set"
+
+assert METRICS_USER is not None, "METRICS_USER environment variable is not set"
+assert METRICS_PASS is not None, "METRICS_PASS environment variable is not set"
+assert METRICS_PORT is not None, "METRICS_PORT environment variable is not set"

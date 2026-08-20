@@ -1,7 +1,8 @@
 directory_for_experiments
 yoyo.ini
 .idea
-
+docker-compose-test.yaml
+prometheus_test.yml
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
