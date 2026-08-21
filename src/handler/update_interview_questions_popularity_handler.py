@@ -34,7 +34,7 @@ async def update_questions_popularity(
             command_message is not None
     ), "updatequestionspopularity command cannot be None"
 
-    telegram_command_usage_total.labels(command="reviewsmonthlysummary").inc()
+    telegram_command_usage_total.labels(command="updatequestionspopularity").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(
