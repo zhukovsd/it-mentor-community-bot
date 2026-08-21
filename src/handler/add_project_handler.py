@@ -8,7 +8,7 @@ from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
 from src import repository
-from src.business_metrics import telegram_command_usage_total
+from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.google_sheet import google_sheet_service
 

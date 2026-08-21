@@ -43,7 +43,7 @@ from src.handler.update_interview_questions_popularity_handler import (
     UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
     update_questions_popularity,
 )
-from src.metrics import metrics_app
+from src.metrics.metrics import metrics_app
 
 logs.configure()
 

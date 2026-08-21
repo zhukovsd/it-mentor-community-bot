@@ -55,6 +55,9 @@ METRICS_USER: str = os.getenv("METRICS_USER")
 METRICS_PASS: str = os.getenv("METRICS_PASS")
 METRICS_PORT: int = os.getenv("METRICS_PORT")
 
+DEFAULT_LLM_MODEL=os.getenv("DEFAULT_LLM_MODEL")
+BIGGER_CONTEXT_LLM_MODEL=os.getenv("BIGGER_CONTEXT_LLM_MODEL")
+
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
 
 assert MAIN_CHANNEL_CHAT_ID is not None, "MAIN_CHANNEL_CHAT_ID environment variable is not set"
@@ -96,3 +99,7 @@ assert QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS is not None, "QUESTIONS_POPU
 assert METRICS_USER is not None, "METRICS_USER environment variable is not set"
 assert METRICS_PASS is not None, "METRICS_PASS environment variable is not set"
 assert METRICS_PORT is not None, "METRICS_PORT environment variable is not set"
+
+assert DEFAULT_LLM_MODEL is not None, "DEFAULT_LLM_MODEL environment variable is not set"
+assert BIGGER_CONTEXT_LLM_MODEL is not None, "BIGGER_CONTEXT_LLM_MODEL environment variable is not set"
+

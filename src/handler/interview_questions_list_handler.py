@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.business_metrics import telegram_command_usage_total
+from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (

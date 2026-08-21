@@ -6,7 +6,7 @@ from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.business_metrics import telegram_command_usage_total
+from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.handler import util
 from src.mcp import client as mcp_client

@@ -11,3 +11,9 @@ openai_tokens_usage_total = Counter(
     "Total number of OpenAI tokens consumed",
     ["token_type", "model"]
 )
+
+openai_spend_usd_total = Counter(
+    'openai_spend_usd_total',
+    "Total money spent on OpenAI API in USD",
+    ["model"]
+)
