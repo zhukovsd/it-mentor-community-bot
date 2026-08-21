@@ -6,9 +6,10 @@ from telegram import Message, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.business_metrics import telegram_command_usage_total
+from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
-from src.config import env
 from src.handler import util
 
 SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = "q\\d+"
@@ -17,13 +18,15 @@ log = logging.getLogger(__name__)
 
 
 async def search_interviews_with_question(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
+        update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     chat = update.effective_chat
     command_message = update.effective_message
 
     assert chat is not None, "Chat in which command is called cannot be None"
     assert command_message is not None, "Message that triggered bot cannot be None"
+
+    telegram_command_usage_total.labels(command="q").inc()
 
     if not is_allowed_chat(chat.id):
         error = await context.bot.send_message(
@@ -118,7 +121,7 @@ def get_question_id(message: Message) -> int:
     match = re.search(r"\d+", message.text)
 
     assert (
-        match is not None
+            match is not None
     ), "Question id absent in user message. This must not happen as the python-telegram-bot handler shouldn't be triggered if the /q command don't have any digits after it"
 
     return int(match.group())

@@ -2,10 +2,12 @@ import asyncio
 import logging
 import sys
 import traceback
+
 from telegram import ChatMember, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from src.business_metrics import telegram_command_usage_total
 from src.config.env import QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS
 from src.github import github_service
 from src.handler import util
@@ -16,21 +18,23 @@ log = logging.getLogger(__name__)
 
 
 async def update_questions_popularity(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
+        update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     chat = update.effective_chat
     chat_member = update.effective_user
     command_message = update.effective_message
 
     assert (
-        chat is not None
+            chat is not None
     ), "updatequestionspopularity command should be used in chat, it must not be None"
     assert (
-        chat_member is not None
+            chat_member is not None
     ), "updatequestionspopularity command should be used by user, it must not be None"
     assert (
-        command_message is not None
+            command_message is not None
     ), "updatequestionspopularity command cannot be None"
+
+    telegram_command_usage_total.labels(command="reviewsmonthlysummary").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(
