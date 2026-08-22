@@ -8,7 +8,6 @@ from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
 from src import repository
-from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.google_sheet import google_sheet_service
 
@@ -38,8 +37,6 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_member is not None
     ), "add_project command should be used by user, it must not be None"
     assert command_message is not None, "add_project command cannot be None"
-
-    telegram_command_usage_total.labels(command="addproject").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(

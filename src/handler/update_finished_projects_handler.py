@@ -7,7 +7,6 @@ from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.metrics.business_metrics import telegram_command_usage_total
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
 from src.google_sheet import google_sheet_service
@@ -33,8 +32,6 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
     assert (
             command_message is not None
     ), f"{UPDATE_FINISHED_PROJECTS_COMMAND} command cannot be None"
-
-    telegram_command_usage_total.labels(command="updatefinishedprojects").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(

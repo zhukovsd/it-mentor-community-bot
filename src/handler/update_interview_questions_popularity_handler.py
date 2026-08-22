@@ -7,7 +7,6 @@ from telegram import ChatMember, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.metrics.business_metrics import telegram_command_usage_total
 from src.config.env import QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS
 from src.github import github_service
 from src.handler import util
@@ -33,8 +32,6 @@ async def update_questions_popularity(
     assert (
             command_message is not None
     ), "updatequestionspopularity command cannot be None"
-
-    telegram_command_usage_total.labels(command="updatequestionspopularity").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(

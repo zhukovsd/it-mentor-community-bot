@@ -43,6 +43,7 @@ from src.handler.update_interview_questions_popularity_handler import (
     UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
     update_questions_popularity,
 )
+from src.metrics.command_metrics import instrument_application
 from src.metrics.metrics import metrics_app
 
 logs.configure()
@@ -65,6 +66,7 @@ async def start_bot() -> None:
     application = (
         ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).concurrent_updates(True).build()
     )
+    instrument_application(application)
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     search_interviews_with_question_handler = MessageHandler(

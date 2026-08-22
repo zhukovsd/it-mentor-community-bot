@@ -6,7 +6,6 @@ from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.handler import util
 from src.mcp import client as mcp_client
@@ -35,8 +34,6 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_member is not None
     ), f"{AI_COMMAND} command should be used by user, it must not be None"
     assert command_message is not None, "Message that triggered bot cannot be None"
-
-    telegram_command_usage_total.labels(command="ai").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(

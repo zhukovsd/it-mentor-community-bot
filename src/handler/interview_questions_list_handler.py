@@ -5,7 +5,6 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.metrics.business_metrics import telegram_command_usage_total
 from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
@@ -27,8 +26,6 @@ async def list_interview_questions_messages(
 
     assert chat is not None, "Chat in which command is called cannot be None"
     assert command_message is not None, "Message that triggered bot cannot be None"
-
-    telegram_command_usage_total.labels(command="interviewprepquestionslist").inc()
 
     async def reply_with_error(text: str) -> None:
         error_message = await context.bot.send_message(
