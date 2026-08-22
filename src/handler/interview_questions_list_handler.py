@@ -5,12 +5,12 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
     InterviewQuestionCategory,
 )
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
+from src.config import env
 from src.handler import util
 
 INTERVIEW_QUESTIONS_LIST_COMMAND = "interviewprepquestionslist"
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 async def list_interview_questions_messages(
-        update: Update, context: ContextTypes.DEFAULT_TYPE
+    update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     chat = update.effective_chat
     command_message = update.effective_message
@@ -51,7 +51,7 @@ async def list_interview_questions_messages(
 
     assert command_text is not None, "Command text cannot be None"
 
-    message_text = command_text[len("/" + INTERVIEW_QUESTIONS_LIST_COMMAND):]
+    message_text = command_text[len("/" + INTERVIEW_QUESTIONS_LIST_COMMAND) :]
 
     if len(message_text.strip()) == 0:
         log.error(
@@ -134,7 +134,7 @@ def to_bool(x: str) -> bool | None:
 
 
 def split_by_categories(
-        questions: list[InterviewQuestion],
+    questions: list[InterviewQuestion],
 ) -> dict[InterviewQuestionCategory, list[InterviewQuestion]]:
     category_to_question: dict[InterviewQuestionCategory, list[InterviewQuestion]] = (
         dict()
@@ -153,9 +153,9 @@ def split_by_categories(
 
 
 def generate_message(
-        category: InterviewQuestionCategory,
-        questions: list[InterviewQuestion],
-        generate_q_command: bool,
+    category: InterviewQuestionCategory,
+    questions: list[InterviewQuestion],
+    generate_q_command: bool,
 ) -> str:
     message_header = f"[{util.escape_special_chars(category.name)}]({category.link})"
 
@@ -177,7 +177,7 @@ def generate_message(
     message = message_header + "\n\n" + message_body
 
     assert (
-            len(message) < util.MAX_MESSAGE_LENGTH
+        len(message) < util.MAX_MESSAGE_LENGTH
     ), "Rest of the code assumes that all questions of the category will fit into one telegram message"
 
     return message

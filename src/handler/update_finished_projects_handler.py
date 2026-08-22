@@ -10,10 +10,11 @@ from telegram.ext import ContextTypes
 from src.config.env import ADD_PROJECT_ALLOWED_USER_IDS
 from src.github import github_service
 from src.google_sheet import google_sheet_service
-from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 from src.handler import util
+from src.google_sheet.dto.project_with_review_dto import ProjectWithReview
 
 UPDATE_FINISHED_PROJECTS_COMMAND = "updatefinishedprojects"
+
 
 log = logging.getLogger(__name__)
 
@@ -24,13 +25,13 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
     command_message = update.effective_message
 
     assert (
-            chat is not None
+        chat is not None
     ), f"{UPDATE_FINISHED_PROJECTS_COMMAND} command should be used in chat, it must not be None"
     assert (
-            chat_member is not None
+        chat_member is not None
     ), f"{UPDATE_FINISHED_PROJECTS_COMMAND} command should be used by user, it must not be None"
     assert (
-            command_message is not None
+        command_message is not None
     ), f"{UPDATE_FINISHED_PROJECTS_COMMAND} command cannot be None"
 
     async def reply_with_error(text: str) -> None:
@@ -134,8 +135,8 @@ async def update_finished_projects(update: Update, context: ContextTypes.DEFAULT
 
 def is_admin(user: ChatMember) -> bool:
     return (
-            user.status == ChatMemberStatus.ADMINISTRATOR
-            or user.status == ChatMemberStatus.OWNER
+        user.status == ChatMemberStatus.ADMINISTRATOR
+        or user.status == ChatMemberStatus.OWNER
     )
 
 

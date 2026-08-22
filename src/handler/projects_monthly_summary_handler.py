@@ -1,6 +1,5 @@
-import asyncio
 import logging
-
+import asyncio
 from telegram import ChatMember, Message, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
@@ -10,6 +9,7 @@ from src.google_sheet import google_sheet_service
 from src.handler import util
 
 PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME = "projectsmonthlysummary"
+
 
 log = logging.getLogger(__name__)
 
@@ -31,10 +31,10 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
     command_message = update.effective_message
 
     assert (
-            chat is not None
+        chat is not None
     ), "projectsmonthlysummary command should be used in chat, it must not be None"
     assert (
-            chat_member is not None
+        chat_member is not None
     ), "projectsmonthlysummary command should be used by user, it must not be None"
     assert command_message is not None, "add_project command cannot be None"
 
@@ -64,7 +64,7 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
 
     assert command_text is not None, "Command text cannot be None"
 
-    message_text = command_text[len("/" + PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME):]
+    message_text = command_text[len("/" + PROJECTS_MONTHLY_SUMMARY_COMMAND_NAME) :]
 
     if len(message_text.strip()) == 0:
         log.error(
@@ -159,8 +159,8 @@ async def projects_monthly_summary(update: Update, context: ContextTypes.DEFAULT
 
 def is_admin(user: ChatMember) -> bool:
     return (
-            user.status == ChatMemberStatus.ADMINISTRATOR
-            or user.status == ChatMemberStatus.OWNER
+        user.status == ChatMemberStatus.ADMINISTRATOR
+        or user.status == ChatMemberStatus.OWNER
     )
 
 

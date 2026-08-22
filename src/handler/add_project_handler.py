@@ -1,15 +1,15 @@
-import asyncio
 import logging
-import sys
+import asyncio
 import traceback
+import sys
 
 from telegram import ChatMember, Message, MessageEntity, Update
 from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
-from src import repository
 from src.config import env
 from src.google_sheet import google_sheet_service
+from src import repository
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
 PROJECT_NAMES = [
@@ -31,10 +31,10 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command_message = update.effective_message
 
     assert (
-            chat is not None
+        chat is not None
     ), "add_project command should be used in chat, it must not be None"
     assert (
-            chat_member is not None
+        chat_member is not None
     ), "add_project command should be used by user, it must not be None"
     assert command_message is not None, "add_project command cannot be None"
 
@@ -69,7 +69,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     assert command_text is not None, "Command text cannot be None"
 
-    message_text = command_text[len("/" + ADD_PROJECT_COMMAND_NAME):]
+    message_text = command_text[len("/" + ADD_PROJECT_COMMAND_NAME) :]
 
     if len(message_text.strip()) == 0:
         log.error(
@@ -103,7 +103,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
     student_message = command_message.reply_to_message
 
     assert (
-            student_message is not None
+        student_message is not None
     ), "Replied to message, i.e. student message with project link cannot be None"
 
     bot_reply_text = repository.find_reply_by_language_and_project(
@@ -213,8 +213,8 @@ def extract_link(message_entity: MessageEntity, value: str) -> str | None:
 
 def is_admin(user: ChatMember) -> bool:
     return (
-            user.status == ChatMemberStatus.ADMINISTRATOR
-            or user.status == ChatMemberStatus.OWNER
+        user.status == ChatMemberStatus.ADMINISTRATOR
+        or user.status == ChatMemberStatus.OWNER
     )
 
 

@@ -31,7 +31,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     assert chat is not None, "Chat in which command is called cannot be None"
     assert (
-            chat_member is not None
+        chat_member is not None
     ), f"{AI_COMMAND} command should be used by user, it must not be None"
     assert command_message is not None, "Message that triggered bot cannot be None"
 
@@ -63,7 +63,7 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     assert command_text is not None, "Command text cannot be None"
 
-    message_text = command_text[len("/" + AI_COMMAND):]
+    message_text = command_text[len("/" + AI_COMMAND) :]
 
     if len(message_text.strip()) == 0:
         log.error(f"{AI_COMMAND} was called with no argument, expected 1")
@@ -137,21 +137,20 @@ async def ask_ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def get_tool_set_for_chat(chat_id: int) -> mcp_client.ToolSet | None:
-    # employment_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
-    # global_chat_id = int(env.MAIN_CHANNEL_CHAT_ID)
-    # projects_group_work_chat_id = int(env.PROJECTS_GROUP_WORK_CHAT_ID)
-    #
-    # if chat_id == employment_mentoring_chat_id:
-    #     return mcp_client.ToolSet.EMPLOYMENT_MENTORING
-    # if chat_id == global_chat_id or chat_id == projects_group_work_chat_id:
-    #     return mcp_client.ToolSet.GLOBAL
-    #
-    # return None
-    return mcp_client.ToolSet.GLOBAL
+    employment_mentoring_chat_id = int(env.EMPLOYMENT_MENTORING_CHAT_ID)
+    global_chat_id = int(env.MAIN_CHANNEL_CHAT_ID)
+    projects_group_work_chat_id = int(env.PROJECTS_GROUP_WORK_CHAT_ID)
+
+    if chat_id == employment_mentoring_chat_id:
+        return mcp_client.ToolSet.EMPLOYMENT_MENTORING
+    if chat_id == global_chat_id or chat_id == projects_group_work_chat_id:
+        return mcp_client.ToolSet.GLOBAL
+
+    return None
 
 
 def is_admin(user: ChatMember) -> bool:
     return (
-            user.status == ChatMemberStatus.ADMINISTRATOR
-            or user.status == ChatMemberStatus.OWNER
+        user.status == ChatMemberStatus.ADMINISTRATOR
+        or user.status == ChatMemberStatus.OWNER
     )
