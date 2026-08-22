@@ -1,8 +1,8 @@
 from src.config import env
-from src.metrics.business_metrics import openai_tokens_usage_total, openai_spend_usd_total
+from src.metrics.metric_definitions import openai_tokens_usage_total, openai_spend_usd_total
 
 PRICING = {
-    env.DEFAULT_LLM_MODEL: {"input": 0.85, "output": 7.00},
+    env.DEFAULT_LLM_MODEL: {"input": 1.75, "output": 14.00},
     env.BIGGER_CONTEXT_LLM_MODEL: {"input": 2.50, "output": 15.00},
 }
 

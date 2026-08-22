@@ -3,7 +3,7 @@ from functools import wraps
 
 from telegram.ext import CommandHandler, MessageHandler
 
-from src.metrics.business_metrics import telegram_command_usage_total
+from src.metrics.metric_definitions import telegram_command_usage_total
 
 log = logging.getLogger(__name__)
 
