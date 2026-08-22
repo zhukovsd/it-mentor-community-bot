@@ -1,14 +1,23 @@
 import logging
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.handler import util
 from src.config import env
+from src.handler import util
+from src.metrics.metric_definitions import telegram_errors_total
 
 log = logging.getLogger(__name__)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    exception_name = type(context.error).__name__ if context.error else "UnknownError"
+
+    try:
+        telegram_errors_total.labels(exception_type=exception_name).inc()
+    except Exception as e:
+        log.warning("Failed to increment error metric: %s", e)
+
     error_msg = f"Unexpected error occurred: {context.error}"
 
     log.error(error_msg)

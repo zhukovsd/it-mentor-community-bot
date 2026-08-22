@@ -17,3 +17,9 @@ openai_spend_usd_total = Counter(
     "Total money spent on OpenAI API in USD",
     ["model"]
 )
+
+telegram_errors_total = Counter(
+    "telegram_errors_total",
+    "Total number of unhandled exceptions caught by the error handler",
+    ["exception_type"]
+)
