@@ -43,8 +43,8 @@ from src.handler.update_interview_questions_popularity_handler import (
     UPDATE_INTERVIEW_QUESTIONS_POPULARITY,
     update_questions_popularity,
 )
-from src.metrics.command_metrics import instrument_application
-from src.metrics.metrics import metrics_app
+from src.metrics.telegram_instrumentation import instrument_application
+from src.metrics.metrics_endpoint import metrics_app
 
 logs.configure()
 

@@ -11,7 +11,7 @@ from openai import (
 from openai.types.shared_params.responses_model import ResponsesModel
 
 from src.config import env
-from src.metrics.instrumented_llm import track_llm_metrics
+from src.metrics.openai_usage import track_llm_metrics
 
 client = OpenAI()
 
