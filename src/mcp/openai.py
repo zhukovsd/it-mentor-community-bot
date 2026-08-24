@@ -1,5 +1,6 @@
 import logging
 from typing import Any, cast
+
 from openai import (
     APIError,
     APIStatusError,
@@ -7,10 +8,10 @@ from openai import (
     OpenAI,
     RateLimitError,
 )
-
 from openai.types.shared_params.responses_model import ResponsesModel
 
 from src.config import env
+from src.metrics.openai_usage import track_llm_metrics
 
 client = OpenAI()
 
@@ -42,6 +43,11 @@ def call_llm(user_input: str, allowed_tools: list[str], model: ResponsesModel) -
                     "allowed_tools": allowed_tools,
                 }
             ],
+        )
+        track_llm_metrics(
+            model=str(model),
+            input_tokens=resp.usage.input_tokens,
+            output_tokens=resp.usage.output_tokens
         )
         return resp.output_text
 

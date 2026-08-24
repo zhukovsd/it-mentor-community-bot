@@ -148,6 +148,10 @@ SEND_PROJECTS_TO_CHAT=
 
 `METRICS_PASS` - Пароль для доступа к странице /metrics
 
+`DEFAULT_LLM_MODEL` - Основная модель для повседневных задач
+
+`BIGGER_CONTEXT_LLM_MODEL` - Модель с увеличенным контекстным окном
+
 5. Поднять БД в контейнере командой
 
 ```bash

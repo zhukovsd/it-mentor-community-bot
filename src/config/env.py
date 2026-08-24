@@ -1,21 +1,21 @@
 # fmt: off
 import os
+
 from dotenv import load_dotenv
 
 _ = load_dotenv()
 
-
 # pyright: reportAssignmentType=false
 TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN")
 
-MAIN_CHANNEL_CHAT_ID : str = os.getenv("MAIN_CHANNEL_CHAT_ID")
-EMPLOYMENT_MENTORING_CHAT_ID : str = os.getenv("EMPLOYMENT_MENTORING_CHAT_ID")
+MAIN_CHANNEL_CHAT_ID: str = os.getenv("MAIN_CHANNEL_CHAT_ID")
+EMPLOYMENT_MENTORING_CHAT_ID: str = os.getenv("EMPLOYMENT_MENTORING_CHAT_ID")
 PROJECTS_REVIEWS_COLLECTION_CHAT_ID: str = os.getenv("PROJECTS_REVIEWS_COLLECTION_CHAT_ID")
 PROJECTS_GROUP_WORK_CHAT_ID: str = os.getenv("PROJECTS_GROUP_WORK_CHAT_ID")
 ERRORS_CHAT_ID: str = os.getenv("ERRORS_CHAT_ID")
 
-MCP_SERVER_API_KEY : str = os.getenv("MCP_SERVER_API_KEY")
-MCP_SERVER_URL : str = os.getenv("MCP_SERVER_URL")
+MCP_SERVER_API_KEY: str = os.getenv("MCP_SERVER_API_KEY")
+MCP_SERVER_URL: str = os.getenv("MCP_SERVER_URL")
 
 ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
@@ -54,6 +54,9 @@ AI_COMMAND_STICKER_REPLY: bool = os.getenv("AI_COMMAND_STICKER_REPLY", "false").
 METRICS_USER: str = os.getenv("METRICS_USER")
 METRICS_PASS: str = os.getenv("METRICS_PASS")
 METRICS_PORT: int = os.getenv("METRICS_PORT")
+
+DEFAULT_LLM_MODEL: str = os.getenv("DEFAULT_LLM_MODEL")
+BIGGER_CONTEXT_LLM_MODEL: str = os.getenv("BIGGER_CONTEXT_LLM_MODEL")
 
 assert TELEGRAM_BOT_TOKEN is not None, "TELEGRAM_BOT_TOKEN environment variable is not set"
 
@@ -96,3 +99,6 @@ assert QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS is not None, "QUESTIONS_POPU
 assert METRICS_USER is not None, "METRICS_USER environment variable is not set"
 assert METRICS_PASS is not None, "METRICS_PASS environment variable is not set"
 assert METRICS_PORT is not None, "METRICS_PORT environment variable is not set"
+
+assert DEFAULT_LLM_MODEL is not None, "DEFAULT_LLM_MODEL environment variable is not set"
+assert BIGGER_CONTEXT_LLM_MODEL is not None, "BIGGER_CONTEXT_LLM_MODEL environment variable is not set"

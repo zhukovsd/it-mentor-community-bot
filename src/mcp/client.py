@@ -1,15 +1,16 @@
+import logging
 from collections.abc import Generator
 from enum import Enum
-import logging
 
 from openai.types import ResponsesModel
 
+from src.config import env
 from src.mcp import openai
 
 log = logging.getLogger(__name__)
 
-default_model: ResponsesModel = "gpt-5.2"
-bigger_context_model: ResponsesModel = "gpt-5.4"
+default_model: ResponsesModel = env.DEFAULT_LLM_MODEL
+bigger_context_model: ResponsesModel = env.BIGGER_CONTEXT_LLM_MODEL
 
 ToolSet = Enum("ToolSet", ["EMPLOYMENT_MENTORING", "GLOBAL"])
 
@@ -20,8 +21,8 @@ max_interviews = 50
 
 
 def get_result(
-    user_input: str,
-    tool_set: ToolSet,
+        user_input: str,
+        tool_set: ToolSet,
 ) -> Generator[str, None, None]:
     allowed_tools: list[str] | None = None
 
