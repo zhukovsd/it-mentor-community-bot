@@ -1,8 +1,7 @@
 ## Информация
 
 > [!IMPORTANT]  
-> Проект разработан на версии python == 3.12, работоспособность на других версиях не гарантируется (на 3.13 проект не
-> запускается)
+> Проект разработан на версии python == 3.12, работоспособность на других версиях не гарантируется (на 3.13 проект не запускается)
 
 - Создание бота и получение токена - https://t.me/BotFather
 - При создании бота нужно отправить BotFather команду `/setinline`, иначе бот не будет работать через `@` в чате
@@ -18,7 +17,7 @@
 - https://console.cloud.google.com/projectselector2/apis/dashboard?supportedpurview=project
 - Далее в: API & Services > Переходим: Credentials > Создаем: Create credentials > Service account key
 - Заполняем все необходимые поля
-- Нажимаем Done
+- Нажимаем Done 
 - Нажимаем “Manage service accounts” над Service Accounts.
 - В открывшейся таблице кликаем 3 точки > Manage Keys
 - ADD KEY > Create new key > JSON
@@ -30,13 +29,13 @@
 Нужно будет добавить к пользователям Email из API Key в ключе `client_email`
 Делать это стоит конкретно к таблице с которой мы будем работать, либо к папке с таблицами в которой мы будем работать
 
-Также надо перейти в
+Также надо перейти в 
 
 - API & Services > Library
 - Ввести `Google Drive API` и `Google Sheets API` в поиск
-- И включить эти две либы (Нажать Enable)
+- И включить эти две либы (Нажать Enable) 
 
-## Локальный запуск
+## Локальный запуск 
 
 1. Создать venv
 
@@ -44,7 +43,7 @@
 python -m venv venv
 ```
 
-2. Активировать venv (если pycharm не сделал это автоматически)
+2. Активировать venv (если pycharm не сделал это автоматически) 
 
 ```bash
 source venv/bin/activate
@@ -52,7 +51,7 @@ source venv/bin/activate
 
 https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html#widget
 
-3. Установить зависимости (если pycharm не сделал это автоматически)
+3. Установить зависимости (если pycharm не сделал это автоматически) 
 
 ```bash
 pip install -r requirements.txt
@@ -103,19 +102,14 @@ QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS=
 SEND_PROJECTS_TO_CHAT=
 ```
 
-`PROJECTS_REVIEWS_SPREADSHEET_ID` - Строка без пробелов содержащая в себе id файла google sheet из google drive который
-подключается с помощью google api.
-
+`PROJECTS_REVIEWS_SPREADSHEET_ID` - Строка без пробелов содержащая в себе id файла google sheet из google drive который подключается с помощью google api.
 - id достается из url самой таблицы при открытии в браузере на ПК
-  `ADD_PROJECT_ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без
-  пробелов = 322,511,987
-  `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по
-  аналогии с
-  `ADD_PROJECT_ALLOWED_USER_IDS`
+`ADD_PROJECT_ALLOWED_USER_IDS` - Список id юзеров, которые могут пользоваться командой. Указывается через запятую без пробелов = 322,511,987
+`PROJECTS_REVIEWS_COLLECTION_CHAT_ID` - ID Чата куда пересылаем ответное сообщение. Указывать можно в виде списка по аналогии с 
+`ADD_PROJECT_ALLOWED_USER_IDS`
 - **Не добавлять сюда** ID другого **чат бота** или того же самого который используется
 
 `GOOGLE_SERVICE_ACCOUNT_JSON_KEY` - JSON строка формата:
-
 ```json
 {
   "type": "service_account",
@@ -144,16 +138,11 @@ SEND_PROJECTS_TO_CHAT=
 `GOLANG_BACKEND_COURSE_SITE_REPO_OWNER` - Владелец репозитория с go роадмапом
 `GOLANG_BACKEND_COURSE_SITE_REPO_NAME` - Название репозитория с go роадмапом
 
-`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в
-репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория
-куда он должен сделать PR
+`GITHUB_COMMUNITY_BOT_ACCESS_TOKEN` - Classic token авторизации GitHub аккаунта бота с которого будет создаваться PR в репозиторий методички. Обязательный scope - repo. Аккаунт бота должен иметь роль collaborator в настройках репозитория куда он должен сделать PR
 
-`QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности
-вопросов. Указывается через запятую без пробелов = 322,511,987
+`QUESTIONS_POPULARITY_UPDATE_ALLOWED_USER_IDS` - Юзеры, которые могут пользоваться командой обновления популярности вопросов. Указывается через запятую без пробелов = 322,511,987
 
-`SEND_PROJECTS_TO_CHAT` - Контролирует нужно ли пересылать сообщения пользователей в чат указанный
-в `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` при использовании команды /addproject. Любое значение кроме `true` расценивается
-как `false`. Дефолтное значение `false`
+`SEND_PROJECTS_TO_CHAT` - Контролирует нужно ли пересылать сообщения пользователей в чат указанный в `PROJECTS_REVIEWS_COLLECTION_CHAT_ID` при использовании команды /addproject. Любое значение кроме `true` расценивается как `false`. Дефолтное значение `false`
 
 `METRICS_USER` - Имя пользователя, которое надо ввести для доступа к странице /metrics
 
@@ -177,14 +166,14 @@ yoyo apply --database postgresql://user:password@localhost:5433/database-name ./
 
 7. Запустить проект
 
-- C помощью UI pycharm
-- Через `python -m src.main`
+ - C помощью UI pycharm
+ - Через `python -m src.main`
 
 ---
 
-## Запуск в докере
+## Запуск в докере 
 
-1. Создать `.env.prod` файл в корне проекта.
+1. Создать `.env.prod` файл в корне проекта. 
 
 `.env.prod` аналогичен `.env` файлу описанному в [4 пункте локального запуска](#локальный-запуск)
 
