@@ -54,7 +54,8 @@ from src.google_sheet.constants.projects_reviews_sheet_constants import (
 
 log = logging.getLogger(__name__)
 
-interview_questions: dict[int, InterviewQuestion] = dict()
+interview_java_questions: dict[int, InterviewQuestion] = dict()
+interview_python_questions: dict[int, InterviewQuestion] = dict()
 
 
 def add_project(project_name: str, language: str, link: str):
@@ -86,18 +87,30 @@ def add_project(project_name: str, language: str, link: str):
     )
 
 
-def get_interview_question_by_id(question_id: int) -> InterviewQuestion | None:
-    if len(interview_questions) == 0:
-        _update_interview_questions()
+def get_interview_question_by_id(question_id: int, lang: str) -> InterviewQuestion | None:
+    questions = (
+        interview_java_questions
+        if lang.lower() == "java"
+        else interview_python_questions
+    )
 
-    return interview_questions.get(question_id)
+    if not questions:
+        _update_interview_questions(lang)
+
+    return questions.get(question_id)
 
 
-def get_interview_questions() -> list[InterviewQuestion]:
-    if len(interview_questions) == 0:
-        _update_interview_questions()
+def get_interview_questions(lang: str) -> list[InterviewQuestion]:
+    questions = (
+        interview_java_questions
+        if lang.lower() == "java"
+        else interview_python_questions
+    )
 
-    return list(interview_questions.values())
+    if not questions:
+        _update_interview_questions(lang)
+
+    return list(questions.values())
 
 
 def get_projects_data() -> list[Project]:
@@ -188,10 +201,10 @@ def get_reviews_data() -> list[Review]:
     return review_data
 
 
-def _update_interview_questions() -> None:
+def _update_interview_questions(lang: str) -> None:
     log.info("Parsing interview collection Google spreadsheet")
 
-    interviews_sheet = google_sheet_client.get_interviews_sheet()
+    interviews_sheet = google_sheet_client.get_interviews_sheet(lang)
 
     # Col[Row[Any]]
     interviews_sheet_values: list[list[Any]] = interviews_sheet.get_all_values()
@@ -205,8 +218,12 @@ def _update_interview_questions() -> None:
     questions = _map_question_id_to_question(
         question_id_to_row_category, col_to_interview_info
     )
-
-    interview_questions.update(questions)
+    target_dict = (
+        interview_java_questions
+        if lang.lower() == "java"
+        else interview_python_questions
+    )
+    target_dict.update(questions)
 
 
 def _map_question_id_to_row_category(
