@@ -21,11 +21,6 @@ async def search_interviews_with_question_python(update: Update,
     chat = update.effective_chat
     command_message = update.effective_message
 
-    # print(f'update={update}')
-    # print(f'context={context}')
-    # print(f'chat={chat}')
-    # print(f'command_message={command_message}')
-
     assert chat is not None, "Chat in which command is called cannot be None"
     assert command_message is not None, "Message that triggered bot cannot be None"
 

@@ -208,11 +208,9 @@ def _update_interview_questions(lang: str) -> None:
 
     # Col[Row[Any]]
     interviews_sheet_values: list[list[Any]] = interviews_sheet.get_all_values()
-
     question_id_to_row_category = _map_question_id_to_row_category(
         interviews_sheet_values
     )
-
     col_to_interview_info = _map_col_index_to_interview_info(interviews_sheet_values)
 
     questions = _map_question_id_to_question(
@@ -258,7 +256,6 @@ def _map_question_id_to_row_category(
         3 : ([3, q3, 3%, 30:00, ''], OOP),
     }
     """
-
     q_id_to_q_row: dict[int, tuple[list[Any], InterviewQuestionCategory]] = dict()
     current_category_name = ""
     current_category_link = ""
