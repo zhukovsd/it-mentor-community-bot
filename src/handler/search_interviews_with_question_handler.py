@@ -6,18 +6,19 @@ from telegram import Message, Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.config import env
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_dto import InterviewQuestion
+from src.config import env
 from src.handler import util
 
-SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP_PYTHON = "qp\\d+"
+SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP = r"qp?\d+"
 
 log = logging.getLogger(__name__)
 
 
-async def search_interviews_with_question_python(update: Update,
-                                                 context: ContextTypes.DEFAULT_TYPE, ):
+async def search_interviews_with_question(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+):
     chat = update.effective_chat
     command_message = update.effective_message
 
@@ -38,6 +39,7 @@ async def search_interviews_with_question_python(update: Update,
         )
         return
 
+    lang = get_language_from_message(command_message)
     question_id = get_question_id(command_message)
 
     if question_id <= 0:
@@ -48,7 +50,7 @@ async def search_interviews_with_question_python(update: Update,
             parse_mode=ParseMode.MARKDOWN_V2,
         )
         return
-    lang = 'python'
+
     question = google_sheet_service.get_interview_question_by_id(question_id, lang)
 
     if question is None:
@@ -117,7 +119,13 @@ def get_question_id(message: Message) -> int:
     match = re.search(r"\d+", message.text)
 
     assert (
-            match is not None
+        match is not None
     ), "Question id absent in user message. This must not happen as the python-telegram-bot handler shouldn't be triggered if the /q command don't have any digits after it"
 
     return int(match.group())
+
+def get_language_from_message(message: Message) -> str:
+    assert message.text is not None
+    if "qp" in message.text.lower():
+        return "python"
+    return "java"
