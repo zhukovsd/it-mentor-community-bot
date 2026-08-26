@@ -7,6 +7,7 @@ from src.metrics.metric_definitions import telegram_command_usage_total
 
 log = logging.getLogger(__name__)
 
+
 def _get_metric_label(handler) -> str | None:
     if isinstance(handler, CommandHandler):
         if handler.commands:
@@ -26,8 +27,17 @@ def _wrap_callback_with_metric(handler, command_label: str) -> None:
 
     @wraps(original_callback)
     async def wrapped_callback(update, context):
+        final_label = command_label
+        lang = ""
 
-        telegram_command_usage_total.labels(command=command_label).inc()
+        if command_label == "search_interviews_with_question":
+            text = (update.effective_message.text or "").lower()
+
+            lang = "python" if "qp" in text else "java"
+            final_label = f"{command_label}_{lang}"
+
+        telegram_command_usage_total.labels(command=final_label).inc()
+
         await original_callback(update, context)
 
     handler.callback = wrapped_callback

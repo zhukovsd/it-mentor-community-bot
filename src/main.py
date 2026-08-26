@@ -35,6 +35,7 @@ from src.handler.search_interviews_with_question_handler import (
     SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
     search_interviews_with_question,
 )
+
 from src.handler.update_finished_projects_handler import (
     UPDATE_FINISHED_PROJECTS_COMMAND,
     update_finished_projects,
@@ -74,6 +75,7 @@ async def start_bot() -> None:
             SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP) & ~ EDITED_MESSAGE & ~ MESSAGE_REACTION,
         search_interviews_with_question,
     )
+
     interview_questions_list_handler = CommandHandler(
         INTERVIEW_QUESTIONS_LIST_COMMAND, list_interview_questions_messages
     )
@@ -101,6 +103,7 @@ async def start_bot() -> None:
     application.add_handler(update_finished_projects_handler)
     application.add_handler(ai_handler)
     application.add_error_handler(error_handler)
+
 
     async with application:
         await application.start()

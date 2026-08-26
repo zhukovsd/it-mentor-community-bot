@@ -37,12 +37,17 @@ def get_reviews_sheet(editable: bool = False) -> Worksheet:
     )
 
 
-def get_interviews_sheet(editable: bool = False) -> Worksheet:
+def get_interviews_sheet(lang: str, editable: bool = False) -> Worksheet:
     client = gspread.auth.service_account_from_dict(
         service_account_key,
         scopes=(DEFAULT_SCOPES if editable else READONLY_SCOPES),
     )
+    spreadsheet_id = (
+        env.JAVA_INTERVIEW_COLLECTION_SPREADSHEET_ID
+        if lang.lower() == "java"
+        else env.PYTHON_INTERVIEW_COLLECTION_SPREADSHEET_ID
+    )
 
-    return client.open_by_key(env.INTERVIEW_COLLECTION_SPREADSHEET_ID).worksheet(
+    return client.open_by_key(spreadsheet_id).worksheet(
         SUMMARY_SHEET_TITLE
     )
