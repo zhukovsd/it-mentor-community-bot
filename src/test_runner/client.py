@@ -31,7 +31,7 @@ def post_test_run(deploy_base_url: str, project_name: str) -> dto.TestRun | str:
         log.error(f"Failed to create test run: {resp.text}")
         return "Failed to create test run"
 
-    return dto.TestRun(**resp.json())
+    return _to_dto(resp)
 
 
 def get_test_run(id: str) -> dto.TestRun | str:
@@ -43,4 +43,12 @@ def get_test_run(id: str) -> dto.TestRun | str:
         log.error(f"Failed to get test run: {resp.text}")
         return "Failed to get test run"
 
-    return dto.TestRun(**resp.json())
+    return _to_dto(resp)
+
+
+def _to_dto(resp: requests.Response) -> dto.TestRun:
+    data = resp.json()
+
+    report = data.pop("report", None) or []
+
+    return dto.TestRun(**data, report=[dto.TestResult(**test) for test in report])
