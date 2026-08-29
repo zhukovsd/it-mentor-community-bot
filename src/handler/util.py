@@ -7,18 +7,20 @@ from mistune.renderers.html import HTMLRenderer
 from mistune.plugins.formatting import strikethrough
 from mistune.plugins.table import table
 
+from src.config import constants
+
 MAX_MESSAGE_LENGTH = 4096
 
 log = logging.getLogger(__name__)
 
 PROJECT_RUSSIAN_NAMES = {
-    "hangman": "Виселица",
-    "simulation": "Симуляция",
-    "currency-exchange": "Обмен валют",
-    "tennis-scoreboard": "Теннисное табло",
-    "weather-viewer": "Погода",
-    "cloud-file-storage": "Облачное хранилище файлов",
-    "task-tracker": "Планировщик задач",
+    constants.PROJECT_HANGMAN: "Виселица",
+    constants.PROJECT_SIMULATION: "Симуляция",
+    constants.PROJECT_CURRENCY_EXCHANGE: "Обмен валют",
+    constants.PROJECT_TENNIS_SCOREBOARD: "Теннисное табло",
+    constants.PROJECT_WEATHER_VIEWER: "Погода",
+    constants.PROJECT_CLOUD_FILE_STORAGE: "Облачное хранилище файлов",
+    constants.PROJECT_TASK_TRACKER: "Планировщик задач",
     "other": "Другое",
 }
 
