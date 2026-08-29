@@ -17,6 +17,9 @@ ERRORS_CHAT_ID: str = os.getenv("ERRORS_CHAT_ID")
 MCP_SERVER_API_KEY: str = os.getenv("MCP_SERVER_API_KEY")
 MCP_SERVER_URL: str = os.getenv("MCP_SERVER_URL")
 
+TEST_RUNNER_URL: str = os.getenv("TEST_RUNNER_URL")
+TEST_RUNNER_API_KEY: str = os.getenv("TEST_RUNNER_API_KEY")
+
 ADD_PROJECT_ALLOWED_USER_IDS: str = os.getenv("ADD_PROJECT_ALLOWED_USER_IDS")
 
 GOOGLE_SERVICE_ACCOUNT_JSON_KEY: str = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_KEY")
@@ -69,6 +72,9 @@ assert ERRORS_CHAT_ID is not None, "ERRORS_CHAT_ID environment variable is not s
 
 assert MCP_SERVER_API_KEY is not None, "MCP_SERVER_API_KEY environment variable is not set"
 assert MCP_SERVER_URL is not None, "MCP_SERVER_URL environment variable is not set"
+
+assert TEST_RUNNER_URL is not None, "TEST_RUNNER_URL environment variable is not set"
+assert TEST_RUNNER_API_KEY is not None, "TEST_RUNNER_API_KEY environment variable is not set"
 
 assert ADD_PROJECT_ALLOWED_USER_IDS is not None, "ADD_PROJECT_ALLOWED_USER_IDS environment variable is not set"
 
