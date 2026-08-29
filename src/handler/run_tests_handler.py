@@ -134,8 +134,22 @@ URL: {test_run.deploy_base_url}
 Пройдено: {test_run.passed}
 Провалено: {test_run.failed}
 Пропущено: {test_run.skipped}
+
+{progress_bar(test_run)}
 """
     return message
+
+
+def progress_bar(test_run: dto.TestRun) -> str:
+    executed = test_run.passed + test_run.skipped + test_run.failed
+    total = test_run.total
+
+    percents = (executed / total) * 100
+
+    filled = round(percents / 10)
+    empty = 10 - filled
+
+    return f"Прогресс: {round(percents, 2)}%\n\n{"◽️" * filled}{"◼️" * empty}"
 
 
 def is_valid_url(value: str) -> bool:
