@@ -31,6 +31,7 @@ from src.handler.reviews_monthly_summary_handler import (
     REVIEWS_MONTHLY_SUMMARY_COMMAND_NAME,
     reviews_monthly_summary,
 )
+from src.handler.run_tests_handler import RUN_TESTS_COMMAND_NAME, run_tests
 from src.handler.search_interviews_with_question_handler import (
     SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP,
     search_interviews_with_question,
@@ -54,10 +55,7 @@ log = logging.getLogger(__name__)
 
 async def start_metrics_server() -> None:
     config: uvicorn.Config = uvicorn.Config(
-        app=metrics_app,
-        host="0.0.0.0",
-        port=int(METRICS_PORT),
-        log_level="info"
+        app=metrics_app, host="0.0.0.0", port=int(METRICS_PORT), log_level="info"
     )
     server: uvicorn.Server = uvicorn.Server(config)
     await server.serve()
@@ -71,8 +69,10 @@ async def start_bot() -> None:
 
     add_project_handler = CommandHandler(ADD_PROJECT_COMMAND_NAME, add_project)
     search_interviews_with_question_handler = MessageHandler(
-        filters.COMMAND & filters.Regex(
-            SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP) & ~ EDITED_MESSAGE & ~ MESSAGE_REACTION,
+        filters.COMMAND
+        & filters.Regex(SEARCH_INTERVIEWS_WITH_QUESTION_COMMAND_REGEXP)
+        & ~EDITED_MESSAGE
+        & ~MESSAGE_REACTION,
         search_interviews_with_question,
     )
 
@@ -93,6 +93,7 @@ async def start_bot() -> None:
         UPDATE_FINISHED_PROJECTS_COMMAND, update_finished_projects
     )
     ai_handler = CommandHandler(AI_COMMAND, ask_ai)
+    run_tests_handler = CommandHandler(RUN_TESTS_COMMAND_NAME, run_tests)
 
     application.add_handler(add_project_handler)
     application.add_handler(search_interviews_with_question_handler)
@@ -102,15 +103,13 @@ async def start_bot() -> None:
     application.add_handler(reviews_monthly_summary_handler)
     application.add_handler(update_finished_projects_handler)
     application.add_handler(ai_handler)
+    application.add_handler(run_tests_handler)
     application.add_error_handler(error_handler)
-
 
     async with application:
         await application.start()
 
-        await application.updater.start_polling(
-            allowed_updates=Update.ALL_TYPES
-        )
+        await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
 
         try:
             await asyncio.Event().wait()
