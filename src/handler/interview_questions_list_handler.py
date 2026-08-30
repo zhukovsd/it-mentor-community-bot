@@ -4,6 +4,7 @@ import logging
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
+from telegram.error import RetryAfter
 
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
@@ -66,10 +67,10 @@ async def list_interview_questions_messages(
 
     if len(args) != 2:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, expected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, expected 2"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и boolean параметром"
         )
         return
 
@@ -81,7 +82,8 @@ async def list_interview_questions_messages(
             f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with non bool argument {generate_q_command}"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и"
+            f"boolean параметром"
         )
         return
 
@@ -90,14 +92,15 @@ async def list_interview_questions_messages(
     messages: list[str] = list()
 
     for category, questions in category_to_question.items():
-        category_messages = generate_messages(
+        full_category_message = generate_message(
             category,
             questions,
             generate_q_command,
             lang,
         )
+        splitted_chunks = util.chunk_string(full_category_message)
 
-        messages.extend(category_messages)
+        messages.extend(splitted_chunks )
 
     log.debug(f"Messages before compressing: {len(messages)}")
 
@@ -106,13 +109,20 @@ async def list_interview_questions_messages(
     log.debug(f"Messages after compressing: {len(messages)}")
 
     for text in messages:
-        _ = await context.bot.send_message(
-            chat_id=chat.id,
-            text=text,
-            parse_mode=ParseMode.MARKDOWN_V2,
-            message_thread_id=command_message.message_thread_id,
-            disable_web_page_preview=True,
-        )
+        while True:
+            try:
+                await context.bot.send_message(
+                    chat_id=chat.id,
+                    text=text,
+                    parse_mode=ParseMode.MARKDOWN_V2,
+                    message_thread_id=command_message.message_thread_id,
+                    disable_web_page_preview=True,
+                )
+                break
+
+            except RetryAfter as exc:
+                await asyncio.sleep(exc.retry_after + 1)
+
         await asyncio.sleep(1)
 
 
@@ -155,18 +165,16 @@ def split_by_categories(
     return category_to_question
 
 
-def generate_messages(
+def generate_message(
     category: InterviewQuestionCategory,
     questions: list[InterviewQuestion],
     generate_q_command: bool,
     lang: str
-) -> list[str]:
+) -> str:
     message_header = f"[{util.escape_special_chars(category.name)}]({category.link})"
-
     command_prefix = "qp" if lang.lower() == "python" else "q"
 
-    messages: list[str] = []
-    current_message = f"{message_header}\n\n"
+    question_bullets: list[str] = list()
 
     for question in questions:
         text = util.escape_special_chars(question.question)
@@ -177,18 +185,10 @@ def generate_messages(
         if generate_q_command:
             question_bullet += f" /{command_prefix}{question.id}"
 
-        candidate_message = f"{current_message}{question_bullet}\n"
+        question_bullets.append(question_bullet)
 
-        if len(candidate_message) >= util.MAX_MESSAGE_LENGTH:
-            messages.append(current_message.rstrip())
-            current_message = (
-                f"{message_header}\n\n"
-                f"{question_bullet}\n"
-            )
-        else:
-            current_message = candidate_message
+    message_body = "\n".join(question_bullets)
 
-    if current_message != f"{message_header}\n\n":
-        messages.append(current_message.rstrip())
+    message = message_header + "\n\n" + message_body
 
-    return messages
+    return message
