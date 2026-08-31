@@ -4,6 +4,7 @@ import logging
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
+from telegram.error import RetryAfter
 
 from src.google_sheet import google_sheet_service
 from src.google_sheet.dto.interview_question_category_dto import (
@@ -55,47 +56,51 @@ async def list_interview_questions_messages(
 
     if len(message_text.strip()) == 0:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, expected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, expected 2"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и boolean параметром"
         )
         return
 
     args: list[str] = message_text.strip().split(" ")
 
-    if len(args) != 1:
+    if len(args) != 2:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, expected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with {len(args)} arguments, expected 2"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и boolean параметром"
         )
         return
 
-    generate_q_command = to_bool(args[0])
+    lang = args[0].lower()
+    generate_q_command = to_bool(args[1])
 
     if generate_q_command is None:
         log.error(
             f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with non bool argument {generate_q_command}"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и"
+            f"boolean параметром"
         )
         return
 
-    interview_questions = google_sheet_service.get_interview_questions()
-
+    interview_questions = google_sheet_service.get_interview_questions(lang)
     category_to_question = split_by_categories(interview_questions)
-
     messages: list[str] = list()
 
-    for category in category_to_question.keys():
-        questions = category_to_question[category]
+    for category, questions in category_to_question.items():
+        full_category_message = generate_message(
+            category,
+            questions,
+            generate_q_command,
+            lang,
+        )
+        splitted_chunks = util.chunk_string(full_category_message)
 
-        message = generate_message(category, questions, generate_q_command)
-
-        messages.append(message)
+        messages.extend(splitted_chunks )
 
     log.debug(f"Messages before compressing: {len(messages)}")
 
@@ -109,6 +114,7 @@ async def list_interview_questions_messages(
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
             message_thread_id=command_message.message_thread_id,
+            disable_web_page_preview=True
         )
         await asyncio.sleep(1)
 
@@ -156,8 +162,10 @@ def generate_message(
     category: InterviewQuestionCategory,
     questions: list[InterviewQuestion],
     generate_q_command: bool,
+    lang: str
 ) -> str:
     message_header = f"[{util.escape_special_chars(category.name)}]({category.link})"
+    command_prefix = "qp" if lang.lower() == "python" else "q"
 
     question_bullets: list[str] = list()
 
@@ -168,16 +176,12 @@ def generate_message(
         question_bullet = f"\\- {text} \\[{popularity}\\]"
 
         if generate_q_command:
-            question_bullet += f" /q{question.id}"
+            question_bullet += f" /{command_prefix}{question.id}"
 
         question_bullets.append(question_bullet)
 
     message_body = "\n".join(question_bullets)
 
     message = message_header + "\n\n" + message_body
-
-    assert (
-        len(message) < util.MAX_MESSAGE_LENGTH
-    ), "Rest of the code assumes that all questions of the category will fit into one telegram message"
 
     return message
