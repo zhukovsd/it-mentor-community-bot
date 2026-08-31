@@ -56,10 +56,10 @@ async def list_interview_questions_messages(
 
     if len(message_text.strip()) == 0:
         log.error(
-            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, expected 1"
+            f"{INTERVIEW_QUESTIONS_LIST_COMMAND} was called with no argument, expected 2"
         )
         await reply_with_error(
-            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с boolean параметром"
+            f"Команда {INTERVIEW_QUESTIONS_LIST_COMMAND} должна вызываться с двумя параметрами: язык программирования и boolean параметром"
         )
         return
 
@@ -109,20 +109,13 @@ async def list_interview_questions_messages(
     log.debug(f"Messages after compressing: {len(messages)}")
 
     for text in messages:
-        while True:
-            try:
-                await context.bot.send_message(
-                    chat_id=chat.id,
-                    text=text,
-                    parse_mode=ParseMode.MARKDOWN_V2,
-                    message_thread_id=command_message.message_thread_id,
-                    disable_web_page_preview=True,
-                )
-                break
-
-            except RetryAfter as exc:
-                await asyncio.sleep(exc.retry_after + 1)
-
+        _ = await context.bot.send_message(
+            chat_id=chat.id,
+            text=text,
+            parse_mode=ParseMode.MARKDOWN_V2,
+            message_thread_id=command_message.message_thread_id,
+            disable_web_page_preview=True
+        )
         await asyncio.sleep(1)
 
 
