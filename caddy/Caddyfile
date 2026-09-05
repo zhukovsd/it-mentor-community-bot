@@ -1,0 +1,9 @@
+{
+    default_sni 159.69.117.141
+}
+
+159.69.117.141:{$METRICS_PORT} {
+    handle {
+        reverse_proxy bot:{$METRICS_PORT}
+    }
+}

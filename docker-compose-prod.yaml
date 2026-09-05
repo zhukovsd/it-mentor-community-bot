@@ -3,8 +3,6 @@ services:
     image: zhukovsd/it-mentor-community-bot:main
     env_file: .env.prod
     restart: always
-    ports:
-      - "${METRICS_PORT}:${METRICS_PORT}"
     depends_on:
       - database
 
@@ -12,3 +10,18 @@ services:
     image: postgres
     env_file: .env.prod
     restart: always
+
+  caddy:
+    image: caddy
+    env_file: .env.prod
+    restart: unless-stopped
+    ports:
+      - "${METRICS_PORT}:${METRICS_PORT}"
+    volumes:
+      - ./caddy:/etc/caddy
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
