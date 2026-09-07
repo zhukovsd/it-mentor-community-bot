@@ -8,19 +8,11 @@ from telegram.constants import ChatMemberStatus, ParseMode
 from telegram.ext import ContextTypes
 
 from src.config import env
+from src.config import constants
 from src.google_sheet import google_sheet_service
 from src import repository
 
 ADD_PROJECT_COMMAND_NAME = "addproject"
-PROJECT_NAMES = [
-    "hangman",
-    "simulation",
-    "currency-exchange",
-    "tennis-scoreboard",
-    "weather-viewer",
-    "cloud-file-storage",
-    "task-tracker",
-]
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +85,7 @@ async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     language, project_name = args
 
-    if project_name not in PROJECT_NAMES:
+    if project_name not in constants.PROJECT_NAMES:
         log.error(
             f"{ADD_PROJECT_COMMAND_NAME} was called with invalid project name '{project_name}' argument"
         )

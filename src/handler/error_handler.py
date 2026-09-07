@@ -1,6 +1,9 @@
+import asyncio
 import logging
+import traceback
 
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from src.config import env
@@ -11,20 +14,37 @@ log = logging.getLogger(__name__)
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-    exception_name = type(context.error).__name__ if context.error else "UnknownError"
+    exception_name = "UnknownError"
+    exception_traceback = "No traceback available"
+
+    if context.error is not None:
+        exception_name = type(context.error).__name__
+        exception_traceback = "\n".join(
+            traceback.format_exception(
+                type(context.error), context.error, context.error.__traceback__
+            )
+        )
 
     try:
         telegram_errors_total.labels(exception_type=exception_name).inc()
     except Exception as e:
         log.warning("Failed to increment error metric: %s", e)
 
-    error_msg = f"Unexpected error occurred: {context.error}"
+    log.error(f"Unexpected error occurred: {exception_name}\n{exception_traceback}")
 
-    log.error(error_msg)
+    error_messages = util.compress_messages(
+        util.chunk_string(
+            f"Unexpected error occurred: {util.escape_special_chars(exception_name)}\n```\n{util.escape_special_chars(exception_traceback)}\n```"
+        )
+    )
 
-    error_msg = util.escape_special_chars(error_msg)
-
-    _ = await context.bot.send_message(chat_id=env.ERRORS_CHAT_ID, text=error_msg)
+    for message in error_messages:
+        _ = await context.bot.send_message(
+            chat_id=env.ERRORS_CHAT_ID,
+            text=message,
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+        await asyncio.sleep(1)
 
     if not isinstance(update, Update):
         return
