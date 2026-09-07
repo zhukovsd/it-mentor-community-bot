@@ -1,6 +1,9 @@
+import io
 import ipaddress
 import logging
 import asyncio
+import textwrap
+from typing import Any
 from urllib.parse import urlparse
 
 from telegram import Message, Update
@@ -95,12 +98,12 @@ async def run_tests(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     test_run_message = await context.bot.send_message(
         chat_id=chat.id,
-        text=util.escape_special_chars(create_message(test_run)),
+        text=util.escape_special_chars(to_status_message(test_run)),
         reply_to_message_id=command_message.id,
         parse_mode=ParseMode.MARKDOWN_V2,
     )
 
-    while test_run.report is None:
+    while test_run.completed_at is None:
         await asyncio.sleep(1)
 
         updated_test_run = client.get_test_run(test_run.id)
@@ -115,32 +118,21 @@ async def run_tests(update: Update, context: ContextTypes.DEFAULT_TYPE):
         test_run = updated_test_run
 
         test_run_message = await test_run_message.edit_text(
-            text=util.escape_special_chars(create_message(test_run)),
+            text=util.escape_special_chars(to_status_message(test_run)),
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
         assert isinstance(test_run_message, Message)
 
-
-def create_message(test_run: dto.TestRun) -> str:
-    message = f"""
-Тесты запущены
-
-URL: {test_run.deploy_base_url}
-Проект: {test_run.project_name}
-Статус: {test_run.status}
-
-Всего тестов: {test_run.total}
-Пройдено: {test_run.passed}
-Провалено: {test_run.failed}
-Пропущено: {test_run.skipped}
-
-{progress_bar(test_run)}
-"""
-    return message
+    _ = await context.bot.send_document(
+        chat_id=chat.id,
+        document=io.BytesIO(to_markdown_report(test_run).encode()),
+        filename=f"test-run-report-{test_run.id}.md",
+        reply_to_message_id=test_run_message.id,
+    )
 
 
-def progress_bar(test_run: dto.TestRun) -> str:
+def to_status_message(test_run: dto.TestRun) -> str:
     executed = test_run.passed + test_run.skipped + test_run.failed
     total = test_run.total
 
@@ -149,7 +141,23 @@ def progress_bar(test_run: dto.TestRun) -> str:
     filled = round(percents / 10)
     empty = 10 - filled
 
-    return f"Прогресс: {round(percents, 2)}%\n\n{"◽️" * filled}{"◼️" * empty}"
+    message = textwrap.dedent(f"""
+    Тесты запущены
+
+    URL: {test_run.deploy_base_url}
+    Проект: {test_run.project_name}
+    Статус: {test_run.status}
+
+    Всего тестов: {test_run.total}
+    Пройдено: {test_run.passed}
+    Провалено: {test_run.failed}
+    Пропущено: {test_run.skipped}
+
+    Прогресс: {round(percents, 2)}%
+
+    {"◽️" * filled}{"◼️" * empty}
+    """).strip()
+    return message
 
 
 def is_valid_url(value: str) -> bool:
@@ -176,3 +184,106 @@ def is_valid_url(value: str) -> bool:
         pass
 
     return True
+
+
+def to_markdown_report(tr: dto.TestRun) -> str:
+    assert tr.report is not None
+    assert tr.completed_at is not None
+
+    tree = {}
+
+    for test in tr.report:
+        parts = test.name.split("/")
+
+        current = tree
+
+        for part in parts:
+            if part not in current:
+                current[part] = {}
+
+            current = current[part]
+
+        current["test"] = test
+
+    report = f"""
+# Tests Report - {tr.project_name}
+
+ID: {tr.id}  
+Status: {tr.status}  
+Tests: {tr.total} total · {tr.passed} passed · {tr.failed} failed · {tr.skipped} skipped  
+Duration: {tr.completed_at - tr.created_at}s  
+Deploy URL: {tr.deploy_base_url}
+
+## Summary
+
+| Status     | Count        |
+|------------|--------------|
+| ✅ Passed  | {tr.passed}  |
+| ❌ Failed  | {tr.failed}  |
+| ⏭️ Skipped | {tr.skipped} |
+
+## Test Results
+
+{render_tree(tree)}
+""".strip()
+
+    return report
+
+
+def render_tree(tree: dict[Any, Any], level: int = 3) -> str:
+    lines: list[str] = []
+
+    for name, children in tree.items():
+
+        child_names = [k for k in children if k != "test"]
+
+        if len(child_names) == 0:
+            lines.append(render_test(children["test"]))
+            continue
+
+        lines.append(f"{"#" * level} {name}")
+        lines.append("")
+
+        lines.append(render_tree(children, level + 1))
+        lines.append("")
+
+        pass
+
+    return "\n".join(lines)
+
+
+def render_test(test: dto.TestResult) -> str:
+    lines: list[str] = []
+
+    def render_details():
+        lines.append(f"""
+Test: {test.name}  
+Output: {test.output}  
+Elapsed: {test.elapsed}s  
+
+**Request**
+
+```http
+{test.request}
+```
+
+**Response**
+
+```http
+{test.response}
+```
+""")
+
+    match test.status.lower():
+        case "passed":
+            lines.append(f"- ✅ {test.description}")
+        case "skipped":
+            lines.append(f"- ⏭️ {test.description}")
+            render_details()
+        case "failed":
+            lines.append(f"- ❌ {test.description}")
+            render_details()
+        case _:
+            pass
+
+    return "\n".join(lines)
